@@ -20,7 +20,8 @@ public class Cell {
 
     public Cell(Point coord) {
         this.coord = coord;
-        this.explored = false; this.virtualWall = false; this.obstacle = false;
+        this.explored = false; this.moveThru = false;
+        this.virtualWall = false; this.obstacle = false;
     }
 
     // Methods

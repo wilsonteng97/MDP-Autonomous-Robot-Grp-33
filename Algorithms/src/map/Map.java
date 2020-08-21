@@ -83,6 +83,13 @@ public class Map extends JPanel {
             }
         }
     } // Reset entire grid to be unexplored with the exception of start & goal zones.
+    public void setAllPassedThru(boolean moveThru) {
+        for (int row = 0; row < grid.length; row++) {
+            for (int col = 0; col < grid[0].length; col++) {
+                grid[row][col].setMoveThru(moveThru);
+            }
+        }
+    }
 
     /**
      * Cell Methods

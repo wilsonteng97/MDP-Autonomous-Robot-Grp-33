@@ -78,17 +78,15 @@ public class AgentSettings {
     }
 
     public static enum Actions {
-        END_EXP, END_FAST,
-        START_EXP, START_FAST,
+        START_EXP, START_FAST, END_EXP, END_FAST,   // Start/End "Exploration"/"Fastest Path" tasks
 
-        FORWARD, BACKWARD,
-        FACE_LEFT, FACE_RIGHT,
-        MOVE_LEFT, MOVE_RIGHT,
-        ALIGN_FRONT, ALIGN_RIGHT,
+        FORWARD, BACKWARD, MOVE_LEFT, MOVE_RIGHT,   // Move with reference to the direction Agent is facing.
+        FACE_LEFT, FACE_RIGHT, FACE_REVERSE,        // Change Direction of Agent
+        ALIGN_FRONT, ALIGN_RIGHT,                   // Calibrate Robot, only used for real runs
 
-        ROBOT_POS,
-        SEND_SENSORS,
+        RESET_ROBOT,                                // Reset Agent, sensors to initial position/direction.
+                                                    // If applicable, reset Waypoint too.
 
-        ERROR;
+        ERROR;                                      // Error
     }
 }

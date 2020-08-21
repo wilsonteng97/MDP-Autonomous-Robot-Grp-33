@@ -61,7 +61,7 @@ public class Sensor {
     public int getBoardX() {
         return SensorBoardPos.x;
     }
-    public void setPos(int col, int row) {
+    public void setSensorBoardPos(int col, int row) {
         this.SensorBoardPos.setLocation(col, row);
     }
     public AgentSettings.Direction getSensorDir() {
