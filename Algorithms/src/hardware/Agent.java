@@ -151,10 +151,7 @@ public class Agent {
 
             case ALIGN_FRONT:
             case ALIGN_RIGHT:
-                align(action); break;
-
-            case SEND_SENSORS:
-                break;
+                calibrate(action); break;
 
             case ERROR:
             default:
@@ -202,7 +199,7 @@ public class Agent {
                 this.agtDir = AgentSettings.Direction.reverse(agtDir); break;
         }
     }
-    public void align(AgentSettings.Actions action) {
+    public void calibrate(AgentSettings.Actions action) {
         switch(action) {
             case ALIGN_FRONT:
             case ALIGN_RIGHT:
