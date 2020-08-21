@@ -33,6 +33,7 @@ public class Agent {
     private AgentSettings.Direction agtDir;
     private AgentSettings.Actions prevAction;
 
+    private ArrayList<Sensor> sensorLst;
     private final Sensor SR1;     // SRFrontLeft
     private final Sensor SR2;     // SRFrontCenter
     private final Sensor SR3;     // SRFrontRight
@@ -44,9 +45,10 @@ public class Agent {
 
     public Agent(int centreY, int centreX, AgentSettings.Direction agtDir, boolean sim) {
         this.ctrY = centreY; this.ctrX = centreX; this.agtDir = agtDir;
+        this.enteredGoal = false;
         this.setSim(sim);
 
-        this.enteredGoal = false;
+        sensorLst = new ArrayList<Sensor>();
 
         // 3 Front SR Sensors same direction (Initialized with respect to Agent's Direction)
         SR1 = new Sensor("SR1", AgentSettings.SHORT_MIN, AgentSettings.SHORT_MAX, ctrY + 1, ctrX + 1,
@@ -65,6 +67,10 @@ public class Agent {
                 referenceAgtDir(AgentSettings.Actions.FACE_RIGHT));
         SR5 = new Sensor("SR5", AgentSettings.SHORT_MIN, AgentSettings.SHORT_MAX, ctrY + 1, ctrX + 1,
                 referenceAgtDir(AgentSettings.Actions.FACE_RIGHT));
+
+        sensorLst.add(SR1); sensorLst.add(SR2); sensorLst.add(SR3);
+        sensorLst.add(LR1);
+        sensorLst.add(SR4); sensorLst.add(SR5);
     }
 
     /**
@@ -116,5 +122,52 @@ public class Agent {
         } else {
             return agtDir;
         }
+    }
+
+    /**
+     * Agent action Methods
+     */
+    public void takeAction(AgentSettings.Actions action, boolean transmitToAndroid) {
+        switch (action) {
+            case FORWARD:
+                break;
+            case FACE_LEFT:
+                break;
+            case FACE_RIGHT:
+                break;
+            case MOVE_LEFT:
+                break;
+            case MOVE_RIGHT:
+                break;
+            case BACKWARD:
+                break;
+            case ALIGN_FRONT:
+                break;
+            case ALIGN_RIGHT:
+                break;
+            case SEND_SENSORS:
+                break;
+            case ERROR:
+                break;
+            case ENDEXP:
+                break;
+            case ENDFAST:
+                break;
+            case ROBOT_POS:
+                break;
+            case START_EXP:
+                break;
+            case START_FAST:
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Network interface with Android Methods
+     */
+    public void transmitAction(AgentSettings.Actions action) {
+        takeAction(action, true);
     }
 }
