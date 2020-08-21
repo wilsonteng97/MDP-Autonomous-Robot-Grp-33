@@ -13,21 +13,21 @@ public class Sensor {
     private int lowerLimit; private int upperLimit;
     private double prevData; private double prevRawData;
 
-    private Point pt;
+    private Point SensorBoardPos; // Sensor position on the Acrylic Board
     private AgentSettings.Direction sensorDir;
 
     public Sensor(String id, int lowerLimit, int upperLimit, int row, int col, AgentSettings.Direction sensorDir) {
         this.id = id;
         this.lowerLimit = lowerLimit;
         this.upperLimit = upperLimit;
-        this.pt = new Point(col, row);
+        this.SensorBoardPos = new Point(col, row);
         this.sensorDir = sensorDir;
         this.prevData = 9;
         this.prevRawData = 99;
     }
 
     public void setSensor(int row, int col, AgentSettings.Direction dir) {
-        this.pt = new Point(col, row);
+        this.SensorBoardPos = new Point(col, row);
         this.sensorDir = dir;
     }
 
@@ -52,17 +52,17 @@ public class Sensor {
 //    public void setMaxRange(int maxRange) {
 //        this.maxRange = maxRange;
 //    }
-    public Point getPt() {
-        return pt;
+    public Point getSensorBoardPos() {
+        return SensorBoardPos;
     }
-    public int getRow() {
-        return pt.y;
+    public int getBoardY() {
+        return SensorBoardPos.y;
     }
-    public int getCol() {
-        return pt.x;
+    public int getBoardX() {
+        return SensorBoardPos.x;
     }
     public void setPos(int col, int row) {
-        this.pt.setLocation(col, row);
+        this.SensorBoardPos.setLocation(col, row);
     }
     public AgentSettings.Direction getSensorDir() {
         return sensorDir;
@@ -92,8 +92,8 @@ public class Sensor {
         // Check if starting point is valid for sensors with lowerRange > 1.
         if (lowerLimit > 1) {
             for (int i = 1; i < this.lowerLimit; i++) {
-                int row = this.getRow() + (rowDisplacement * i);
-                int col = this.getCol() + (colDisplacement * i);
+                int row = this.getBoardY() + (rowDisplacement * i);
+                int col = this.getBoardX() + (colDisplacement * i);
 
                 if (!explorationMap.checkValidCell(row, col) || simMap.getCell(row, col).isObstacle()) {
                     return i;
@@ -102,8 +102,8 @@ public class Sensor {
         }
         // If anything is detected by sensor, return range
         for (int i = this.lowerLimit; i <= this.upperLimit; i++) {
-            int row = this.getRow() + (rowDisplacement * i);
-            int col = this.getCol() + (colDisplacement * i);
+            int row = this.getBoardY() + (rowDisplacement * i);
+            int col = this.getBoardX() + (colDisplacement * i);
 
             if (!explorationMap.checkValidCell(row, col)) {
                 return i;
