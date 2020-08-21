@@ -132,7 +132,7 @@ public class Agent {
     }
 
     /**
-     * Agent action Methods
+     * Flexible agent action Methods
      */
     public void takeAction(AgentSettings.Actions action) {
         switch (action) {
@@ -173,6 +173,9 @@ public class Agent {
         }
     }
 
+    /**
+     * Agent action component Methods
+     */
     public void endTask(AgentSettings.Actions action) {
         switch (action) {
             case END_EXP:
