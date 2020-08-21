@@ -78,7 +78,7 @@ public class AgentSettings {
     }
 
     public static enum Actions {
-        ENDEXP, ENDFAST,
+        END_EXP, END_FAST,
         START_EXP, START_FAST,
 
         FORWARD, BACKWARD,
