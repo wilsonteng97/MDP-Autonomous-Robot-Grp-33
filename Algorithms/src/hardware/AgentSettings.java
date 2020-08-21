@@ -78,6 +78,17 @@ public class AgentSettings {
     }
 
     public static enum Actions {
-        FORWARD, FACE_LEFT, FACE_RIGHT, MOVE_LEFT, MOVE_RIGHT, BACKWARD, ALIGN_FRONT, ALIGN_RIGHT, SEND_SENSORS, ERROR, ENDEXP, ENDFAST, ROBOT_POS, START_EXP, START_FAST;
+        ENDEXP, ENDFAST,
+        START_EXP, START_FAST,
+
+        FORWARD, BACKWARD,
+        FACE_LEFT, FACE_RIGHT,
+        MOVE_LEFT, MOVE_RIGHT,
+        ALIGN_FRONT, ALIGN_RIGHT,
+
+        ROBOT_POS,
+        SEND_SENSORS,
+
+        ERROR;
     }
 }

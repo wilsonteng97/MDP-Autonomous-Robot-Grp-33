@@ -68,6 +68,7 @@ public class Agent {
         SR5 = new Sensor("SR5", AgentSettings.SHORT_MIN, AgentSettings.SHORT_MAX, ctrY + 1, ctrX + 1,
                 referenceAgtDir(AgentSettings.Actions.FACE_RIGHT));
 
+        // Add sensors to SensorLst
         sensorLst.add(SR1); sensorLst.add(SR2); sensorLst.add(SR3);
         sensorLst.add(LR1);
         sensorLst.add(SR4); sensorLst.add(SR5);
@@ -129,36 +130,34 @@ public class Agent {
      */
     public void takeAction(AgentSettings.Actions action, boolean transmitToAndroid) {
         switch (action) {
+            case ENDEXP:
+            case ENDFAST:
+            case START_EXP:
+            case START_FAST:
+                break;
+
             case FORWARD:
-                break;
-            case FACE_LEFT:
-                break;
-            case FACE_RIGHT:
-                break;
-            case MOVE_LEFT:
-                break;
-            case MOVE_RIGHT:
-                break;
             case BACKWARD:
                 break;
-            case ALIGN_FRONT:
+
+            case FACE_LEFT:
+            case FACE_RIGHT:
                 break;
+
+            case MOVE_LEFT:
+            case MOVE_RIGHT:
+                break;
+
+            case ALIGN_FRONT:
             case ALIGN_RIGHT:
+                break;
+
+            case ROBOT_POS:
                 break;
             case SEND_SENSORS:
                 break;
+
             case ERROR:
-                break;
-            case ENDEXP:
-                break;
-            case ENDFAST:
-                break;
-            case ROBOT_POS:
-                break;
-            case START_EXP:
-                break;
-            case START_FAST:
-                break;
             default:
                 break;
         }
