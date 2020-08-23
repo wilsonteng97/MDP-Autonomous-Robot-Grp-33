@@ -4,7 +4,7 @@ public class AgentSettings {
     // G values used for A* algorithm
     public static final int MOVE_COST = 1;
     public static final int TURN_COST = 5;
-    public static final double INFINITE_COST = 10000000;
+    public static final int INFINITE_COST = 10000000;
     //	public static final int CALIBRATE_AFTER = 3; //Calibrate After number of moves
 
     public static final int MOVE_STEPS = 1;
@@ -78,6 +78,44 @@ public class AgentSettings {
     }
 
     public static enum Actions {
-        FORWARD, FACE_LEFT, FACE_RIGHT, MOVE_LEFT, MOVE_RIGHT, BACKWARD, ALIGN_FRONT, ALIGN_RIGHT, SEND_SENSORS, ERROR, ENDEXP, ENDFAST, ROBOT_POS, START_EXP, START_FAST;
+        FORWARD, FACE_LEFT, FACE_RIGHT, MOVE_LEFT, MOVE_RIGHT, BACKWARD, ALIGN_FRONT, ALIGN_RIGHT, SEND_SENSORS, ERROR, ENDEXP, ENDFAST, ROBOT_POS, START_EXP, START_FAST, CALIBRATE;
+
+        public static String print(Actions m) {
+            switch (m) {
+                case FORWARD:
+                    return "F";
+                case BACKWARD:
+                    return "B";
+                case FACE_RIGHT:
+                    return "FR";
+                case MOVE_RIGHT:
+                    return "MR";
+                case FACE_LEFT:
+                    return "FL";
+                case MOVE_LEFT:
+                    return "ML";
+                case START_EXP:
+                    return "START_EXP";
+                case ENDEXP:
+                    return "END_EXP";
+                case ALIGN_FRONT:
+                    return "ALIGN_FRONT";
+                case ALIGN_RIGHT:
+                    return "ALIGN_RIGHT";
+                case ROBOT_POS:
+                    return "ROBOT_POS";
+                case START_FAST:
+                    return "START_FAST";
+                case ENDFAST:
+                    return "END_FAST";
+                case SEND_SENSORS:
+                    return "SEND_SENSORS";
+                case CALIBRATE:
+                    return "C";
+                case ERROR:
+                default:
+                    return "E";
+            }
+        }
     }
 }

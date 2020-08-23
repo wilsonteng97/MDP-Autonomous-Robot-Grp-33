@@ -106,6 +106,9 @@ public class Map extends JPanel {
     public boolean checkValidCell(int row, int col) {
         return row >= 0 && col >= 0 && row < MapSettings.MAP_ROWS && col < MapSettings.MAP_COLS;
     }
+    public boolean isObstacleCell(int row, int col) {
+        return grid[row][col].isObstacle();
+    }
     public boolean checkValidMove(int row, int col) {
         return checkValidCell(row, col) && getCell(row, col).isMovableCell();
     }

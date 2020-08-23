@@ -110,6 +110,13 @@ public class Agent {
     public void setSim(boolean sim) {
         this.sim = sim;
     }
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
+    public int getSpeed() {
+        return this.speed;
+    }
+
 
     /**
      * Change direction Methods
