@@ -25,7 +25,7 @@ public class Map extends JPanel {
     }
 
     public Map(Agent agt) {
-        this.agt = agt;
+        Map.agt = agt;
         grid = new Cell[MapSettings.MAP_ROWS][MapSettings.MAP_COLS];
         detectedImg = new ArrayList<Point>();
         initGrid();
@@ -88,11 +88,7 @@ public class Map extends JPanel {
     public void setAllUnexplored() {
         for (int row = 0; row < grid.length; row++) {
             for (int col = 0; col < grid[0].length; col++) {
-                if (inStartZone(row, col) || inGoalZone(row, col)) {
-                    grid[row][col].setExplored(true);
-                } else {
-                    grid[row][col].setExplored(false);
-                }
+                grid[row][col].setExplored(inStartZone(row, col) || inGoalZone(row, col));
             }
         }
     } // Reset entire grid to be unexplored with the exception of start & goal zones.

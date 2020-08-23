@@ -90,6 +90,6 @@ public class AgentSettings {
         RESET_ROBOT,                                // Reset Agent, sensors to initial position/direction.
                                                     // If applicable, reset Waypoint too.
 
-        ERROR;                                      // Error
+        ERROR                                      // Error
     }
 }

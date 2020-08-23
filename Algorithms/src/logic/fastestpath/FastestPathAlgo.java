@@ -2,7 +2,6 @@ package logic.fastestpath;
 
 import hardware.Agent;
 import map.Map;
-import map.MapSettings;
 
 public class FastestPathAlgo {
 

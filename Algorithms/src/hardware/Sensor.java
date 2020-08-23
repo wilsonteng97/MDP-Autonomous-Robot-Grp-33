@@ -10,7 +10,7 @@ import java.awt.*;
 
 public class Sensor {
     private String id;
-    private int lowerLimit; private int upperLimit;
+    private final int lowerLimit; private final int upperLimit;
     private double prevData; private double prevRawData;
 
     private Point SensorBoardPos; // Sensor position on the Acrylic Board
