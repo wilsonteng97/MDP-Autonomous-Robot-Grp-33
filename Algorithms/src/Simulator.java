@@ -9,6 +9,8 @@ import map.MapSettings;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -110,6 +112,25 @@ public class Simulator {
                     loadMapDialog.setLayout(new FlowLayout());
 
                     final JTextField loadTF = new JTextField(15);
+                    loadTF.addKeyListener(new KeyListener() {
+                        @Override
+                        public void keyTyped(KeyEvent e) {}
+
+                        @Override
+                        public void keyPressed(KeyEvent e) {
+                            if (e.getKeyCode()==KeyEvent.VK_ENTER){
+                                loadMapDialog.setVisible(false);
+                                loadMap(dummyMap, loadTF.getText());
+                                CardLayout cl = ((CardLayout) _mapCards.getLayout());
+                                cl.show(_mapCards, "DUMMY_MAP");
+                                dummyMap.repaint();
+                            }
+                        }
+
+                        @Override
+                        public void keyReleased(KeyEvent e) {}
+                    });
+
                     JButton loadMapButton = new JButton("Load");
 
                     loadMapButton.addMouseListener(new MouseAdapter() {
