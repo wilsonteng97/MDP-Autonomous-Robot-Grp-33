@@ -85,6 +85,14 @@ public class Agent {
     public int getAgtY() {
         return ctrY;
     }
+    public void setAgtCtrCoord(int row, int col) {
+        int xDispl = ctrX - col; int yDispl = ctrY - row;
+        this.ctrY = row; this.ctrX = col;
+        for (Sensor s : sensorLst) {
+            s.setSensorBoardPos(s.getBoardX() + xDispl, s.getBoardY() + yDispl);
+        }
+
+    }
     public void setAgtCtrCoord(Point newCentrePt) {
         int xDispl = ctrX - newCentrePt.x; int yDispl = ctrY - newCentrePt.y;
         this.ctrY = newCentrePt.y; this.ctrX = newCentrePt.x;

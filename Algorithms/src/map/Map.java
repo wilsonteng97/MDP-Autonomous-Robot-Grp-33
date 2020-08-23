@@ -191,6 +191,14 @@ public class Map extends JPanel {
             }
         }
     }
+    public boolean isMapExplored() {
+        for (int row = 0; row < MapSettings.MAP_ROWS; row++) {
+            for (int col = 0; col < MapSettings.MAP_COLS; col++) {
+                if (!this.getCell(row, col).isExplored()) return false;
+            }
+        }
+        return true;
+    }
 //    public boolean checkCanMoveThruCell(int row, int col) {
 //        for(int r = row-1; r <= row+1; r++) {
 //            for(int c = col-1; c <= col+1; c++) {
