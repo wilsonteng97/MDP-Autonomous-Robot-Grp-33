@@ -224,6 +224,33 @@ public class Agent {
     }
 
     /**
+     * Agent environment sensing Method
+     * (with the help of sensors)
+     */
+    public void senseEnv(Map explorationMap, Map map) {
+        int[] result = new int[sensorLst.size()];
+        int sensorCount = 0;
+
+        if (sim) {
+            for (Sensor s : sensorLst) {
+                result[sensorCount] = s.simDetect(explorationMap, map);
+                sensorCount++;
+            }
+        } else {
+            // Get Sensor readings from Network Manager.
+        }
+
+        sensorCount = 0;
+        for (Sensor s : sensorLst) {
+            s.realDetect(explorationMap, result[sensorCount]);
+            sensorCount++;
+        }
+
+//        String[] mapStrings = MapDescriptor.generateMapDescriptor(explorationMap);
+//        comm.sendMsg(mapStrings[0] + " " + mapStrings[1], CommMgr.MAP_STRINGS);
+    }
+
+    /**
      * !FIXME For real run, Network interface with Android Methods
      */
     public void transmitAction(AgentSettings.Actions action) {

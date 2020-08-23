@@ -1,10 +1,13 @@
 package hardware;
 
 public class AgentSettings {
+    // Agent Start Direction
+    public static final Direction START_DIR = Direction.NORTH;
+
     // G values used for A* algorithm
     public static final int MOVE_COST = 1;
     public static final int TURN_COST = 5;
-    public static final double INFINITE_COST = 10000000;
+    public static final double INFINITE_COST = 99999;
     //	public static final int CALIBRATE_AFTER = 3; //Calibrate After number of moves
 
     public static final int MOVE_STEPS = 1;

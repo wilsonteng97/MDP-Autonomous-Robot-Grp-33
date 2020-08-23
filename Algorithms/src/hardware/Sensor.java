@@ -70,6 +70,18 @@ public class Sensor {
     public void setSensorDir(AgentSettings.Direction sensorDir) {
         this.sensorDir = sensorDir;
     }
+    public double getPrevData() {
+        return prevData;
+    }
+    public void setPrevData(double prevData) {
+        this.prevData = prevData;
+    }
+    public double getPrevRawData() {
+        return prevRawData;
+    }
+    public void setPrevRawData(double prevRawData) {
+        this.prevRawData = prevRawData;
+    }
 
     /**
      * Simulation detection Methods
@@ -119,12 +131,54 @@ public class Sensor {
     }
 
     /**
-     * !FIXME :Real detection Methods
+     * Real detection Methods
      */
-    public int realDetect(Map explorationMap, int sensorVal) {
-        return detectObstacle(explorationMap, 0, 0, 0);
+    public void realDetect(Map explorationMap, int sensorVal) {
+        switch (sensorDir) {
+            case NORTH:
+                detectObstacle(explorationMap, sensorVal, 1, 0);
+            case EAST:
+                detectObstacle(explorationMap, sensorVal, 0, 1);
+            case SOUTH:
+                detectObstacle(explorationMap, sensorVal, -1, 0);
+            case WEST:
+                detectObstacle(explorationMap, sensorVal, 0, -1);
+        }
     }
-    public int detectObstacle(Map explorationMap, int sensorVal, int rowDisplacement, int colDisplacement) {
-        return -1;
+    public void detectObstacle(Map explorationMap, int sensorVal, int rowDispl, int colDispl) {
+        if (sensorVal == 0) return;  // return value for LR sensor if obstacle before lowerRange
+
+        // If above fails, check if starting point is valid for sensors with lowerRange > 1.
+        for (int i = 1; i < this.lowerLimit; i++) {
+            int row = this.getBoardY() + (rowDispl * i);
+            int col = this.getBoardX() + (colDispl * i);
+
+            if (!explorationMap.checkValidCell(row, col)) return;
+            if (explorationMap.getCell(row, col).isObstacle()) return;
+        }
+
+        // Update map according to sensor's value.
+        for (int i = this.lowerLimit; i <= this.upperLimit; i++) {
+            int row = this.getBoardY() + (rowDispl * i);
+            int col = this.getBoardX() + (colDispl * i);
+
+            if (!explorationMap.checkValidCell(row, col)) continue;
+
+            explorationMap.getCell(row, col).setExplored(true);
+
+            if (sensorVal == i) {
+                explorationMap.createVirtualWalls(row, col);
+                break;
+            }
+
+            // Override previous obstacle value if front sensors detect no obstacle.
+            if (explorationMap.getCell(row, col).isObstacle()) {
+                if (id.equals("SR1") || id.equals("SR2") || id.equals("SR3")) {
+                    explorationMap.getCell(row, col).setVirtualWall(false);
+                } else {
+                    break;
+                }
+            }
+        }
     }
 }

@@ -18,8 +18,14 @@ public class Map extends JPanel {
     private static Agent agt;
     private ArrayList<Point> detectedImg;
 
-    public Map(Agent agent) {
-        this.agt = agent;
+    public Map() {
+        grid = new Cell[MapSettings.MAP_ROWS][MapSettings.MAP_COLS];
+        detectedImg = new ArrayList<Point>();
+        initGrid();
+    }
+
+    public Map(Agent agt) {
+        this.agt = agt;
         grid = new Cell[MapSettings.MAP_ROWS][MapSettings.MAP_COLS];
         detectedImg = new ArrayList<Point>();
         initGrid();
@@ -28,6 +34,12 @@ public class Map extends JPanel {
     /**
      * Init Map Methods
      */
+    public void setAgt(Agent agt) {
+        this.agt = agt;
+    }
+    public Agent getAgt() {
+        return this.agt;
+    }
     private void initGrid() {
         for (int row = 0; row < MapSettings.MAP_ROWS; row++) {
             for (int col = 0; col < MapSettings.MAP_COLS; col++) {
@@ -37,13 +49,14 @@ public class Map extends JPanel {
             }
         }
     }
-    private void createVirtualWalls(int row, int col) {
+    public void createVirtualWalls(int row, int col) {
         // Set true walls
-        if ((row == 0) || (row == MapSettings.MAP_ROWS - 1) || (col == 0) || (col != MapSettings.MAP_COLS - 1)) {
+        if ((row == 0) || (row == MapSettings.MAP_ROWS - 1) || (col == 0) || (col == MapSettings.MAP_COLS - 1)) {
             grid[row][col].setVirtualWall(true);
         }
         // Set obstacle virtual walls
         if (grid[row][col].isObstacle()) {
+            if (inStartZone(row, col) || inGoalZone(row, col)) return;
             for (int r = row - 1; r <= row + 1; r++)
                 for (int c = col - 1; c <= col + 1; c++)
                     if (checkValidCell(r, c))
@@ -171,6 +184,13 @@ public class Map extends JPanel {
         }
         return true;
     }
+    public void recreateVirtualWalls() {
+        for (int row = 0; row < MapSettings.MAP_ROWS; row++) {
+            for (int col = 0; col < MapSettings.MAP_COLS; col++) {
+                createVirtualWalls(row, col); // Create Virtual Wall
+            }
+        }
+    }
 //    public boolean checkCanMoveThruCell(int row, int col) {
 //        for(int r = row-1; r <= row+1; r++) {
 //            for(int c = col-1; c <= col+1; c++) {
@@ -186,6 +206,7 @@ public class Map extends JPanel {
      * @author Suyash Lakhotia
      */
     public void paintComponent(Graphics g) {
+        super.paintComponent(g);
         // Create a two-dimensional array of _DisplayCell objects for rendering.
         _DisplayCell[][] _mapCells = new _DisplayCell[MapSettings.MAP_ROWS][MapSettings.MAP_COLS];
         for (int mapRow = 0; mapRow < MapSettings.MAP_ROWS; mapRow++) {
@@ -240,6 +261,7 @@ public class Map extends JPanel {
                 g.fillOval(c * GraphicsSettings.CELL_SIZE - 15 + GraphicsSettings.MAP_X_OFFSET, GraphicsSettings.MAP_H - r * GraphicsSettings.CELL_SIZE + 10, GraphicsSettings.ROBOT_DIR_W, GraphicsSettings.ROBOT_DIR_H);
                 break;
         }
+        setBackground(GraphicsSettings.C_BACKGROUND);
     }
 
     private class _DisplayCell {
