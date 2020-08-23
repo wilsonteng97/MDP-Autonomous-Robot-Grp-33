@@ -39,7 +39,7 @@ public class Map extends JPanel {
     }
     private void createVirtualWalls(int row, int col) {
         // Set true walls
-        if ((row == 0) || (row == MapSettings.MAP_ROWS - 1) || (col == 0) || (col != MapSettings.MAP_COLS - 1)) {
+        if ((row == 0) || (row == MapSettings.MAP_ROWS - 1) || (col == 0) || (col == MapSettings.MAP_COLS - 1)) {
             grid[row][col].setVirtualWall(true);
         }
         // Set obstacle virtual walls
