@@ -15,7 +15,7 @@ import java.util.Stack;
 
 
 
-public class AStarHeuristicSearch {
+public class AStarHeuristicSearch extends FastestPathAlgo {
     private ArrayList<Cell> toVisit;        // array of Cells to be visited
     private ArrayList<Cell> visited;        // array of visited Cells
     private HashMap<Cell, Cell> parents;    // HashMap of Child --> Parent
@@ -30,11 +30,13 @@ public class AStarHeuristicSearch {
     private boolean explorationMode;
 
     public AStarHeuristicSearch(Map exploredMap, Agent bot) {
+        super(exploredMap, bot);
         this.realMap = null;
         initObject(exploredMap, bot);
     }
 
     public AStarHeuristicSearch(Map exploredMap, Agent bot, Map realMap) {
+        super(exploredMap, bot);
         this.realMap = realMap;
         this.explorationMode = true;
         initObject(exploredMap, bot);
@@ -298,7 +300,7 @@ public class AStarHeuristicSearch {
 
             System.out.println("Movement " + Actions.print(m) + " from (" + tempBot.getAgtX() + ", " + tempBot.getAgtY() + ") to (" + temp.getX() + ", " + temp.getY() + ")");
 
-            tempBot.takeAction(m, false);
+            tempBot.takeAction(m);
             movements.add(m);
             outputString.append(Actions.print(m));
         }
@@ -312,7 +314,7 @@ public class AStarHeuristicSearch {
                     }
                 }
 
-                bot.takeAction(x, false);
+                bot.takeAction(x);
                 this.exploredMap.repaint();
 
                 // During exploration, use sensor data to update exploredMap.
