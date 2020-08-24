@@ -1,6 +1,9 @@
 package hardware;
 
 public class AgentSettings {
+    // Agent Start Direction
+    public static final Direction START_DIR = Direction.NORTH;
+
     // G values used for A* algorithm
     public static final int MOVE_COST = 1;
     public static final int TURN_COST = 5;
@@ -78,9 +81,19 @@ public class AgentSettings {
     }
 
     public static enum Actions {
-        FORWARD, FACE_LEFT, FACE_RIGHT, MOVE_LEFT, MOVE_RIGHT, BACKWARD, ALIGN_FRONT, ALIGN_RIGHT, SEND_SENSORS, ERROR, ENDEXP, ENDFAST, ROBOT_POS, START_EXP, START_FAST, CALIBRATE;
 
-        public static String print(Actions m) {
+        START_EXP, START_FAST, END_EXP, END_FAST,   // Start/End "Exploration"/"Fastest Path" tasks
+
+        FORWARD, BACKWARD, MOVE_LEFT, MOVE_RIGHT,   // Move with reference to the direction Agent is facing.
+        FACE_LEFT, FACE_RIGHT, FACE_REVERSE,        // Change Direction of Agent
+        ALIGN_FRONT, ALIGN_RIGHT,                   // Calibrate Robot, only used for real runs
+
+        RESET_ROBOT,                                // Reset Agent, sensors to initial position/direction.
+                                                    // If applicable, reset Waypoint too.
+
+        ERROR;                                      // Error
+          
+          public static String print(Actions m) {
             switch (m) {
                 case FORWARD:
                     return "F";

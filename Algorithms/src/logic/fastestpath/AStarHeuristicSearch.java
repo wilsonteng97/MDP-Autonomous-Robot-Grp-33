@@ -464,6 +464,15 @@ public class AStarHeuristicSearch {
 
         System.out.println("\n");
     }
+// import hardware.Agent;
+// import map.Map;
+
+// public class AStarHeuristicSearch extends FastestPathAlgo {
+
+//     public AStarHeuristicSearch(Map map, Agent agt) {
+//         super(map, agt);
+//     }
+
 
     /**
      * Prints all the current g(n) values for the cells.

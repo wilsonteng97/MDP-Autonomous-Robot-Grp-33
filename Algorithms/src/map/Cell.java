@@ -1,6 +1,6 @@
 package map;
 
-import java.awt.Point;
+import java.awt.*;
 
 /**
  * @author Wilson Thurman Teng
@@ -20,7 +20,8 @@ public class Cell {
 
     public Cell(Point coord) {
         this.coord = coord;
-        this.explored = false; this.virtualWall = false; this.obstacle = false;
+        this.explored = false; this.moveThru = false;
+        this.virtualWall = false; this.obstacle = false;
     }
 
     // Methods
@@ -70,7 +71,6 @@ public class Cell {
     public void setVirtualWall(boolean virtualWall) {
         this.virtualWall = virtualWall;
     }
-
     public boolean isWayPoint() {
         return isWayPoint;
     }

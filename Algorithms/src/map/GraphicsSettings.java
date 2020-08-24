@@ -2,15 +2,15 @@ package map;
 
 import java.awt.*;
 
-class GraphicsSettings {
+public class GraphicsSettings {
     public static final int CELL_LINE_WEIGHT = 2;
 
-    public static final Color C_BACKGROUND = Color.BLACK;
+    public static final Color C_BACKGROUND = Color.DARK_GRAY;
     public static final Color C_START = Color.CYAN;
     public static final Color C_GOAL = Color.GREEN;
+    public static final Color C_FREE = Color.LIGHT_GRAY;
     public static final Color C_UNEXPLORED = Color.GRAY;
-    public static final Color C_FREE = Color.WHITE;
-    public static final Color C_OBSTACLE = Color.DARK_GRAY;
+    public static final Color C_OBSTACLE = Color.BLACK;
 
     public static final Color C_ROBOT = Color.PINK;
     public static final Color C_ROBOT_DIR = Color.RED;

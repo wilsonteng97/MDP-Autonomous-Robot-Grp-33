@@ -1,5 +1,7 @@
 package hardware;
 
+import map.Map;
+
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -68,6 +70,7 @@ public class Agent {
         SR5 = new Sensor("SR5", AgentSettings.SHORT_MIN, AgentSettings.SHORT_MAX, ctrY + 1, ctrX + 1,
                 referenceAgtDir(AgentSettings.Actions.FACE_RIGHT));
 
+        // Add sensors to SensorLst
         sensorLst.add(SR1); sensorLst.add(SR2); sensorLst.add(SR3);
         sensorLst.add(LR1);
         sensorLst.add(SR4); sensorLst.add(SR5);
@@ -82,9 +85,21 @@ public class Agent {
     public int getAgtY() {
         return ctrY;
     }
-    public void setAgtCtrCoord(Point centrePt) {
-        this.ctrY = centrePt.y;
-        this.ctrX = centrePt.x;
+    public void setAgtCtrCoord(int row, int col) {
+        int xDispl = ctrX - col; int yDispl = ctrY - row;
+        this.ctrY = row; this.ctrX = col;
+        for (Sensor s : sensorLst) {
+            s.setSensorBoardPos(s.getBoardX() + xDispl, s.getBoardY() + yDispl);
+        }
+
+    }
+    public void setAgtCtrCoord(Point newCentrePt) {
+        int xDispl = ctrX - newCentrePt.x; int yDispl = ctrY - newCentrePt.y;
+        this.ctrY = newCentrePt.y; this.ctrX = newCentrePt.x;
+        for (Sensor s : sensorLst) {
+            s.setSensorBoardPos(s.getBoardX() + xDispl, s.getBoardY() + yDispl);
+        }
+
     }
     public AgentSettings.Direction getAgtDir() {
         return agtDir;
@@ -132,49 +147,128 @@ public class Agent {
     }
 
     /**
-     * Agent action Methods
+     * Flexible agent action Methods
      */
-    public void takeAction(AgentSettings.Actions action, boolean transmitToAndroid) {
+    public void takeAction(AgentSettings.Actions action) {
+        switch (action) {
+            case END_EXP:
+            case END_FAST:
+                endTask(action); break;
+
+            case START_EXP:
+            case START_FAST:
+                startTask(action); break;
+
+            case FACE_LEFT:
+            case FACE_RIGHT:
+            case FACE_REVERSE:
+                changeDir(action); break;
+
+            case ALIGN_FRONT:
+            case ALIGN_RIGHT:
+                calibrate(action); break;
+
+            case ERROR:
+            default:
+                break;
+        }
+    }
+
+    public void takeAction(AgentSettings.Actions action, int steps, Map explorationMap) {
         switch (action) {
             case FORWARD:
-                break;
-            case FACE_LEFT:
-                break;
-            case FACE_RIGHT:
-                break;
-            case MOVE_LEFT:
-                break;
-            case MOVE_RIGHT:
-                break;
             case BACKWARD:
-                break;
-            case ALIGN_FRONT:
-                break;
-            case ALIGN_RIGHT:
-                break;
-            case SEND_SENSORS:
-                break;
+            case MOVE_LEFT:
+            case MOVE_RIGHT:
+                move(action, steps, explorationMap); break;
+
             case ERROR:
-                break;
-            case ENDEXP:
-                break;
-            case ENDFAST:
-                break;
-            case ROBOT_POS:
-                break;
-            case START_EXP:
-                break;
-            case START_FAST:
-                break;
             default:
                 break;
         }
     }
 
     /**
-     * Network interface with Android Methods
+     * Agent action component Methods
+     */
+    public void endTask(AgentSettings.Actions action) {
+        switch (action) {
+            case END_EXP:
+                break;
+            case END_FAST:
+                break;
+        }
+    }
+    public void startTask(AgentSettings.Actions action) {
+        switch (action) {
+            case START_EXP:
+                break;
+            case START_FAST:
+                break;
+        }
+    }
+    public void changeDir(AgentSettings.Actions action) {
+        switch (action) {
+            case FACE_LEFT:
+                this.agtDir = AgentSettings.Direction.antiClockwise90(agtDir); break;
+            case FACE_RIGHT:
+                this.agtDir = AgentSettings.Direction.clockwise90(agtDir); break;
+            case FACE_REVERSE:
+                this.agtDir = AgentSettings.Direction.reverse(agtDir); break;
+        }
+    }
+    public void calibrate(AgentSettings.Actions action) {
+        switch(action) {
+            case ALIGN_FRONT:
+            case ALIGN_RIGHT:
+                break;
+        }
+    }
+
+    public void move(AgentSettings.Actions action, int steps, Map explorationMap) {
+        switch (action) {
+            case FORWARD:
+                break;
+            case BACKWARD:
+                break;
+            case MOVE_LEFT:
+                break;
+            case MOVE_RIGHT:
+                break;
+        }
+    }
+
+    /**
+     * Agent environment sensing Method
+     * (with the help of sensors)
+     */
+    public void senseEnv(Map explorationMap, Map map) {
+        int[] result = new int[sensorLst.size()];
+        int sensorCount = 0;
+
+        if (sim) {
+            for (Sensor s : sensorLst) {
+                result[sensorCount] = s.simDetect(explorationMap, map);
+                sensorCount++;
+            }
+        } else {
+            // Get Sensor readings from Network Manager.
+        }
+
+        sensorCount = 0;
+        for (Sensor s : sensorLst) {
+            s.realDetect(explorationMap, result[sensorCount]);
+            sensorCount++;
+        }
+
+//        String[] mapStrings = MapDescriptor.generateMapDescriptor(explorationMap);
+//        comm.sendMsg(mapStrings[0] + " " + mapStrings[1], CommMgr.MAP_STRINGS);
+    }
+
+    /**
+     * !FIXME For real run, Network interface with Android Methods
      */
     public void transmitAction(AgentSettings.Actions action) {
-        takeAction(action, true);
+        takeAction(action);
     }
 }
