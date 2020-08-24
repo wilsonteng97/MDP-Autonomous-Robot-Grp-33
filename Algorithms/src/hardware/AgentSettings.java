@@ -109,22 +109,12 @@ public class AgentSettings {
                     return "ML";
                 case START_EXP:
                     return "START_EXP";
-                case ENDEXP:
-                    return "END_EXP";
                 case ALIGN_FRONT:
                     return "ALIGN_FRONT";
                 case ALIGN_RIGHT:
                     return "ALIGN_RIGHT";
-                case ROBOT_POS:
-                    return "ROBOT_POS";
                 case START_FAST:
                     return "START_FAST";
-                case ENDFAST:
-                    return "END_FAST";
-                case SEND_SENSORS:
-                    return "SEND_SENSORS";
-                case CALIBRATE:
-                    return "C";
                 case ERROR:
                 default:
                     return "E";

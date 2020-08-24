@@ -9,7 +9,7 @@ import map.Cell;
 import hardware.AgentSettings.Actions;
 import hardware.AgentSettings.Direction;
 
-public class RightWallHugging {
+public class RightWallHugging extends ExplorationAlgo {
     private final Map exploredMap;
     private final Map realMap;
     private final Agent bot;
@@ -20,6 +20,7 @@ public class RightWallHugging {
     private long endTime;   // in millisecond
 
     public RightWallHugging(Map exploredMap, Map realMap, Agent bot, int coverageLimit, int timeLimit) {
+        super(exploredMap, realMap, bot, coverageLimit, timeLimit);
         this.exploredMap = exploredMap;
         this.realMap = realMap;
         this.bot = bot;
@@ -251,7 +252,7 @@ public class RightWallHugging {
      * Moves the bot, repaints the map and calls senseAndRepaint().
      */
     private void moveBot(Actions m) {
-        bot.takeAction(m, false);
+        bot.takeAction(m);
         exploredMap.repaint();
 
         // TODO calibration
@@ -283,21 +284,20 @@ public class RightWallHugging {
 //            calibrationMode = false;
 //        }
     }
-
-    // TODO
-    /**
-     * Sets the bot's sensors, processes the sensor data and repaints the map.
-     */
+        // TODO
+        /**
+         * Sets the bot's sensors, processes the sensor data and repaints the map.
+         */
 //    private void senseAndRepaint() {
 //        bot.setSensors();
 //        bot.sense(exploredMap, realMap);
 //        exploredMap.repaint();
 //    }
 
-    // TODO
-    /**
-     * Checks if the robot can calibrate at its current position given a direction.
-     */
+        // TODO
+        /**
+         * Checks if the robot can calibrate at its current position given a direction.
+         */
 //    private boolean canCalibrateOnTheSpot(Direction botDir) {
 //        int row = bot.getRobotPosRow();
 //        int col = bot.getRobotPosCol();
@@ -316,10 +316,10 @@ public class RightWallHugging {
 //        return false;
 //    }
 
-    // TODO
-    /**
-     * Returns a possible direction for robot calibration or null, otherwise.
-     */
+        // TODO
+        /**
+         * Returns a possible direction for robot calibration or null, otherwise.
+         */
 //    private Direction getCalibrationDirection() {
 //        DIRECTION origDir = bot.getRobotCurDir();
 //        DIRECTION dirToCheck;
@@ -336,11 +336,11 @@ public class RightWallHugging {
 //        return null;
 //    }
 
-    // TODO
-    /**
-     * Turns the bot in the needed direction and sends the CALIBRATE movement. Once calibrated, the bot is turned back
-     * to its original direction.
-     */
+        // TODO
+        /**
+         * Turns the bot in the needed direction and sends the CALIBRATE movement. Once calibrated, the bot is turned back
+         * to its original direction.
+         */
 //    private void calibrateBot(Direction targetDir) {
 //        DIRECTION origDir = bot.getRobotCurDir();
 //
@@ -349,10 +349,10 @@ public class RightWallHugging {
 //        turnBotDirection(origDir);
 //    }
 
-    // TODO
-    /**
-     * Turns the robot to the required direction.
-     */
+        // TODO
+        /**
+         * Turns the robot to the required direction.
+         */
 //    private void turnBotDirection(Direction targetDir) {
 //        int numOfTurn = Math.abs(bot.getRobotCurDir().ordinal() - targetDir.ordinal());
 //        if (numOfTurn > 2) numOfTurn = numOfTurn % 2;
@@ -368,15 +368,4 @@ public class RightWallHugging {
 //            moveBot(MOVEMENT.RIGHT);
 //        }
 //    }
-
-    /**
-     * Helper functions made for algo testing
-     */
-
-
-
-// public class RightWallHugging extends ExplorationAlgo {
-//     public RightWallHugging(Map explorationMap, Map dummyMap, Agent agt, int coverageLimit, int timeLimit) {
-//         super(explorationMap, dummyMap, agt, coverageLimit, timeLimit);
-//     }
-// }
+}
