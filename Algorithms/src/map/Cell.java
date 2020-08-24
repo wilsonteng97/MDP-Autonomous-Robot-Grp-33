@@ -48,6 +48,8 @@ public class Cell {
     public Point getCoord() {
         return coord;
     }
+    public int getX() { return (int)coord.getX(); } // return coord[0] in integer
+    public int getY() { return (int)coord.getY(); } // return coord[1] in integer
     public void setCoord(Point coord) {
         this.coord = coord;
     }
