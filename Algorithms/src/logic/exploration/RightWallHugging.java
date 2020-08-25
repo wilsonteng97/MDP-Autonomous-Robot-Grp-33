@@ -255,6 +255,7 @@ public class RightWallHugging extends ExplorationAlgo {
      */
     private void moveBot(Actions m) {
         bot.takeAction(m, 1, exploredMap);
+        System.out.println("Action: " + m);
         exploredMap.repaint();
 
         // TODO calibration
