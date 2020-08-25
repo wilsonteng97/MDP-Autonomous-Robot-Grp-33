@@ -1,10 +1,9 @@
 # Image Processing Server 
 
 ## Prerequisites
-###  Ensure VirtualEnv is installed 
-`pip install virtualen`
+Ensure VirtualEnv is Installed 
+`pip install virtualenv`
 ## Set Up
-
 - change directory to 'image_processing_server': `cd ImageProcessingServer`
 - create a new virtual environment named 'venv' in the 'image_processing_server' directory: `python -m venv venv` (or `python3 -m venv venv --python=python3.7.4` if your python version is different)
 - activate the virtual environment: `source venv/bin/activate`
