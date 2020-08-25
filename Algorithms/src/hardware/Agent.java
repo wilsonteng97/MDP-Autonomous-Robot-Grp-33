@@ -4,6 +4,7 @@ import map.Map;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Represents the Agent moving on the map.
@@ -226,16 +227,59 @@ public class Agent {
     }
 
     public void move(AgentSettings.Actions action, int steps, Map explorationMap) {
+        if (sim) {
+            // Emulate real movement by pausing execution.
+            try {
+                TimeUnit.MILLISECONDS.sleep(speed);
+            } catch (InterruptedException e) {
+                System.out.println("Something went wrong in Robot.move()!");
+            }
+        }
+
         switch (action) {
             case FORWARD:
+                switch (agtDir) {
+                    case NORTH:
+                        ctrX += steps;
+                        break;
+                    case EAST:
+                        ctrY += steps;
+                        break;
+                    case SOUTH:
+                        ctrX -= steps;
+                        break;
+                    case WEST:
+                        ctrY -= steps;
+                        break;
+                }
                 break;
             case BACKWARD:
+                switch (agtDir) {
+                    case NORTH:
+                        ctrX -= steps;
+                        break;
+                    case EAST:
+                        ctrY -= steps;
+                        break;
+                    case SOUTH:
+                        ctrX += steps;
+                        break;
+                    case WEST:
+                        ctrY += steps;
+                        break;
+                }
                 break;
-            case MOVE_LEFT:
+            case FACE_RIGHT:
+            case FACE_LEFT:
+                changeDir(action);
                 break;
-            case MOVE_RIGHT:
+            default:
+                System.out.println("Error in Agent.move()!");
                 break;
         }
+
+        // TODO real bot: send movement
+        if (!sim) {}
     }
 
     /**
@@ -265,6 +309,22 @@ public class Agent {
 //        comm.sendMsg(mapStrings[0] + " " + mapStrings[1], CommMgr.MAP_STRINGS);
     }
 
+    /**
+     * Sets the sensors' position and direction values according to the robot's current position and direction.
+     */
+    public void setSensors() {
+        switch (agtDir) {
+            case NORTH:
+                break;
+            case EAST:
+                break;
+            case SOUTH:
+                break;
+            case WEST:
+                break;
+        }
+
+    }
     /**
      * !FIXME For real run, Network interface with Android Methods
      */

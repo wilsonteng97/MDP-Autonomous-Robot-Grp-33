@@ -206,7 +206,7 @@ public class Simulator {
                     // Transmit signal to start Agent
                 }
 
-                exploration.run();
+                ((RightWallHugging) exploration).runExploration();
 
                 if (!sim) {
                     new FastestPath().execute();

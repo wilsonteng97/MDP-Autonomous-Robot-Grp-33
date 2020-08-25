@@ -1,13 +1,12 @@
 package logic.exploration;
 
 import hardware.Agent;
-import hardware.AgentSettings;
-import logic.TestMap;
 import map.Map;
 import map.MapSettings;
 import map.Cell;
 import hardware.AgentSettings.Actions;
-import hardware.AgentSettings.Direction;
+
+import java.util.Scanner;
 
 public class RightWallHugging extends ExplorationAlgo {
     private final Map exploredMap;
@@ -29,7 +28,7 @@ public class RightWallHugging extends ExplorationAlgo {
     }
 
     public void runExploration() {
-        // TODO check for real bot connection
+        // FIXME check for real bot connection
 //        if (bot.getRealBot()) {
 //            System.out.println("Starting calibration...");
 //
@@ -74,6 +73,7 @@ public class RightWallHugging extends ExplorationAlgo {
 //            CommMgr.getCommMgr().sendMsg(null, CommMgr.BOT_START);
 //        }
 //        senseAndRepaint();
+        exploredMap.repaint();
     }
 
     /**
@@ -94,6 +94,8 @@ public class RightWallHugging extends ExplorationAlgo {
                     break;
                 }
             }
+            Scanner scanner = new Scanner(System.in);
+            scanner.nextLine();
         } while (areaExplored <= coverageLimit && System.currentTimeMillis() <= endTime);
 
         goHome();
@@ -252,7 +254,7 @@ public class RightWallHugging extends ExplorationAlgo {
      * Moves the bot, repaints the map and calls senseAndRepaint().
      */
     private void moveBot(Actions m) {
-        bot.takeAction(m);
+        bot.takeAction(m, 1, exploredMap);
         exploredMap.repaint();
 
         // TODO calibration
@@ -288,11 +290,11 @@ public class RightWallHugging extends ExplorationAlgo {
         /**
          * Sets the bot's sensors, processes the sensor data and repaints the map.
          */
-//    private void senseAndRepaint() {
+    private void senseAndRepaint() {
 //        bot.setSensors();
-//        bot.sense(exploredMap, realMap);
-//        exploredMap.repaint();
-//    }
+        bot.senseEnv(exploredMap, realMap);
+        exploredMap.repaint();
+    }
 
         // TODO
         /**
