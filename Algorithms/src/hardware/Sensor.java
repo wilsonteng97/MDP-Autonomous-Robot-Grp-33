@@ -55,14 +55,14 @@ public class Sensor {
     public Point getSensorBoardPos() {
         return SensorBoardPos;
     }
+    public void setSensorBoardPos(int col, int row) {
+        this.SensorBoardPos.setLocation(col, row);
+    }
     public int getBoardY() {
         return SensorBoardPos.y;
     }
     public int getBoardX() {
         return SensorBoardPos.x;
-    }
-    public void setSensorBoardPos(int col, int row) {
-        this.SensorBoardPos.setLocation(col, row);
     }
     public AgentSettings.Direction getSensorDir() {
         return sensorDir;

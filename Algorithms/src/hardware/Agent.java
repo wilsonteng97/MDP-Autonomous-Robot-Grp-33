@@ -12,13 +12,14 @@ import java.util.concurrent.TimeUnit;
  * ============ Limitations ============
  * 5 Short Range IR Sensors, 2 Long Range IR Sensors, 2 Ultrasonic Sensors
  *
- * ========== Sensor Positions ==========
- *            ^   ^   ^
- *           SR1 SR2 SR3
- *   <<< LR1 [X] [X] [X] SR4 >
- *           [X] [X] [X]
- *           [X] [X] [X] SR5 >
+ * ========== Sensor Positions (Assuming robot faces NORTH) ==========
+ *             ^     ^     ^
+ *            SR1   SR2   SR3
+ *   <<< LR1 [20]  [21]  [22] SR4 >
+ *           [10]  [11]  [12]
+ *           [00]  [01]  [02] SR5 >
  *
+ * [01] represents position at 0 row, 1 col
  * SR = Short Range Sensor, LR = Long Range Sensor, US = Ultrasonic Sensor
  *
  * @author Wilson Thurman Teng
@@ -49,16 +50,17 @@ public class Agent {
     public Agent(int centreY, int centreX, AgentSettings.Direction agtDir, boolean sim) {
         this.ctrY = centreY; this.ctrX = centreX; this.agtDir = agtDir;
         this.enteredGoal = false;
+        this.speed = AgentSettings.SPEED;
         this.setSim(sim);
 
         sensorLst = new ArrayList<Sensor>();
 
         // 3 Front SR Sensors same direction (Initialized with respect to Agent's Direction)
-        SR1 = new Sensor("SR1", AgentSettings.SHORT_MIN, AgentSettings.SHORT_MAX, ctrY + 1, ctrX + 1,
+        SR1 = new Sensor("SR1", AgentSettings.SHORT_MIN, AgentSettings.SHORT_MAX, ctrY + 1, ctrX - 1,
                 this.agtDir);
         SR2 = new Sensor("SR2", AgentSettings.SHORT_MIN, AgentSettings.SHORT_MAX, ctrY + 1, ctrX,
                 this.agtDir);
-        SR3 = new Sensor("SR3", AgentSettings.SHORT_MIN, AgentSettings.SHORT_MAX, ctrY + 1, ctrX - 1,
+        SR3 = new Sensor("SR3", AgentSettings.SHORT_MIN, AgentSettings.SHORT_MAX, ctrY + 1, ctrX + 1,
                 this.agtDir);
 
         // 1 Top Left LR Sensor
@@ -66,9 +68,9 @@ public class Agent {
                 referenceAgtDir(AgentSettings.Actions.FACE_LEFT));
 
         // 2 Right SR Sensors, 1 Top & 1 Bottom
-        SR4 = new Sensor("SR4", AgentSettings.SHORT_MIN, AgentSettings.SHORT_MAX, ctrY - 1, ctrX + 1,
+        SR4 = new Sensor("SR4", AgentSettings.SHORT_MIN, AgentSettings.SHORT_MAX, ctrY + 1, ctrX + 1,
                 referenceAgtDir(AgentSettings.Actions.FACE_RIGHT));
-        SR5 = new Sensor("SR5", AgentSettings.SHORT_MIN, AgentSettings.SHORT_MAX, ctrY + 1, ctrX + 1,
+        SR5 = new Sensor("SR5", AgentSettings.SHORT_MIN, AgentSettings.SHORT_MAX, ctrY - 1, ctrX + 1,
                 referenceAgtDir(AgentSettings.Actions.FACE_RIGHT));
 
         // Add sensors to SensorLst
@@ -135,7 +137,7 @@ public class Agent {
 
 
     /**
-     * Change direction Methods
+     * Initial Agent direction initialisation
      */
     private AgentSettings.Direction referenceAgtDir(AgentSettings.Actions action) {
         if (action == AgentSettings.Actions.FACE_RIGHT) {
@@ -149,84 +151,99 @@ public class Agent {
 
     /**
      * Flexible agent action Methods
+     * @return
      */
-    public void takeAction(AgentSettings.Actions action) {
+    public AgentSettings.Direction takeAction(AgentSettings.Actions action) {
         switch (action) {
             case END_EXP:
             case END_FAST:
-                endTask(action); break;
+                return endTask(action);
 
             case START_EXP:
             case START_FAST:
-                startTask(action); break;
-
-            case FACE_LEFT:
-            case FACE_RIGHT:
-            case FACE_REVERSE:
-                changeDir(action); break;
-
-            case ALIGN_FRONT:
-            case ALIGN_RIGHT:
-                calibrate(action); break;
+                return startTask(action);
 
             case ERROR:
             default:
                 break;
         }
+        return agtDir;
     }
 
-    public void takeAction(AgentSettings.Actions action, int steps, Map explorationMap) {
+    public AgentSettings.Direction takeAction(AgentSettings.Actions action, int steps, Map explorationMap, Map map) {
         switch (action) {
             case FORWARD:
             case BACKWARD:
             case MOVE_LEFT:
             case MOVE_RIGHT:
-                move(action, steps, explorationMap); break;
+                agtDir = move(action, steps, explorationMap, map); break;
+
+            case FACE_LEFT:
+            case FACE_RIGHT:
+            case FACE_REVERSE:
+                return changeDir(action, explorationMap, map);
+
+            case ALIGN_FRONT:
+            case ALIGN_RIGHT:
+                return calibrate(action, explorationMap, map);
 
             case ERROR:
             default:
                 break;
         }
+        return agtDir;
     }
 
     /**
      * Agent action component Methods
+     * @returns original changed direction or original direction if it is unchanged.
      */
-    public void endTask(AgentSettings.Actions action) {
+    // TODO
+    public AgentSettings.Direction endTask(AgentSettings.Actions action) {
         switch (action) {
             case END_EXP:
                 break;
             case END_FAST:
                 break;
         }
+        return agtDir;
     }
-    public void startTask(AgentSettings.Actions action) {
+    // TODO
+    public AgentSettings.Direction startTask(AgentSettings.Actions action) {
         switch (action) {
             case START_EXP:
                 break;
             case START_FAST:
                 break;
         }
+        return agtDir;
     }
-    public void changeDir(AgentSettings.Actions action) {
-        switch (action) {
-            case FACE_LEFT:
-                this.agtDir = AgentSettings.Direction.antiClockwise90(agtDir); break;
-            case FACE_RIGHT:
-                this.agtDir = AgentSettings.Direction.clockwise90(agtDir); break;
-            case FACE_REVERSE:
-                this.agtDir = AgentSettings.Direction.reverse(agtDir); break;
-        }
-    }
-    public void calibrate(AgentSettings.Actions action) {
+    // TODO
+    public AgentSettings.Direction calibrate(AgentSettings.Actions action, Map explorationMap, Map map) {
         switch(action) {
             case ALIGN_FRONT:
             case ALIGN_RIGHT:
                 break;
         }
+        this.setSensors();
+        this.senseEnv(explorationMap, map);
+        return agtDir;
     }
-
-    public void move(AgentSettings.Actions action, int steps, Map explorationMap) {
+    public AgentSettings.Direction changeDir(AgentSettings.Actions action, Map explorationMap, Map map) {
+        switch (action) {
+            case FACE_LEFT:
+                this.agtDir = AgentSettings.Direction.antiClockwise90(agtDir);
+            case FACE_RIGHT:
+                this.agtDir = AgentSettings.Direction.clockwise90(agtDir);
+            case FACE_REVERSE:
+                this.agtDir = AgentSettings.Direction.reverse(agtDir);
+        }
+        this.setSensors();
+        this.senseEnv(explorationMap, map);
+        return agtDir;
+    }
+    // TODO MOVE_LEFT & MOVE_RIGHT
+    public AgentSettings.Direction move(AgentSettings.Actions action, int steps, Map explorationMap, Map map) {
         if (sim) {
             // Emulate real movement by pausing execution.
             try {
@@ -240,46 +257,46 @@ public class Agent {
             case FORWARD:
                 switch (agtDir) {
                     case NORTH:
-                        ctrX += steps;
-                        break;
-                    case EAST:
                         ctrY += steps;
                         break;
+                    case EAST:
+                        ctrX += steps;
+                        break;
                     case SOUTH:
-                        ctrX -= steps;
+                        ctrY -= steps;
                         break;
                     case WEST:
-                        ctrY -= steps;
+                        ctrX -= steps;
                         break;
                 }
                 break;
             case BACKWARD:
                 switch (agtDir) {
                     case NORTH:
-                        ctrX -= steps;
-                        break;
-                    case EAST:
                         ctrY -= steps;
                         break;
+                    case EAST:
+                        ctrX -= steps;
+                        break;
                     case SOUTH:
-                        ctrX += steps;
+                        ctrY += steps;
                         break;
                     case WEST:
-                        ctrY += steps;
+                        ctrX += steps;
                         break;
                 }
                 break;
-            case FACE_RIGHT:
-            case FACE_LEFT:
-                changeDir(action);
-                break;
             default:
-                System.out.println("Error in Agent.move()!");
+                System.out.println("Error in Agent.move()!" + action + " " + agtDir);
                 break;
         }
+        this.setSensors();
+        this.senseEnv(explorationMap, map);
 
         // TODO real bot: send movement
         if (!sim) {}
+
+        return agtDir;
     }
 
     /**
@@ -315,15 +332,22 @@ public class Agent {
     public void setSensors() {
         switch (agtDir) {
             case NORTH:
+                for (Sensor s : sensorLst)
+                    s.setSensor(s.getBoardY()+1, s.getBoardX(), AgentSettings.Direction.NORTH);
                 break;
             case EAST:
+                for (Sensor s : sensorLst)
+                    s.setSensor(s.getBoardY(), s.getBoardX()+1, AgentSettings.Direction.EAST);
                 break;
             case SOUTH:
+                for (Sensor s : sensorLst)
+                    s.setSensor(s.getBoardY()-1, s.getBoardX(), AgentSettings.Direction.SOUTH);
                 break;
             case WEST:
+                for (Sensor s : sensorLst)
+                    s.setSensor(s.getBoardY(), s.getBoardX()-1, AgentSettings.Direction.WEST);
                 break;
         }
-
     }
     /**
      * !FIXME For real run, Network interface with Android Methods

@@ -254,7 +254,7 @@ public class RightWallHugging extends ExplorationAlgo {
      * Moves the bot, repaints the map and calls senseAndRepaint().
      */
     private void moveBot(Actions m) {
-        bot.takeAction(m, 1, exploredMap);
+        bot.takeAction(m, 1, exploredMap, realMap);
         System.out.println("Action: " + m);
         exploredMap.repaint();
 

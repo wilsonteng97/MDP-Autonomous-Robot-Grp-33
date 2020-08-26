@@ -3,16 +3,17 @@ package hardware;
 public class AgentSettings {
     // Agent Start Direction
     public static final Direction START_DIR = Direction.NORTH;
+    public static final int SPEED = 100;                // delay between movements (ms)
 
     // G values used for A* algorithm
     public static final int MOVE_COST = 1;
     public static final int TURN_COST = 5;
     public static final int INFINITE_COST = 10000000;
-    //	public static final int CALIBRATE_AFTER = 3; //Calibrate After number of moves
+//    public static final int CALIBRATE_AFTER = 3;        //Calibrate After number of moves
 
     public static final int MOVE_STEPS = 1;
-    public static final int MOVE_SPEED = 5000;	//Delays before movement (Lower = faster) in milliseconds
-    public static final long WAIT_TIME = 5000;	//Time waiting before retransmitting in milliseconds
+    public static final int MOVE_SPEED = 5000;	        // Delays before movement (Lower = faster) in milliseconds
+    public static final long WAIT_TIME = 5000;	        // Time waiting before retransmitting in milliseconds
     public static final short CAMERA_RANGE = 4;
 
     // Sensors default range (In grids)
@@ -22,7 +23,7 @@ public class AgentSettings {
     public static final int LONG_MIN = 1;
     public static final int LONG_MAX = 5;
 
-    public static final double RIGHT_THRES = 0.5; //Threshold value or right sensor will calibrate once exceeded
+    public static final double RIGHT_THRES = 0.5;       // Threshold value or right sensor will calibrate once exceeded
     public static final double RIGHT_DIS_THRES_CLOSE = 1.0;
     public static final double RIGHT_DIS_THRES_FAR = 3.8;
 
