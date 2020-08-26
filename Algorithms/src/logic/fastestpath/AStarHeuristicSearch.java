@@ -8,10 +8,10 @@ import hardware.AgentSettings;
 import hardware.AgentSettings.Direction;
 import hardware.AgentSettings.Actions;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Stack;
+import java.util.Scanner;
 
 
 
@@ -28,6 +28,8 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
     private final Map realMap;
     private int loopCount;
     private boolean explorationMode;
+
+    private Scanner scanner = new Scanner(System.in);
 
     public AStarHeuristicSearch(Map exploredMap, Agent bot) {
         super(exploredMap, bot);
@@ -74,7 +76,6 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
         this.loopCount = 0;
     }
 
-
     /**
      * Returns true if the cell can be visited.
      */
@@ -105,6 +106,7 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
 
     /**
      * Returns the heuristic cost i.e. h(n) from a given Cell to a given [goalRow, goalCol] in the maze.
+     * TODO costH could be stored to avoid duplicated calculation
      */
     private double costH(Cell b, int goalRow, int goalCol) {
         // Heuristic: The no. of moves will be equal to the difference in the row and column values.
@@ -166,7 +168,6 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
         return moveCost + turnCost;
     }
 
-
     /**
      * Find the fastest path from the robot's current position to [goalRow, goalCol].
      */
@@ -176,10 +177,13 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
         Stack<Cell> path;
         do {
             loopCount++;
+            System.out.printf("Expansion %d: \n", loopCount);
 
             // Get cell with minimum cost from toVisit and assign it to current.
             current = minimumCostCell(goalRow, goalCol);
-
+            System.out.println("Checking cell...");
+            System.out.println(current);
+            System.out.println();
             // Point the robot in the direction of current from the previous cell.
             if (parents.containsKey(current)) {
                 curDir = getTargetDir(parents.get(current).getX(), parents.get(current).getY(), curDir, current);
@@ -234,7 +238,7 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
                     }
 
                     if (!(toVisit.contains(neighbors[i]))) {
-                        parents.put(neighbors[i], current);
+                        parents.put(neighbors[i], current); // child->parent
                         gCosts[neighbors[i].getX()][neighbors[i].getY()] = gCosts[current.getX()][current.getY()] + costG(current, neighbors[i], curDir);
                         toVisit.add(neighbors[i]);
                     } else {
@@ -247,11 +251,18 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
                     }
                 }
             }
+            System.out.println("Expanding...");
+            for (Cell tmp : toVisit) {
+                if (tmp != null)
+                    System.out.printf("%s\tgCost: %.0f\thCost: %.0f\ttotalCost: %.0f\n", tmp, gCosts[tmp.getX()][tmp.getY()], costH(tmp, goalRow, goalCol), gCosts[tmp.getX()][tmp.getY()]+costH(tmp, goalRow, goalCol));
+            }
+            scanner.nextLine();
         } while (!toVisit.isEmpty());
 
         System.out.println("Path not found!");
         return null;
     }
+
 
     /**
      * Generates path in reverse using the parents HashMap.
@@ -319,11 +330,11 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
 
                 // During exploration, use sensor data to update exploredMap.
                 // TODO get update sensor
-//                if (explorationMode) {
-//                    bot.setSensors();
+                if (explorationMode) {
+                    bot.setSensors();
 //                    bot.sense(this.exploredMap, this.realMap);
-//                    this.exploredMap.repaint();
-//                }
+                    this.exploredMap.repaint();
+                }
             }
         }
         else {
@@ -466,14 +477,6 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
 
         System.out.println("\n");
     }
-// import hardware.Agent;
-// import map.Map;
-
-// public class AStarHeuristicSearch extends FastestPathAlgo {
-
-//     public AStarHeuristicSearch(Map map, Agent agt) {
-//         super(map, agt);
-//     }
 
 
     /**

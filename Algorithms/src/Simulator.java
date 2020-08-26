@@ -182,7 +182,8 @@ public class Simulator {
                 FastestPathAlgo fastestPath;
                 fastestPath = new AStarHeuristicSearch(explorationMap, agt);
 
-                fastestPath.run(MapSettings.GOAL_ROW, MapSettings.GOAL_COL);
+                ((AStarHeuristicSearch) fastestPath).runFastestPath(
+                        MapSettings.GOAL_ROW, MapSettings.GOAL_COL);
 
                 return 222;
             }

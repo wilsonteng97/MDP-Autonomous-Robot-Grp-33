@@ -11,7 +11,7 @@ import static utils.IOsettings.FILE_EXT;
 public class FileIO {
     public static Map loadMap(Map map, String filename) {
         try {
-            InputStream inputStream = new FileInputStream(FILE_DIR + filename + FILE_EXT);
+            InputStream inputStream = new FileInputStream("/Users/guomukun/mdp/MDP-Autonomous-Robot-Grp-33/Algorithms/arena/" + filename + FILE_EXT);
             BufferedReader buf = new BufferedReader(new InputStreamReader(inputStream));
 
             String line = buf.readLine();

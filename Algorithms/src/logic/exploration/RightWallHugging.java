@@ -96,7 +96,7 @@ public class RightWallHugging extends ExplorationAlgo {
                 }
             }
             Scanner scanner = new Scanner(System.in);
-            scanner.nextLine();
+//            scanner.nextLine();
         } while (areaExplored <= coverageLimit && System.currentTimeMillis() <= endTime);
 
         goHome();
