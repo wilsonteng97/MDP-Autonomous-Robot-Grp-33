@@ -38,17 +38,17 @@ public class Agent {
     private AgentSettings.Actions prevAction;
 
     private ArrayList<Sensor> sensorLst;
-    private final Sensor SR1;     // SRFrontLeft
-    private final Sensor SR2;     // SRFrontCenter
-    private final Sensor SR3;     // SRFrontRight
+    private final Sensor SR1;     // SR1
+    private final Sensor SR2;     // SR2
+    private final Sensor SR3;     // SR3
     private final Sensor LR1;     // LRLeftTop
     private final Sensor SR4;     // SRRightTop
     private final Sensor SR5;     // SRRightBtm
 
     private boolean sim;
 
-    public Agent(int centreY, int centreX, AgentSettings.Direction agtDir, boolean sim) {
-        this.ctrY = centreY; this.ctrX = centreX; this.agtDir = agtDir;
+    public Agent(int centreY, int centreX, boolean sim) {
+        this.ctrY = centreY; this.ctrX = centreX; this.agtDir = AgentSettings.START_DIR;
         this.enteredGoal = false;
         this.speed = AgentSettings.SPEED;
         this.setSim(sim);
@@ -65,13 +65,13 @@ public class Agent {
 
         // 1 Top Left LR Sensor
         LR1 = new Sensor("LR1", AgentSettings.LONG_MIN, AgentSettings.LONG_MAX, ctrY + 1, ctrX - 1,
-                referenceAgtDir(AgentSettings.Actions.FACE_LEFT));
+                AgentSettings.Direction.antiClockwise90(agtDir));
 
         // 2 Right SR Sensors, 1 Top & 1 Bottom
         SR4 = new Sensor("SR4", AgentSettings.SHORT_MIN, AgentSettings.SHORT_MAX, ctrY + 1, ctrX + 1,
-                referenceAgtDir(AgentSettings.Actions.FACE_RIGHT));
+                AgentSettings.Direction.clockwise90(agtDir));
         SR5 = new Sensor("SR5", AgentSettings.SHORT_MIN, AgentSettings.SHORT_MAX, ctrY - 1, ctrX + 1,
-                referenceAgtDir(AgentSettings.Actions.FACE_RIGHT));
+                AgentSettings.Direction.clockwise90(agtDir));
 
         // Add sensors to SensorLst
         sensorLst.add(SR1); sensorLst.add(SR2); sensorLst.add(SR3);
@@ -139,15 +139,24 @@ public class Agent {
     /**
      * Initial Agent direction initialisation
      */
-    private AgentSettings.Direction referenceAgtDir(AgentSettings.Actions action) {
-        if (action == AgentSettings.Actions.FACE_RIGHT) {
-            return AgentSettings.Direction.clockwise90(agtDir);
-        } else if (action == AgentSettings.Actions.FACE_LEFT) {
-            return AgentSettings.Direction.antiClockwise90(agtDir);
-        } else {
-            return agtDir;
-        }
-    }
+//    private AgentSettings.Direction referenceAgtDir(AgentSettings.Actions action) {
+//        switch (action) {
+//            case FACE_LEFT:
+//                this.agtDir = AgentSettings.Direction.antiClockwise90(agtDir);
+//            case FACE_RIGHT:
+//                this.agtDir = AgentSettings.Direction.clockwise90(agtDir);
+//            case FACE_REVERSE:
+//                this.agtDir = AgentSettings.Direction.reverse(agtDir);
+//        }
+//        return agtDir;
+//        if (action == AgentSettings.Actions.FACE_RIGHT) {
+//            return AgentSettings.Direction.clockwise90(agtDir);
+//        } else if (action == AgentSettings.Actions.FACE_LEFT) {
+//            return AgentSettings.Direction.antiClockwise90(agtDir);
+//        } else {
+//            return agtDir;
+//        }
+//    }
 
     /**
      * Flexible agent action Methods
@@ -181,11 +190,11 @@ public class Agent {
             case FACE_LEFT:
             case FACE_RIGHT:
             case FACE_REVERSE:
-                return changeDir(action, explorationMap, map);
+                agtDir = changeDir(action, explorationMap, map); break;
 
             case ALIGN_FRONT:
             case ALIGN_RIGHT:
-                return calibrate(action, explorationMap, map);
+                agtDir = calibrate(action, explorationMap, map); break;
 
             case ERROR:
             default:
@@ -245,7 +254,7 @@ public class Agent {
     // TODO MOVE_LEFT & MOVE_RIGHT
     public AgentSettings.Direction move(AgentSettings.Actions action, int steps, Map explorationMap, Map map) {
         if (sim) {
-            // Emulate real movement by pausing execution.
+            // Emulate real AgentSettings.Direction by pausing execution.
             try {
                 TimeUnit.MILLISECONDS.sleep(speed);
             } catch (InterruptedException e) {
@@ -293,7 +302,7 @@ public class Agent {
         this.setSensors();
         this.senseEnv(explorationMap, map);
 
-        // TODO real bot: send movement
+        // TODO real bot: send AgentSettings.Direction
         if (!sim) {}
 
         return agtDir;
@@ -330,23 +339,49 @@ public class Agent {
      * Sets the sensors' position and direction values according to the robot's current position and direction.
      */
     public void setSensors() {
+        AgentSettings.Direction dirAgtLeft = AgentSettings.Direction.antiClockwise90(agtDir);
+        AgentSettings.Direction dirAgtRight = AgentSettings.Direction.clockwise90(agtDir);
+        System.out.println("[Before]");
+        for (Sensor s : sensorLst) {
+            System.out.println(s.getId() + " [" + s.getBoardY() + "," + s.getBoardX() + "] " + s.getSensorDir().toString());
+        }
         switch (agtDir) {
             case NORTH:
-                for (Sensor s : sensorLst)
-                    s.setSensor(s.getBoardY()+1, s.getBoardX(), AgentSettings.Direction.NORTH);
+                SR1.setSensor(this.ctrY + 1, this.ctrX - 1, this.agtDir);
+                SR2.setSensor(this.ctrY + 1, this.ctrX, this.agtDir);
+                SR3.setSensor(this.ctrY + 1, this.ctrX + 1, this.agtDir);
+                LR1.setSensor(this.ctrY + 1, this.ctrX - 1, dirAgtLeft);
+                SR4.setSensor(this.ctrY + 1, this.ctrX + 1, dirAgtRight);
+                SR5.setSensor(this.ctrY - 1, this.ctrX + 1, dirAgtRight);
                 break;
             case EAST:
-                for (Sensor s : sensorLst)
-                    s.setSensor(s.getBoardY(), s.getBoardX()+1, AgentSettings.Direction.EAST);
+                SR1.setSensor(this.ctrY + 1, this.ctrX + 1, this.agtDir);
+                SR2.setSensor(this.ctrY, this.ctrX + 1, this.agtDir);
+                SR3.setSensor(this.ctrY - 1, this.ctrX + 1, this.agtDir);
+                LR1.setSensor(this.ctrY + 1, this.ctrX + 1, dirAgtLeft);
+                SR4.setSensor(this.ctrY - 1, this.ctrX + 1, dirAgtRight);
+                SR5.setSensor(this.ctrY - 1, this.ctrX - 1, dirAgtRight);
                 break;
             case SOUTH:
-                for (Sensor s : sensorLst)
-                    s.setSensor(s.getBoardY()-1, s.getBoardX(), AgentSettings.Direction.SOUTH);
+                SR1.setSensor(this.ctrY - 1, this.ctrX + 1, this.agtDir);
+                SR2.setSensor(this.ctrY - 1, this.ctrX, this.agtDir);
+                SR3.setSensor(this.ctrY - 1, this.ctrX - 1, this.agtDir);
+                LR1.setSensor(this.ctrY - 1, this.ctrX + 1, dirAgtLeft);
+                SR4.setSensor(this.ctrY - 1, this.ctrX - 1, dirAgtRight);
+                SR5.setSensor(this.ctrY + 1, this.ctrX - 1, dirAgtRight);
                 break;
             case WEST:
-                for (Sensor s : sensorLst)
-                    s.setSensor(s.getBoardY(), s.getBoardX()-1, AgentSettings.Direction.WEST);
+                SR1.setSensor(this.ctrY - 1, this.ctrX - 1, this.agtDir);
+                SR2.setSensor(this.ctrY, this.ctrX - 1, this.agtDir);
+                SR3.setSensor(this.ctrY + 1, this.ctrX - 1, this.agtDir);
+                LR1.setSensor(this.ctrY - 1, this.ctrX - 1, dirAgtLeft);
+                SR4.setSensor(this.ctrY + 1, this.ctrX - 1, dirAgtRight);
+                SR5.setSensor(this.ctrY + 1, this.ctrX + 1, dirAgtRight);
                 break;
+        }
+        System.out.println("[After]");
+        for (Sensor s : sensorLst) {
+            System.out.println(s.getId() + " [" + s.getBoardY() + "," + s.getBoardX() + "] " + s.getSensorDir().toString());
         }
     }
     /**

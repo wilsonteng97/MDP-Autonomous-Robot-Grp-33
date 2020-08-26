@@ -18,10 +18,10 @@ public class AgentSettings {
 
     // Sensors default range (In grids)
     public static final int SHORT_MIN = 1;
-    public static final int SHORT_MAX = 3;
+    public static final int SHORT_MAX = 2;
 
-    public static final int LONG_MIN = 1;
-    public static final int LONG_MAX = 5;
+    public static final int LONG_MIN = 3;
+    public static final int LONG_MAX = 4;
 
     public static final double RIGHT_THRES = 0.5;       // Threshold value or right sensor will calibrate once exceeded
     public static final double RIGHT_DIS_THRES_CLOSE = 1.0;
@@ -33,7 +33,9 @@ public class AgentSettings {
 
         // Get new direction when robot turns clockwise
         public static Direction clockwise90(Direction currDirection) {
-            return values()[(currDirection.ordinal() + 2) % values().length];
+            AgentSettings.Direction test = values()[(currDirection.ordinal() + 2) % values().length];
+            System.out.println(currDirection.ordinal() + " | " + currDirection.toString() + " | " + test.toString() + " | " + values().length);
+            return test;
         }
         public static Direction clockwise(Direction currDirection, int step45) {
             return values()[(currDirection.ordinal() + step45) % values().length];

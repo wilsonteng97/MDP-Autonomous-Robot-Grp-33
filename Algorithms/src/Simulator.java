@@ -37,7 +37,7 @@ public class Simulator {
     public static void main(String[] args) {
 //        if (!sim) comm.openConnection();
 
-        agt = new Agent(MapSettings.START_ROW, MapSettings.START_COL, startDir, sim);
+        agt = new Agent(MapSettings.START_ROW, MapSettings.START_COL, sim);
         if (sim) {
             dummyMap = new Map(agt); dummyMap.setAllUnexplored();
         }

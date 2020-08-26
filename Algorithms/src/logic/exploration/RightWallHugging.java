@@ -67,7 +67,7 @@ public class RightWallHugging extends ExplorationAlgo {
         areaExplored = calculateAreaExplored();
         System.out.println("Explored Area: " + areaExplored);
 
-        explorationLoop(bot.getAgtX(), bot.getAgtY());
+        explorationLoop(bot.getAgtY(), bot.getAgtX());
 
 //        if (bot.getRealBot()) {
 //            CommMgr.getCommMgr().sendMsg(null, CommMgr.BOT_START);
@@ -88,8 +88,9 @@ public class RightWallHugging extends ExplorationAlgo {
 
             areaExplored = calculateAreaExplored();
             System.out.println("Area explored: " + areaExplored);
+//            System.out.println();
 
-            if (bot.getAgtX() == r && bot.getAgtY() == c) {
+            if (bot.getAgtY() == r && bot.getAgtX() == c) {
                 if (areaExplored >= 100) {
                     break;
                 }
@@ -106,16 +107,18 @@ public class RightWallHugging extends ExplorationAlgo {
      */
     private void nextMove() {
         if (lookRight()) {
+            System.out.println("[->] lookRight");
             moveBot(Actions.FACE_RIGHT);
             if (lookForward()) moveBot(Actions.FORWARD);
         } else if (lookForward()) {
+//            System.out.println("[->] lookForward");
             moveBot(Actions.FORWARD);
         } else if (lookLeft()) {
+            System.out.println("[->] lookleft");
             moveBot(Actions.FACE_LEFT);
             if (lookForward()) moveBot(Actions.FORWARD);
         } else {
-            moveBot(Actions.FACE_RIGHT);
-            moveBot(Actions.FACE_RIGHT);
+            moveBot(Actions.FACE_REVERSE);
         }
     }
 
@@ -174,8 +177,8 @@ public class RightWallHugging extends ExplorationAlgo {
      * Returns true if the robot can move to the north cell.
      */
     private boolean northFree() {
-        int botRow = bot.getAgtX();
-        int botCol = bot.getAgtY();
+        int botRow = bot.getAgtY();
+        int botCol = bot.getAgtX();
         return (isExploredNotObstacle(botRow + 1, botCol - 1) && isExploredAndFree(botRow + 1, botCol) && isExploredNotObstacle(botRow + 1, botCol + 1));
     }
 
@@ -183,8 +186,8 @@ public class RightWallHugging extends ExplorationAlgo {
      * Returns true if the robot can move to the east cell.
      */
     private boolean eastFree() {
-        int botRow = bot.getAgtX();
-        int botCol = bot.getAgtY();
+        int botRow = bot.getAgtY();
+        int botCol = bot.getAgtX();
         return (isExploredNotObstacle(botRow - 1, botCol + 1) && isExploredAndFree(botRow, botCol + 1) && isExploredNotObstacle(botRow + 1, botCol + 1));
     }
 
@@ -192,8 +195,8 @@ public class RightWallHugging extends ExplorationAlgo {
      * Returns true if the robot can move to the south cell.
      */
     private boolean southFree() {
-        int botRow = bot.getAgtX();
-        int botCol = bot.getAgtY();
+        int botRow = bot.getAgtY();
+        int botCol = bot.getAgtX();
         return (isExploredNotObstacle(botRow - 1, botCol - 1) && isExploredAndFree(botRow - 1, botCol) && isExploredNotObstacle(botRow - 1, botCol + 1));
     }
 
@@ -201,13 +204,13 @@ public class RightWallHugging extends ExplorationAlgo {
      * Returns true if the robot can move to the west cell.
      */
     private boolean westFree() {
-        int botRow = bot.getAgtX();
-        int botCol = bot.getAgtY();
+        int botRow = bot.getAgtY();
+        int botCol = bot.getAgtX();
         return (isExploredNotObstacle(botRow - 1, botCol - 1) && isExploredAndFree(botRow, botCol - 1) && isExploredNotObstacle(botRow + 1, botCol - 1));
     }
 
     /**
-     * Send the bot sto START and points the bot northwards
+     * Send the bot to START and points the bot northwards
      */
     private void goHome() {
         // TODO
@@ -254,6 +257,7 @@ public class RightWallHugging extends ExplorationAlgo {
      * Moves the bot, repaints the map and calls senseAndRepaint().
      */
     private void moveBot(Actions m) {
+        System.out.println("[Agent Dir] " + bot.getAgtDir());
         bot.takeAction(m, 1, exploredMap, realMap);
         System.out.println("Action: " + m);
         exploredMap.repaint();
