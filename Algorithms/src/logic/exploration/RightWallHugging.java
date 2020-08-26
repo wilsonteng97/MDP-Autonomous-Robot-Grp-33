@@ -88,7 +88,7 @@ public class RightWallHugging extends ExplorationAlgo {
 
             areaExplored = calculateAreaExplored();
             System.out.println("Area explored: " + areaExplored);
-//            System.out.println();
+            System.out.println();
 
             if (bot.getAgtY() == r && bot.getAgtX() == c) {
                 if (areaExplored >= 100) {
@@ -107,14 +107,14 @@ public class RightWallHugging extends ExplorationAlgo {
      */
     private void nextMove() {
         if (lookRight()) {
-            System.out.println("[->] lookRight");
+//            System.out.println("[->] lookRight");
             moveBot(Actions.FACE_RIGHT);
             if (lookForward()) moveBot(Actions.FORWARD);
         } else if (lookForward()) {
 //            System.out.println("[->] lookForward");
             moveBot(Actions.FORWARD);
         } else if (lookLeft()) {
-            System.out.println("[->] lookleft");
+//            System.out.println("[->] lookleft");
             moveBot(Actions.FACE_LEFT);
             if (lookForward()) moveBot(Actions.FORWARD);
         } else {
@@ -257,7 +257,7 @@ public class RightWallHugging extends ExplorationAlgo {
      * Moves the bot, repaints the map and calls senseAndRepaint().
      */
     private void moveBot(Actions m) {
-        System.out.println("[Agent Dir] " + bot.getAgtDir());
+//        System.out.println("[Agent Dir] " + bot.getAgtDir());
         bot.takeAction(m, 1, exploredMap, realMap);
         System.out.println("Action: " + m);
         exploredMap.repaint();

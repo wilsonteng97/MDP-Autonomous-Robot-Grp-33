@@ -241,11 +241,11 @@ public class Agent {
     public AgentSettings.Direction changeDir(AgentSettings.Actions action, Map explorationMap, Map map) {
         switch (action) {
             case FACE_LEFT:
-                this.agtDir = AgentSettings.Direction.antiClockwise90(agtDir);
+                this.agtDir = AgentSettings.Direction.antiClockwise90(agtDir); break;
             case FACE_RIGHT:
-                this.agtDir = AgentSettings.Direction.clockwise90(agtDir);
+                this.agtDir = AgentSettings.Direction.clockwise90(agtDir); break;
             case FACE_REVERSE:
-                this.agtDir = AgentSettings.Direction.reverse(agtDir);
+                this.agtDir = AgentSettings.Direction.reverse(agtDir); break;
         }
         this.setSensors();
         this.senseEnv(explorationMap, map);
@@ -341,10 +341,7 @@ public class Agent {
     public void setSensors() {
         AgentSettings.Direction dirAgtLeft = AgentSettings.Direction.antiClockwise90(agtDir);
         AgentSettings.Direction dirAgtRight = AgentSettings.Direction.clockwise90(agtDir);
-        System.out.println("[Before]");
-        for (Sensor s : sensorLst) {
-            System.out.println(s.getId() + " [" + s.getBoardY() + "," + s.getBoardX() + "] " + s.getSensorDir().toString());
-        }
+
         switch (agtDir) {
             case NORTH:
                 SR1.setSensor(this.ctrY + 1, this.ctrX - 1, this.agtDir);
@@ -378,10 +375,6 @@ public class Agent {
                 SR4.setSensor(this.ctrY + 1, this.ctrX - 1, dirAgtRight);
                 SR5.setSensor(this.ctrY + 1, this.ctrX + 1, dirAgtRight);
                 break;
-        }
-        System.out.println("[After]");
-        for (Sensor s : sensorLst) {
-            System.out.println(s.getId() + " [" + s.getBoardY() + "," + s.getBoardX() + "] " + s.getSensorDir().toString());
         }
     }
     /**

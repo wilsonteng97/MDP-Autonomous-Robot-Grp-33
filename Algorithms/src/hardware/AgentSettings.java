@@ -33,9 +33,7 @@ public class AgentSettings {
 
         // Get new direction when robot turns clockwise
         public static Direction clockwise90(Direction currDirection) {
-            AgentSettings.Direction test = values()[(currDirection.ordinal() + 2) % values().length];
-            System.out.println(currDirection.ordinal() + " | " + currDirection.toString() + " | " + test.toString() + " | " + values().length);
-            return test;
+            return values()[(currDirection.ordinal() + 2) % values().length];
         }
         public static Direction clockwise(Direction currDirection, int step45) {
             return values()[(currDirection.ordinal() + step45) % values().length];
