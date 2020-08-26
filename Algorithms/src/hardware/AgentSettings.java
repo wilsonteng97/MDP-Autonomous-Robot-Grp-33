@@ -18,10 +18,10 @@ public class AgentSettings {
 
     // Sensors default range (In grids)
     public static final int SHORT_MIN = 1;
-    public static final int SHORT_MAX = 2;
+    public static final int SHORT_MAX = 3;
 
-    public static final int LONG_MIN = 3;
-    public static final int LONG_MAX = 4;
+    public static final int LONG_MIN = 1;
+    public static final int LONG_MAX = 5;
 
     public static final double RIGHT_THRES = 0.5;       // Threshold value or right sensor will calibrate once exceeded
     public static final double RIGHT_DIS_THRES_CLOSE = 1.0;

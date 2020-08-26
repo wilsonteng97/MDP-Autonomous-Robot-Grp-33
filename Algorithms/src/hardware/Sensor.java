@@ -174,7 +174,7 @@ public class Sensor {
             // Override previous obstacle value if front sensors detect no obstacle.
             if (explorationMap.getCell(row, col).isObstacle()) {
                 if (id.equals("SR1") || id.equals("SR2") || id.equals("SR3")) {
-                    explorationMap.getCell(row, col).setVirtualWall(false);
+                    explorationMap.resetVirtualWalls(row, col);
                 } else {
                     break;
                 }

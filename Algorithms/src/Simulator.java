@@ -197,6 +197,7 @@ public class Simulator {
                 row = MapSettings.START_ROW;
                 col = MapSettings.START_COL;
 
+                explorationMap.setAllUnexplored(); dummyMap.setAllUnexplored();
                 agt.setAgtCtrCoord(row, col);
                 explorationMap.repaint();
 

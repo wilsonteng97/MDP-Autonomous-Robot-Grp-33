@@ -63,6 +63,37 @@ public class Map extends JPanel {
                         grid[row][col].setVirtualWall(true);
         }
     }
+    public void resetVirtualWalls(int row, int col) {
+        grid[row][col].setObstacle(false);
+
+        if (row >= 1) {
+            grid[row - 1][col].setVirtualWall(false);            // bottom cell
+            if (col < MapSettings.MAP_COLS - 1) {
+                grid[row - 1][col + 1].setVirtualWall(false);    // bottom-right cell
+            }
+            if (col >= 1) {
+                grid[row - 1][col - 1].setVirtualWall(false);    // bottom-left cell
+            }
+        }
+
+        if (row < MapSettings.MAP_ROWS - 1) {
+            grid[row + 1][col].setVirtualWall(false);            // top cell
+            if (col < MapSettings.MAP_COLS - 1) {
+                grid[row + 1][col + 1].setVirtualWall(false);    // top-right cell
+            }
+            if (col >= 1) {
+                grid[row + 1][col - 1].setVirtualWall(false);    // top-left cell
+            }
+        }
+
+        if (col >= 1) {
+            grid[row][col - 1].setVirtualWall(false);            // left cell
+        }
+
+        if (col < MapSettings.MAP_COLS - 1) {
+            grid[row][col + 1].setVirtualWall(false);            // right cell
+        }
+    }
 
     /**
      * Set grid Methods
