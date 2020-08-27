@@ -217,6 +217,7 @@ public class Agent {
         }
         return agtDir;
     }
+
     // TODO
     public AgentSettings.Direction startTask(AgentSettings.Actions action) {
         switch (action) {
@@ -227,6 +228,7 @@ public class Agent {
         }
         return agtDir;
     }
+
     // TODO
     public AgentSettings.Direction calibrate(AgentSettings.Actions action, Map explorationMap, Map map) {
         switch(action) {
@@ -238,6 +240,7 @@ public class Agent {
         this.senseEnv(explorationMap, map);
         return agtDir;
     }
+
     public AgentSettings.Direction changeDir(AgentSettings.Actions action, Map explorationMap, Map map) {
         switch (action) {
             case FACE_LEFT:
@@ -251,6 +254,7 @@ public class Agent {
         this.senseEnv(explorationMap, map);
         return agtDir;
     }
+
     // TODO MOVE_LEFT & MOVE_RIGHT
     public AgentSettings.Direction move(AgentSettings.Actions action, int steps, Map explorationMap, Map map) {
         if (sim) {
@@ -299,8 +303,8 @@ public class Agent {
                 System.out.println("Error in Agent.move()!" + action + " " + agtDir);
                 break;
         }
-        this.setSensors();
-        this.senseEnv(explorationMap, map);
+        setSensors();
+        senseEnv(explorationMap, map);
 
         // TODO real bot: send AgentSettings.Direction
         if (!sim) {}
@@ -312,7 +316,7 @@ public class Agent {
      * Agent environment sensing Method
      * (with the help of sensors)
      */
-    public void senseEnv(Map explorationMap, Map map) {
+    public int[] senseEnv(Map explorationMap, Map map) {
         int[] result = new int[sensorLst.size()];
         int sensorCount = 0;
 
@@ -334,6 +338,7 @@ public class Agent {
 
 //        String[] mapStrings = MapDescriptor.generateMapDescriptor(explorationMap);
 //        comm.sendMsg(mapStrings[0] + " " + mapStrings[1], CommMgr.MAP_STRINGS);
+        return result;
     }
 
     /**

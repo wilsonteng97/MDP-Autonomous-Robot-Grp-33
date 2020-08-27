@@ -73,7 +73,7 @@ public class RightWallHugging extends ExplorationAlgo {
 //            CommMgr.getCommMgr().sendMsg(null, CommMgr.BOT_START);
 //        }
 //        senseAndRepaint();
-        exploredMap.repaint();
+        senseAndRepaint();
     }
 
     /**
@@ -85,6 +85,7 @@ public class RightWallHugging extends ExplorationAlgo {
     private void explorationLoop(int r, int c) {
         do {
             nextMove();
+            System.out.printf("Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
 
             areaExplored = calculateAreaExplored();
             System.out.println("Area explored: " + areaExplored);
@@ -96,7 +97,7 @@ public class RightWallHugging extends ExplorationAlgo {
                 }
             }
             Scanner scanner = new Scanner(System.in);
-//            scanner.nextLine();
+            scanner.nextLine();
         } while (areaExplored <= coverageLimit && System.currentTimeMillis() <= endTime);
 
         goHome();
@@ -260,7 +261,7 @@ public class RightWallHugging extends ExplorationAlgo {
 //        System.out.println("[Agent Dir] " + bot.getAgtDir());
         bot.takeAction(m, 1, exploredMap, realMap);
         System.out.println("Action: " + m);
-        exploredMap.repaint();
+        senseAndRepaint();
 
         // TODO calibration
 //        if (m != MOVEMENT.CALIBRATE) {
@@ -297,7 +298,7 @@ public class RightWallHugging extends ExplorationAlgo {
          */
     private void senseAndRepaint() {
 //        bot.setSensors();
-        bot.senseEnv(exploredMap, realMap);
+//        bot.senseEnv(exploredMap, realMap);
         exploredMap.repaint();
     }
 
