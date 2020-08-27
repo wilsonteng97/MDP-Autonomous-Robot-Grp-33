@@ -11,9 +11,17 @@ import static utils.IOsettings.FILE_EXT;
 public class FileIO {
     public static Map loadMap(Map map, String filename) {
         try {
-            InputStream inputStream = new FileInputStream(FILE_DIR + filename + FILE_EXT);
-            BufferedReader buf = new BufferedReader(new InputStreamReader(inputStream));
-
+            String basePath = new File("").getAbsolutePath();
+            BufferedReader buf;
+            InputStream inputStream;
+            try {
+                inputStream = new FileInputStream(basePath + '/' + FILE_DIR + filename + FILE_EXT);
+                buf = new BufferedReader(new InputStreamReader(inputStream));
+            } catch (IOException e) {
+                System.out.println("Try reading file again...");
+                inputStream = new FileInputStream(basePath + "/Algorithms/" + FILE_DIR + filename + FILE_EXT);
+                buf = new BufferedReader(new InputStreamReader(inputStream));
+            }
             String line = buf.readLine();
             StringBuilder sb = new StringBuilder();
             while (line != null) {
