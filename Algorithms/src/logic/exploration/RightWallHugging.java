@@ -85,7 +85,7 @@ public class RightWallHugging extends ExplorationAlgo {
     private void explorationLoop(int r, int c) {
         do {
             nextMove();
-            System.out.printf("Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
+            System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
 
             areaExplored = calculateAreaExplored();
             System.out.println("Area explored: " + areaExplored);
@@ -260,7 +260,7 @@ public class RightWallHugging extends ExplorationAlgo {
     private void moveBot(Actions m) {
 //        System.out.println("[Agent Dir] " + bot.getAgtDir());
         bot.takeAction(m, 1, exploredMap, realMap);
-        System.out.println("Action: " + m);
+        System.out.println("Action executed: " + m);
         senseAndRepaint();
 
         // TODO calibration
