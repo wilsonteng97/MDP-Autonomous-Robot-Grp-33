@@ -167,14 +167,14 @@ public class Sensor {
             explorationMap.getCell(row, col).setExplored(true);
 
             if (sensorVal == i) {
-                explorationMap.createVirtualWalls(row, col);
+//                explorationMap.createVirtualWalls(row, col);
                 break;
             }
 
             // Override previous obstacle value if front sensors detect no obstacle.
             if (explorationMap.getCell(row, col).isObstacle()) {
                 if (id.equals("SR1") || id.equals("SR2") || id.equals("SR3")) {
-                    explorationMap.resetVirtualWalls(row, col);
+//                    explorationMap.resetVirtualWalls(row, col);
                 } else {
                     break;
                 }
