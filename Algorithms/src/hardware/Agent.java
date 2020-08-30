@@ -1,6 +1,7 @@
 package hardware;
 
 import map.Map;
+import map.MapSettings;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -88,6 +89,8 @@ public class Agent {
     public int getAgtY() {
         return ctrY;
     }
+    public int getAgtRow() { return ctrY; }
+    public int getAgtCol() { return ctrX; }
     public void setAgtCtrCoord(int row, int col) {
         int xDispl = ctrX - col; int yDispl = ctrY - row;
         this.ctrY = row; this.ctrX = col;
@@ -113,8 +116,9 @@ public class Agent {
     public boolean hasEnteredGoal() {
         return enteredGoal;
     }
-    public void setEnteredGoal(boolean enteredGoal) {
-        this.enteredGoal = enteredGoal;
+    public void updateEnteredGoal() {
+        if (this.getAgtRow() == MapSettings.GOAL_ROW && this.getAgtCol() == MapSettings.GOAL_COL)
+            this.enteredGoal = true;
     }
     public boolean isFastPathMode() {
         return fastPathMode;
@@ -250,13 +254,14 @@ public class Agent {
             case FACE_REVERSE:
                 this.agtDir = AgentSettings.Direction.reverse(agtDir); break;
         }
-        this.setSensors();
-        this.senseEnv(explorationMap, map);
+//        this.setSensors();
+//        this.senseEnv(explorationMap, map);
         return agtDir;
     }
 
     // TODO MOVE_LEFT & MOVE_RIGHT
     public AgentSettings.Direction move(AgentSettings.Actions action, int steps, Map explorationMap, Map map) {
+        System.out.printf("[Function executed] move(%s)\n", action);
         if (sim) {
             // Emulate real AgentSettings.Direction by pausing execution.
             try {
@@ -303,12 +308,15 @@ public class Agent {
                 System.out.println("Error in Agent.move()!" + action + " " + agtDir);
                 break;
         }
-        setSensors();
-        senseEnv(explorationMap, map);
+//        setSensors();
+//        senseEnv(explorationMap, map);
+//        System.out.println("br");
 
         // TODO real bot: send AgentSettings.Direction
         if (!sim) {}
 
+        updateEnteredGoal();
+        System.out.printf("[Function completed] move(%s)\n", action);
         return agtDir;
     }
 
@@ -317,20 +325,23 @@ public class Agent {
      * (with the help of sensors)
      */
     public int[] senseEnv(Map explorationMap, Map map) {
+        System.out.println("[Function executed] senseEnv");
         int[] result = new int[sensorLst.size()];
         int sensorCount = 0;
 
         if (sim) {
+            System.out.println(" -> Is simulator");
             for (Sensor s : sensorLst) {
+                System.out.println(" -> 1st loop executed");
                 result[sensorCount] = s.simDetect(explorationMap, map);
                 sensorCount++;
             }
         } else {
             // Get Sensor readings from Network Manager.
         }
-
         sensorCount = 0;
         for (Sensor s : sensorLst) {
+            System.out.println(" -> 2nd loop executed");
             s.realDetect(explorationMap, result[sensorCount]);
             sensorCount++;
         }

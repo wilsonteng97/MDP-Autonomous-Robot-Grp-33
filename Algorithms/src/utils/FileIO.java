@@ -33,7 +33,9 @@ public class FileIO {
             int binPtr = 0;
             for (int row = MapSettings.MAP_ROWS - 1; row >= 0; row--) {
                 for (int col = 0; col < MapSettings.MAP_COLS; col++) {
-                    if (bin.charAt(binPtr) == '1') map.getCell(row, col).setObstacle(true);
+                    if (bin.charAt(binPtr) == '1') {
+                        map.getCell(row, col).setObstacle(true);
+                    }
                     binPtr++;
                 }
             }

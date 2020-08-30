@@ -1,10 +1,12 @@
 package logic.exploration;
 
 import hardware.Agent;
+import hardware.AgentSettings;
 import map.Map;
 import map.MapSettings;
 import map.Cell;
-import hardware.AgentSettings.Actions;
+import hardware.AgentSettings.*;
+import logic.fastestpath.AStarHeuristicSearch;
 
 import java.util.Scanner;
 
@@ -97,7 +99,7 @@ public class RightWallHugging extends ExplorationAlgo {
                 }
             }
             Scanner scanner = new Scanner(System.in);
-            scanner.nextLine();
+//            scanner.nextLine();
         } while (areaExplored <= coverageLimit && System.currentTimeMillis() <= endTime);
 
         goHome();
@@ -107,19 +109,28 @@ public class RightWallHugging extends ExplorationAlgo {
      * Determines the next move for the robot and executes it accordingly.
      */
     private void nextMove() {
+        System.out.println("Bot Direction: " + bot.getAgtDir());
         if (lookRight()) {
-//            System.out.println("[->] lookRight");
+            System.out.println("Right Clear");
             moveBot(Actions.FACE_RIGHT);
-            if (lookForward()) moveBot(Actions.FORWARD);
+            if (lookForward()) {
+                System.out.println("  ->Forward Clear");
+                moveBot(Actions.FORWARD);
+            }
         } else if (lookForward()) {
-//            System.out.println("[->] lookForward");
+            System.out.println("Forward Clear");
             moveBot(Actions.FORWARD);
         } else if (lookLeft()) {
-//            System.out.println("[->] lookleft");
+            System.out.println("Left Clear");
             moveBot(Actions.FACE_LEFT);
-            if (lookForward()) moveBot(Actions.FORWARD);
+            if (lookForward()) {
+                System.out.println("  ->Forward Clear");
+                moveBot(Actions.FORWARD);
+            }
         } else {
-            moveBot(Actions.FACE_REVERSE);
+            System.out.println("Reverse Direction");
+            moveBot(Actions.FACE_RIGHT);
+            moveBot(Actions.FACE_RIGHT);
         }
     }
 
@@ -127,6 +138,7 @@ public class RightWallHugging extends ExplorationAlgo {
      * Returns true if the right side of the robot is free to move into.
      */
     private boolean lookRight() {
+        System.out.println("[Function executed] lookRight()");
         switch (bot.getAgtDir()) {
             case NORTH:
                 return eastFree();
@@ -144,6 +156,7 @@ public class RightWallHugging extends ExplorationAlgo {
      * Returns true if the robot is free to move forward.
      */
     private boolean lookForward() {
+        System.out.println("[Function executed] lookForward()");
         switch (bot.getAgtDir()) {
             case NORTH:
                 return northFree();
@@ -161,6 +174,7 @@ public class RightWallHugging extends ExplorationAlgo {
      * * Returns true if the left side of the robot is free to move into.
      */
     private boolean lookLeft() {
+        System.out.println("[Function executed] lookLeft()");
         switch (bot.getAgtDir()) {
             case NORTH:
                 return westFree();
@@ -178,6 +192,7 @@ public class RightWallHugging extends ExplorationAlgo {
      * Returns true if the robot can move to the north cell.
      */
     private boolean northFree() {
+        System.out.println("[Function executed] northFree()");
         int botRow = bot.getAgtY();
         int botCol = bot.getAgtX();
         return (isExploredNotObstacle(botRow + 1, botCol - 1) && isExploredAndFree(botRow + 1, botCol) && isExploredNotObstacle(botRow + 1, botCol + 1));
@@ -187,6 +202,7 @@ public class RightWallHugging extends ExplorationAlgo {
      * Returns true if the robot can move to the east cell.
      */
     private boolean eastFree() {
+        System.out.println("[Function executed] eastFree()");
         int botRow = bot.getAgtY();
         int botCol = bot.getAgtX();
         return (isExploredNotObstacle(botRow - 1, botCol + 1) && isExploredAndFree(botRow, botCol + 1) && isExploredNotObstacle(botRow + 1, botCol + 1));
@@ -196,6 +212,7 @@ public class RightWallHugging extends ExplorationAlgo {
      * Returns true if the robot can move to the south cell.
      */
     private boolean southFree() {
+        System.out.println("[Function executed] southFree()");
         int botRow = bot.getAgtY();
         int botCol = bot.getAgtX();
         return (isExploredNotObstacle(botRow - 1, botCol - 1) && isExploredAndFree(botRow - 1, botCol) && isExploredNotObstacle(botRow - 1, botCol + 1));
@@ -205,6 +222,7 @@ public class RightWallHugging extends ExplorationAlgo {
      * Returns true if the robot can move to the west cell.
      */
     private boolean westFree() {
+        System.out.println("[Function executed] westFree()");
         int botRow = bot.getAgtY();
         int botCol = bot.getAgtX();
         return (isExploredNotObstacle(botRow - 1, botCol - 1) && isExploredAndFree(botRow, botCol - 1) && isExploredNotObstacle(botRow + 1, botCol - 1));
@@ -214,13 +232,38 @@ public class RightWallHugging extends ExplorationAlgo {
      * Send the bot to START and points the bot northwards
      */
     private void goHome() {
-        // TODO
+        if (!bot.hasEnteredGoal() && coverageLimit == 300 && timeLimit == 3600) {
+            AStarHeuristicSearch goToGoal = new AStarHeuristicSearch(exploredMap, bot, realMap);
+            goToGoal.runFastestPath(AgentSettings.GOAL_ROW, AgentSettings.GOAL_COL);
+        }
+
+        AStarHeuristicSearch returnToStart = new AStarHeuristicSearch(exploredMap, bot, realMap);
+        returnToStart.runFastestPath(AgentSettings.START_ROW, AgentSettings.START_COL);
+
+        System.out.println("Exploration complete!");
+        areaExplored = calculateAreaExplored();
+        System.out.printf("%.2f%% Coverage", (areaExplored / 300.0) * 100.0);
+        System.out.println(", " + areaExplored + " Cells");
+        System.out.println((System.currentTimeMillis() - startTime) / 1000 + " Seconds");
+
+        // TODO realbot
+//        if (bot.getRealBot()) {
+//            turnBotDirection(DIRECTION.WEST);
+//            moveBot(MOVEMENT.CALIBRATE);
+//            turnBotDirection(DIRECTION.SOUTH);
+//            moveBot(MOVEMENT.CALIBRATE);
+//            turnBotDirection(DIRECTION.WEST);
+//            moveBot(MOVEMENT.CALIBRATE);
+//        }
+        turnBotDirection(Direction.NORTH);
+        System.out.println("Went home");
     }
 
     /**
      * Returns true for cells that are explored and not obstacles.
      */
     private boolean isExploredNotObstacle(int r, int c) {
+        System.out.println(exploredMap.getCell(r, c));
         if (exploredMap.checkValidCell(r, c)) {
             Cell tmp = exploredMap.getCell(r, c);
             return (tmp.isExplored() && !tmp.isObstacle());
@@ -232,6 +275,7 @@ public class RightWallHugging extends ExplorationAlgo {
      * Returns true for cells that are explored, not virtual walls and not obstacles.
      */
     private boolean isExploredAndFree(int r, int c) {
+        System.out.println(exploredMap.getCell(r, c));
         if (exploredMap.checkValidCell(r, c)) {
             Cell b = exploredMap.getCell(r, c);
             return (b.isExplored() && !b.isVirtualWall() && !b.isObstacle());
@@ -259,8 +303,8 @@ public class RightWallHugging extends ExplorationAlgo {
      */
     private void moveBot(Actions m) {
 //        System.out.println("[Agent Dir] " + bot.getAgtDir());
-        bot.takeAction(m, 1, exploredMap, realMap);
         System.out.println("Action executed: " + m);
+        bot.takeAction(m, 1, exploredMap, realMap);
         senseAndRepaint();
 
         // TODO calibration
@@ -297,8 +341,8 @@ public class RightWallHugging extends ExplorationAlgo {
          * Sets the bot's sensors, processes the sensor data and repaints the map.
          */
     private void senseAndRepaint() {
-//        bot.setSensors();
-//        bot.senseEnv(exploredMap, realMap);
+        bot.setSensors();
+        bot.senseEnv(exploredMap, realMap);
         exploredMap.repaint();
     }
 
@@ -361,19 +405,19 @@ public class RightWallHugging extends ExplorationAlgo {
         /**
          * Turns the robot to the required direction.
          */
-//    private void turnBotDirection(Direction targetDir) {
-//        int numOfTurn = Math.abs(bot.getRobotCurDir().ordinal() - targetDir.ordinal());
-//        if (numOfTurn > 2) numOfTurn = numOfTurn % 2;
-//
-//        if (numOfTurn == 1) {
-//            if (DIRECTION.getNext(bot.getRobotCurDir()) == targetDir) {
-//                moveBot(MOVEMENT.RIGHT);
-//            } else {
-//                moveBot(MOVEMENT.LEFT);
-//            }
-//        } else if (numOfTurn == 2) {
-//            moveBot(MOVEMENT.RIGHT);
-//            moveBot(MOVEMENT.RIGHT);
-//        }
-//    }
+    private void turnBotDirection(Direction targetDir) {
+        int numOfTurn = Math.abs(bot.getAgtDir().ordinal() - targetDir.ordinal()) / 2;
+        if (numOfTurn > 2) numOfTurn = numOfTurn % 2;
+
+        if (numOfTurn == 1) {
+            if (Direction.clockwise90(bot.getAgtDir()) == targetDir) {
+                moveBot(Actions.FACE_RIGHT);
+            } else {
+                moveBot(Actions.FACE_LEFT);
+            }
+        } else if (numOfTurn == 2) {
+            moveBot(Actions.FACE_RIGHT);
+            moveBot(Actions.FACE_RIGHT);
+        }
+    }
 }

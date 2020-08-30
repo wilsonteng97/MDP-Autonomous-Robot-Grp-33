@@ -112,17 +112,19 @@ public class Sensor {
                 }
             }
         }
+
         // If anything is detected by sensor, return range
         for (int i = this.lowerLimit; i <= this.upperLimit; i++) {
             int row = this.getBoardY() + (rowDisplacement * i);
             int col = this.getBoardX() + (colDisplacement * i);
-
             if (!explorationMap.checkValidCell(row, col)) {
+                System.out.printf("Cell[%d, %d] is not valid", col, row);
                 return i;
             }
             explorationMap.getCell(row, col).setExplored(true);
             if (simMap.getCell(row, col).isObstacle()) {
                 explorationMap.getCell(row, col).setObstacle(true);
+
                 return i;
             }
         }

@@ -179,11 +179,10 @@ public class Simulator {
                     // Transmit signal to get Agent to start. Initiate handshake signals.
                 }
 
-                FastestPathAlgo fastestPath;
+                AStarHeuristicSearch fastestPath;
                 fastestPath = new AStarHeuristicSearch(explorationMap, agt);
 
-                ((AStarHeuristicSearch) fastestPath).runFastestPath(
-                        MapSettings.GOAL_ROW, MapSettings.GOAL_COL);
+                fastestPath.runFastestPath(MapSettings.GOAL_ROW, MapSettings.GOAL_COL);
 
                 return 222;
             }

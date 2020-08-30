@@ -15,7 +15,7 @@ import java.util.Scanner;
 
 
 
-public class AStarHeuristicSearch extends FastestPathAlgo {
+public class AStarHeuristicSearch {
     private ArrayList<Cell> toVisit;        // array of Cells to be visited
     private ArrayList<Cell> visited;        // array of visited Cells
     private HashMap<Cell, Cell> parents;    // HashMap of Child --> Parent
@@ -32,13 +32,11 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
     private Scanner scanner = new Scanner(System.in);
 
     public AStarHeuristicSearch(Map exploredMap, Agent bot) {
-        super(exploredMap, bot);
         this.realMap = null;
         initObject(exploredMap, bot);
     }
 
     public AStarHeuristicSearch(Map exploredMap, Agent bot, Map realMap) {
-        super(exploredMap, bot);
         this.realMap = realMap;
         this.explorationMode = true;
         initObject(exploredMap, bot);
@@ -54,7 +52,7 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
         this.visited = new ArrayList<>();
         this.parents = new HashMap<>();
         this.neighbors = new Cell[4];
-        this.current = map.getCell(bot.getAgtX(), bot.getAgtY());
+        this.current = map.getCell(bot.getAgtRow(), bot.getAgtCol());
         this.curDir = bot.getAgtDir();
         this.gCosts = new double[MapSettings.MAP_ROWS][MapSettings.MAP_COLS];
 
@@ -69,10 +67,10 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
                 }
             }
         }
-        toVisit.add(current); // add START to toVisit
+        toVisit.add(current);
 
         // Initialise starting point
-        gCosts[bot.getAgtX()][bot.getAgtY()] = 0;
+        gCosts[bot.getAgtRow()][bot.getAgtCol()] = 0;
         this.loopCount = 0;
     }
 
@@ -93,7 +91,7 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
         Cell result = null;
 
         for (int i = size - 1; i >= 0; i--) {
-            double gCost = gCosts[(toVisit.get(i).getX())][(toVisit.get(i).getY())];
+            double gCost = gCosts[(toVisit.get(i).getRow())][(toVisit.get(i).getCol())];
             double cost = gCost + costH(toVisit.get(i), goalRow, getCol);
             if (cost < minCost) {
                 minCost = cost;
@@ -110,13 +108,13 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
      */
     private double costH(Cell b, int goalRow, int goalCol) {
         // Heuristic: The no. of moves will be equal to the difference in the row and column values.
-        double movementCost = (Math.abs(goalCol - b.getY()) + Math.abs(goalRow - b.getX())) * AgentSettings.MOVE_COST;
+        double movementCost = (Math.abs(goalCol - b.getCol()) + Math.abs(goalRow - b.getRow())) * AgentSettings.MOVE_COST;
 
         if (movementCost == 0) return 0;
 
         // Heuristic: If b is not in the same row or column, one turn will be needed.
         double turnCost = 0;
-        if (goalCol - b.getY() != 0 || goalRow - b.getX() != 0) {
+        if (goalCol - b.getCol() != 0 || goalRow - b.getRow() != 0) {
             turnCost = AgentSettings.TURN_COST;
         }
 
@@ -128,14 +126,14 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
      * Assuming bot position and target position are neighbors
      */
     private Direction getTargetDir(int botR, int botC, Direction botDir, Cell target) {
-        if (botC - target.getY() > 0) {
+        if (botC - target.getCol() > 0) {
             return Direction.WEST;
-        } else if (target.getY() - botC > 0) {
+        } else if (target.getCol() - botC > 0) {
             return Direction.EAST;
         } else {
-            if (botR - target.getX() > 0) {
+            if (botR - target.getRow() > 0) {
                 return Direction.SOUTH;
-            } else if (target.getX() - botR > 0) {
+            } else if (target.getRow() - botR > 0) {
                 return Direction.NORTH;
             } else {
                 return botDir;
@@ -162,7 +160,7 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
         double moveCost = AgentSettings.MOVE_COST; // one movement to neighbor
 
         double turnCost;
-        Direction targetDir = getTargetDir(a.getX(), a.getY(), aDir, b);
+        Direction targetDir = getTargetDir(a.getRow(), a.getCol(), aDir, b);
         turnCost = getTurnCost(aDir, targetDir);
 
         return moveCost + turnCost;
@@ -172,27 +170,23 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
      * Find the fastest path from the robot's current position to [goalRow, goalCol].
      */
     public String runFastestPath(int goalRow, int goalCol) {
-        System.out.println("Calculating fastest path from (" + current.getX() + ", " + current.getY() + ") to goal (" + goalRow + ", " + goalCol + ")...");
+        System.out.println("Calculating fastest path from (" + current.getRow() + ", " + current.getCol() + ") to goal (" + goalRow + ", " + goalCol + ")...");
 
         Stack<Cell> path;
         do {
             loopCount++;
-            System.out.printf("Expansion %d: \n", loopCount);
 
             // Get cell with minimum cost from toVisit and assign it to current.
             current = minimumCostCell(goalRow, goalCol);
-            System.out.println("Checking cell...");
-            System.out.println(current);
-            System.out.println();
+
             // Point the robot in the direction of current from the previous cell.
             if (parents.containsKey(current)) {
-                curDir = getTargetDir(parents.get(current).getX(), parents.get(current).getY(), curDir, current);
+                curDir = getTargetDir(parents.get(current).getRow(), parents.get(current).getCol(), curDir, current);
             }
 
             visited.add(current);       // add current to visited
             toVisit.remove(current);    // remove current from toVisit
 
-            // Terminating condition
             if (visited.contains(exploredMap.getCell(goalRow, goalCol))) {
                 System.out.println("Goal visited. Path found!");
                 path = getPath(goalRow, goalCol);
@@ -201,30 +195,26 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
             }
 
             // Setup neighbors of current cell. [Top, Bottom, Left, Right].
-            // Top
-            if (exploredMap.checkValidCell(current.getX() + 1, current.getY())) {
-                neighbors[0] = exploredMap.getCell(current.getX() + 1, current.getY());
+            if (exploredMap.checkValidCell(current.getRow() + 1, current.getCol())) {
+                neighbors[0] = exploredMap.getCell(current.getRow() + 1, current.getCol());
                 if (!canBeVisited(neighbors[0])) {
                     neighbors[0] = null;
                 }
             }
-            // Bottom
-            if (exploredMap.checkValidCell(current.getX() - 1, current.getY())) {
-                neighbors[1] = exploredMap.getCell(current.getX() - 1, current.getY());
+            if (exploredMap.checkValidCell(current.getRow() - 1, current.getCol())) {
+                neighbors[1] = exploredMap.getCell(current.getRow() - 1, current.getCol());
                 if (!canBeVisited(neighbors[1])) {
                     neighbors[1] = null;
                 }
             }
-            // Left
-            if (exploredMap.checkValidCell(current.getX(), current.getY() - 1)) {
-                neighbors[2] = exploredMap.getCell(current.getX(), current.getY() - 1);
+            if (exploredMap.checkValidCell(current.getRow(), current.getCol() - 1)) {
+                neighbors[2] = exploredMap.getCell(current.getRow(), current.getCol() - 1);
                 if (!canBeVisited(neighbors[2])) {
                     neighbors[2] = null;
                 }
             }
-            // Right
-            if (exploredMap.checkValidCell(current.getX(), current.getY() + 1)) {
-                neighbors[3] = exploredMap.getCell(current.getX(), current.getY() + 1);
+            if (exploredMap.checkValidCell(current.getRow(), current.getCol() + 1)) {
+                neighbors[3] = exploredMap.getCell(current.getRow(), current.getCol() + 1);
                 if (!canBeVisited(neighbors[3])) {
                     neighbors[3] = null;
                 }
@@ -238,25 +228,19 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
                     }
 
                     if (!(toVisit.contains(neighbors[i]))) {
-                        parents.put(neighbors[i], current); // child->parent
-                        gCosts[neighbors[i].getX()][neighbors[i].getY()] = gCosts[current.getX()][current.getY()] + costG(current, neighbors[i], curDir);
+                        parents.put(neighbors[i], current);
+                        gCosts[neighbors[i].getRow()][neighbors[i].getCol()] = gCosts[current.getRow()][current.getCol()] + costG(current, neighbors[i], curDir);
                         toVisit.add(neighbors[i]);
                     } else {
-                        double currentGScore = gCosts[neighbors[i].getX()][neighbors[i].getY()];
-                        double newGScore = gCosts[current.getX()][current.getY()] + costG(current, neighbors[i], curDir);
+                        double currentGScore = gCosts[neighbors[i].getRow()][neighbors[i].getCol()];
+                        double newGScore = gCosts[current.getRow()][current.getCol()] + costG(current, neighbors[i], curDir);
                         if (newGScore < currentGScore) {
-                            gCosts[neighbors[i].getX()][neighbors[i].getY()] = newGScore;
+                            gCosts[neighbors[i].getRow()][neighbors[i].getCol()] = newGScore;
                             parents.put(neighbors[i], current);
                         }
                     }
                 }
             }
-            System.out.println("Expanding...");
-            for (Cell tmp : toVisit) {
-                if (tmp != null)
-                    System.out.printf("%s\tgCost: %.0f\thCost: %.0f\ttotalCost: %.0f\n", tmp, gCosts[tmp.getX()][tmp.getY()], costH(tmp, goalRow, goalCol), gCosts[tmp.getX()][tmp.getY()]+costH(tmp, goalRow, goalCol));
-            }
-            scanner.nextLine();
         } while (!toVisit.isEmpty());
 
         System.out.println("Path not found!");
@@ -295,12 +279,14 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
 
         Agent tempBot = new Agent(1, 1, true);
         tempBot.setSpeed(0);
-        while ((tempBot.getAgtX() != goalRow) || (tempBot.getAgtY() != goalCol)) {
-            if (tempBot.getAgtX() == temp.getX() && tempBot.getAgtY() == temp.getY()) {
+        while ((tempBot.getAgtRow() != goalRow) || (tempBot.getAgtCol() != goalCol)) {
+//            System.out.println("Checking " + temp);
+            if (tempBot.getAgtRow() == temp.getRow() && tempBot.getAgtCol() == temp.getCol()) {
                 temp = path.pop();
+//                System.out.println(" -> Update to " + temp);
             }
 
-            targetDir = getTargetDir(tempBot.getAgtX(), tempBot.getAgtY(), tempBot.getAgtDir(), temp);
+            targetDir = getTargetDir(tempBot.getAgtRow(), tempBot.getAgtCol(), tempBot.getAgtDir(), temp);
 
             Actions m;
             if (tempBot.getAgtDir() != targetDir) {
@@ -309,11 +295,12 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
                 m = Actions.FORWARD;
             }
 
-            System.out.println("Movement " + Actions.print(m) + " from (" + tempBot.getAgtX() + ", " + tempBot.getAgtY() + ") to (" + temp.getX() + ", " + temp.getY() + ")");
+            System.out.println("Movement " + Actions.print(m) + " from (" + tempBot.getAgtCol() + ", " + tempBot.getAgtRow() + ") to (" + temp.getCol() + ", " + temp.getRow() + ")");
 
-            tempBot.takeAction(m);
+            tempBot.takeAction(m, 1, exploredMap, realMap);
             movements.add(m);
             outputString.append(Actions.print(m));
+//            scanner.nextLine();
         }
 
         if (bot.isSim() || explorationMode) {
@@ -325,14 +312,14 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
                     }
                 }
 
-                bot.takeAction(x);
+                bot.takeAction(x, 1, exploredMap, realMap);
                 this.exploredMap.repaint();
 
                 // During exploration, use sensor data to update exploredMap.
                 // TODO get update sensor
                 if (explorationMode) {
                     bot.setSensors();
-//                    bot.sense(this.exploredMap, this.realMap);
+                    bot.senseEnv(this.exploredMap, this.realMap);
                     this.exploredMap.repaint();
                 }
             }
@@ -374,8 +361,8 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
      * Returns true if the robot can move forward one cell with the current heading.
      */
     private boolean canMoveForward() {
-        int row = bot.getAgtX();
-        int col = bot.getAgtY();
+        int row = bot.getAgtRow();
+        int col = bot.getAgtCol();
 
         switch (bot.getAgtDir()) {
             case NORTH:
@@ -471,8 +458,8 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
         System.out.println("Path:");
         while (!pathForPrint.isEmpty()) {
             temp = pathForPrint.pop();
-            if (!pathForPrint.isEmpty()) System.out.print("(" + temp.getX() + ", " + temp.getY() + ") --> ");
-            else System.out.print("(" + temp.getX() + ", " + temp.getY() + ")");
+            if (!pathForPrint.isEmpty()) System.out.print("(" + temp.getCol() + ", " + temp.getRow() + ") --> ");
+            else System.out.print("(" + temp.getCol() + ", " + temp.getRow() + ")");
         }
 
         System.out.println("\n");

@@ -5,6 +5,11 @@ public class AgentSettings {
     public static final Direction START_DIR = Direction.NORTH;
     public static final int SPEED = 100;                // delay between movements (ms)
 
+    public static final int GOAL_ROW = 18;                          // row no. of goal cell
+    public static final int GOAL_COL = 13;                          // col no. of goal cell
+    public static final int START_ROW = 1;                          // row no. of start cell
+    public static final int START_COL = 1;                          // col no. of start cell
+
     // G values used for A* algorithm
     public static final int MOVE_COST = 1;
     public static final int TURN_COST = 5;
@@ -101,11 +106,11 @@ public class AgentSettings {
                 case BACKWARD:
                     return "B";
                 case FACE_RIGHT:
-                    return "FR";
+                    return "FACE_RIGHT";
                 case MOVE_RIGHT:
                     return "MR";
                 case FACE_LEFT:
-                    return "FL";
+                    return "FACE_LEFT";
                 case MOVE_LEFT:
                     return "ML";
                 case START_EXP:
