@@ -37,7 +37,7 @@ public class Simulator {
     public static void main(String[] args) {
 //        if (!sim) comm.openConnection();
 
-        agt = new Agent(MapSettings.START_ROW, MapSettings.START_COL, startDir, sim);
+        agt = new Agent(MapSettings.START_ROW, MapSettings.START_COL, sim);
         if (sim) {
             dummyMap = new Map(agt); dummyMap.setAllUnexplored();
         }
@@ -179,10 +179,10 @@ public class Simulator {
                     // Transmit signal to get Agent to start. Initiate handshake signals.
                 }
 
-                FastestPathAlgo fastestPath;
+                AStarHeuristicSearch fastestPath;
                 fastestPath = new AStarHeuristicSearch(explorationMap, agt);
 
-                fastestPath.run(MapSettings.GOAL_ROW, MapSettings.GOAL_COL);
+                fastestPath.runFastestPath(MapSettings.GOAL_ROW, MapSettings.GOAL_COL);
 
                 return 222;
             }
@@ -196,6 +196,7 @@ public class Simulator {
                 row = MapSettings.START_ROW;
                 col = MapSettings.START_COL;
 
+                explorationMap.setAllUnexplored(); dummyMap.setAllUnexplored();
                 agt.setAgtCtrCoord(row, col);
                 explorationMap.repaint();
 
@@ -206,7 +207,7 @@ public class Simulator {
                     // Transmit signal to start Agent
                 }
 
-                exploration.run();
+                ((RightWallHugging) exploration).runExploration();
 
                 if (!sim) {
                     new FastestPath().execute();

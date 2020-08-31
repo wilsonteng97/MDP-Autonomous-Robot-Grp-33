@@ -50,6 +50,8 @@ public class Cell {
     }
     public int getX() { return (int)coord.getX(); } // return coord[0] in integer
     public int getY() { return (int)coord.getY(); } // return coord[1] in integer
+    public int getRow() { return getY(); }
+    public int getCol() { return getX(); }
     public void setCoord(Point coord) {
         this.coord = coord;
     }
