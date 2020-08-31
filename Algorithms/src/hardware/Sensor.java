@@ -114,6 +114,7 @@ public class Sensor {
         }
 
         // If anything is detected by sensor, return range
+//        System.out.println("Lower : " + this.lowerLimit + " | Upper : " + this.upperLimit);
         for (int i = this.lowerLimit; i <= this.upperLimit; i++) {
             int row = this.getBoardY() + (rowDisplacement * i);
             int col = this.getBoardX() + (colDisplacement * i);
@@ -121,10 +122,9 @@ public class Sensor {
                 System.out.printf("Cell[%d, %d] is not valid", col, row);
                 return i;
             }
-            explorationMap.getCell(row, col).setExplored(true);
+//            explorationMap.getCell(row, col).setExplored(true);
             if (simMap.getCell(row, col).isObstacle()) {
-                explorationMap.getCell(row, col).setObstacle(true);
-
+//                explorationMap.getCell(row, col).setObstacle(true);
                 return i;
             }
         }
@@ -138,13 +138,13 @@ public class Sensor {
     public void realDetect(Map explorationMap, int sensorVal) {
         switch (sensorDir) {
             case NORTH:
-                detectObstacle(explorationMap, sensorVal, 1, 0);
+                detectObstacle(explorationMap, sensorVal, 1, 0); break;
             case EAST:
-                detectObstacle(explorationMap, sensorVal, 0, 1);
+                detectObstacle(explorationMap, sensorVal, 0, 1); break;
             case SOUTH:
-                detectObstacle(explorationMap, sensorVal, -1, 0);
+                detectObstacle(explorationMap, sensorVal, -1, 0); break;
             case WEST:
-                detectObstacle(explorationMap, sensorVal, 0, -1);
+                detectObstacle(explorationMap, sensorVal, 0, -1); break;
         }
     }
     public void detectObstacle(Map explorationMap, int sensorVal, int rowDispl, int colDispl) {
@@ -159,28 +159,30 @@ public class Sensor {
             if (explorationMap.getCell(row, col).isObstacle()) return;
         }
 
-        // Update map according to sensor's value.
+        // Update Map according to sensor value
         for (int i = this.lowerLimit; i <= this.upperLimit; i++) {
             int row = this.getBoardY() + (rowDispl * i);
             int col = this.getBoardX() + (colDispl * i);
-
-            if (!explorationMap.checkValidCell(row, col)) continue;
-
+            if (!explorationMap.checkValidCell(row, col)) {
+                System.out.println("Cell[" + col + ", " + row + "]" + "is not valid"); return;
+            }
+//            System.out.println("[!SETEXPLORED@" + i + "] Cell[" + col + ", " + row + "]");
             explorationMap.getCell(row, col).setExplored(true);
-
             if (sensorVal == i) {
-//                explorationMap.createVirtualWalls(row, col);
-                break;
+//                System.out.println("[!SETOBSTACLE@" + i + "] Cell[" + col + ", " + row + "]");
+                explorationMap.getCell(row, col).setObstacle(true);
+                explorationMap.createVirtualWalls(row, col);
+//                System.out.println("Cell is virtualwall @[" + (row+1) + ", " + col + "]=" + explorationMap.getCell(row+1, col).isVirtualWall());
+                return;
             }
-
-            // Override previous obstacle value if front sensors detect no obstacle.
-            if (explorationMap.getCell(row, col).isObstacle()) {
-                if (id.equals("SR1") || id.equals("SR2") || id.equals("SR3")) {
+//             Override previous obstacle value if front sensors detect no obstacle.
+//            if (explorationMap.getCell(row, col).isObstacle()) {
+//                if (id.equals("SR1") || id.equals("SR2") || id.equals("SR3")) {
 //                    explorationMap.resetVirtualWalls(row, col);
-                } else {
-                    break;
-                }
-            }
+//                } else {
+//                    break;
+//                }
+//            }
         }
     }
 }

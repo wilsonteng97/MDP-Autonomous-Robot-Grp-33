@@ -11,6 +11,7 @@ public class GraphicsSettings {
     public static final Color C_FREE = Color.LIGHT_GRAY;
     public static final Color C_UNEXPLORED = Color.GRAY;
     public static final Color C_OBSTACLE = Color.BLACK;
+    public static final Color C_VIRTUALWALL = Color.PINK;
 
     public static final Color C_ROBOT = Color.PINK;
     public static final Color C_ROBOT_DIR = Color.RED;

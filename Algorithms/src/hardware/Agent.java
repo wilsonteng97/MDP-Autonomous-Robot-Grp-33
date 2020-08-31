@@ -332,7 +332,7 @@ public class Agent {
         if (sim) {
             System.out.println(" -> Is simulator");
             for (Sensor s : sensorLst) {
-                System.out.println(" -> 1st loop executed");
+                System.out.println(" -> 1st loop executed | " + s.getId());
                 result[sensorCount] = s.simDetect(explorationMap, map);
                 sensorCount++;
             }
@@ -341,7 +341,7 @@ public class Agent {
         }
         sensorCount = 0;
         for (Sensor s : sensorLst) {
-            System.out.println(" -> 2nd loop executed");
+            System.out.println(" -> 2nd loop executed | [" + s.getId() + "]");
             s.realDetect(explorationMap, result[sensorCount]);
             sensorCount++;
         }

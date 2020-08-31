@@ -50,20 +50,20 @@ public class Map extends JPanel {
         }
     }
     public void createVirtualWalls(int row, int col) {
-        System.out.println("[Function executed] createVirtualWalls()");
+//        System.out.println("[Function executed] createVirtualWalls() " + row + ", " + col);
         // Set true walls
         if ((row == 0) || (row == MapSettings.MAP_ROWS - 1) || (col == 0) || (col == MapSettings.MAP_COLS - 1)) {
-            grid[row][col].setVirtualWall(true);
+            this.grid[row][col].setVirtualWall(true); return;
         }
         // Set obstacle virtual walls
-        if (grid[row][col].isObstacle()) {
-            System.out.printf(" ->grid[%d][%d] is obstacle", row, col);
+        if (this.grid[row][col].isObstacle()) {
+            System.out.printf(" ->grid[%d][%d] is obstacle\n", row, col);
 //            if (inStartZone(row, col) || inGoalZone(row, col)) return;
             for (int r = row - 1; r <= row + 1; r++)
                 for (int c = col - 1; c <= col + 1; c++)
                     if (checkValidCell(r, c)) {
                         System.out.println("Setting Virtual wall at " + "[" + r + ", " + c + "]");
-                        grid[row][col].setVirtualWall(true);
+                        this.grid[r][c].setVirtualWall(true);
                     }
 
         }
@@ -271,6 +271,8 @@ public class Map extends JPanel {
                         cellColor = GraphicsSettings.C_UNEXPLORED;
                     else if (grid[mapRow][mapCol].isObstacle())
                         cellColor = GraphicsSettings.C_OBSTACLE;
+                    else if (grid[mapRow][mapCol].isVirtualWall())
+                        cellColor = GraphicsSettings.C_VIRTUALWALL;
                     else
                         cellColor = GraphicsSettings.C_FREE;
                 }
