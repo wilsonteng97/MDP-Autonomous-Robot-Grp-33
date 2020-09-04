@@ -248,8 +248,8 @@ public class Simulator {
                 agt.setAgtCtrCoord(MapSettings.START_ROW, MapSettings.START_COL);
                 explorationMap.repaint();
 
-                ExplorationAlgo timeExplo = new ExplorationAlgo(explorationMap, dummyMap, agt, coverageLimit, timeLimit);
-                timeExplo.run();
+                ExplorationAlgo timeExplo = new RightWallHugging(explorationMap, dummyMap, agt, coverageLimit, timeLimit);
+                timeExplo.runExploration();
 
                 return 333;
             }
@@ -293,8 +293,8 @@ public class Simulator {
                 agt.setAgtCtrCoord(MapSettings.START_ROW, MapSettings.START_COL);
                 explorationMap.repaint();
 
-                ExplorationAlgo coverageExplo = new ExplorationAlgo(explorationMap, dummyMap, agt, coverageLimit, timeLimit);
-                coverageExplo.run();
+                ExplorationAlgo coverageExplo = new RightWallHugging(explorationMap, dummyMap, agt, coverageLimit, timeLimit);
+                coverageExplo.runExploration();
 
                 return 444;
             }
