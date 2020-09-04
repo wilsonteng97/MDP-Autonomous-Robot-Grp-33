@@ -11,15 +11,9 @@ import logic.fastestpath.AStarHeuristicSearch;
 import java.util.Scanner;
 
 public class RightWallHugging extends ExplorationAlgo {
-
-
     public RightWallHugging(Map exploredMap, Map realMap, Agent bot, int coverageLimit, int timeLimit) {
         super(exploredMap, realMap, bot, coverageLimit, timeLimit);
     }
-
-
-
-
 
     /**
      * Determines the next move for the robot and executes it accordingly.

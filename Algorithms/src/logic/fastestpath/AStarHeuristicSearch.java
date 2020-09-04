@@ -15,45 +15,34 @@ import java.util.Scanner;
 
 
 
-public class AStarHeuristicSearch {
+public class AStarHeuristicSearch extends FastestPathAlgo {
+
     private ArrayList<Cell> toVisit;        // array of Cells to be visited
     private ArrayList<Cell> visited;        // array of visited Cells
     private HashMap<Cell, Cell> parents;    // HashMap of Child --> Parent
-    private Cell current;                   // current Cell
     private Cell[] neighbors;               // array of neighbors of current Cell
-    private Direction curDir;               // current direction of robot
     private double[][] gCosts;              // array of real cost from START to [row][col] i.e. g(n)
-    private Agent bot;
-    private Map exploredMap;
-    private final Map realMap;
     private int loopCount;
-    private boolean explorationMode;
 
     private Scanner scanner = new Scanner(System.in);
 
     public AStarHeuristicSearch(Map exploredMap, Agent bot) {
-        this.realMap = null;
-        initObject(exploredMap, bot);
+        super(exploredMap, bot);
     }
 
     public AStarHeuristicSearch(Map exploredMap, Agent bot, Map realMap) {
-        this.realMap = realMap;
-        this.explorationMode = true;
-        initObject(exploredMap, bot);
+        super(exploredMap, bot, realMap);
     }
 
     /**
      * Initialise the FastestPathAlgo object.
      */
-    private void initObject(Map map, Agent bot) {
-        this.bot = bot;
-        this.exploredMap = map;
+    protected void initObject(Map map, Agent bot) {
+        super.initObject(map, bot);
         this.toVisit = new ArrayList<>();
         this.visited = new ArrayList<>();
         this.parents = new HashMap<>();
         this.neighbors = new Cell[4];
-        this.current = map.getCell(bot.getAgtRow(), bot.getAgtCol());
-        this.curDir = bot.getAgtDir();
         this.gCosts = new double[MapSettings.MAP_ROWS][MapSettings.MAP_COLS];
 
         // Initialise gCosts array
@@ -72,13 +61,6 @@ public class AStarHeuristicSearch {
         // Initialise starting point
         gCosts[bot.getAgtRow()][bot.getAgtCol()] = 0;
         this.loopCount = 0;
-    }
-
-    /**
-     * Returns true if the cell can be visited.
-     */
-    private boolean canBeVisited(Cell c) {
-        return c.isExplored() && !c.isObstacle() && !c.isVirtualWall();
     }
 
     /**
@@ -121,37 +103,6 @@ public class AStarHeuristicSearch {
         return movementCost + turnCost;
     }
 
-    /**
-     * Returns the target direction of the bot from [botR, botC] to target Cell.
-     * Assuming bot position and target position are neighbors
-     */
-    private Direction getTargetDir(int botR, int botC, Direction botDir, Cell target) {
-        if (botC - target.getCol() > 0) {
-            return Direction.WEST;
-        } else if (target.getCol() - botC > 0) {
-            return Direction.EAST;
-        } else {
-            if (botR - target.getRow() > 0) {
-                return Direction.SOUTH;
-            } else if (target.getRow() - botR > 0) {
-                return Direction.NORTH;
-            } else {
-                return botDir;
-            }
-        }
-    }
-
-    /**
-     * Get the actual turning cost from one DIRECTION to another.
-     * TODO need to test
-     */
-    private double getTurnCost(Direction a, Direction b) {
-        int numOfTurn = Math.abs(a.ordinal() - b.ordinal()) / 2;    // need to test
-        if (numOfTurn > 2) {
-            numOfTurn = numOfTurn % 2;
-        }
-        return (numOfTurn * AgentSettings.TURN_COST);
-    }
 
     /**
      * Calculate the actual cost of moving from Cell a to Cell b (assuming both are neighbors).
@@ -167,8 +118,9 @@ public class AStarHeuristicSearch {
     }
 
     /**
-     * Find the fastest path from the robot's current position to [goalRow, goalCol].
+     * Use a software bot to find the fastest path from the robot's current position to [goalRow, goalCol].
      */
+    @Override
     public String runFastestPath(int goalRow, int goalCol) {
         System.out.println("Calculating fastest path from (" + current.getRow() + ", " + current.getCol() + ") to goal (" + goalRow + ", " + goalCol + ")...");
 
@@ -251,7 +203,8 @@ public class AStarHeuristicSearch {
     /**
      * Generates path in reverse using the parents HashMap.
      */
-    private Stack<Cell> getPath(int goalRow, int goalCol) {
+    @Override
+    protected Stack<Cell> getPath(int goalRow, int goalCol) {
         Stack<Cell> actualPath = new Stack<>();
         Cell temp = exploredMap.getCell(goalRow, goalCol);
 
@@ -269,7 +222,8 @@ public class AStarHeuristicSearch {
     /**
      * Executes the fastest path and returns a StringBuilder object with the path steps.
      */
-    private String executePath(Stack<Cell> path, int goalRow, int goalCol) {
+    @Override
+    protected String executePath(Stack<Cell> path, int goalRow, int goalCol) {
         StringBuilder outputString = new StringBuilder();
 
         Cell temp = path.pop();
@@ -358,98 +312,10 @@ public class AStarHeuristicSearch {
     }
 
     /**
-     * Returns true if the robot can move forward one cell with the current heading.
-     */
-    private boolean canMoveForward() {
-        int row = bot.getAgtRow();
-        int col = bot.getAgtCol();
-
-        switch (bot.getAgtDir()) {
-            case NORTH:
-                if (!exploredMap.isObstacleCell(row + 2, col - 1) && !exploredMap.isObstacleCell(row + 2, col) && !exploredMap.isObstacleCell(row + 2, col + 1)) {
-                    return true;
-                }
-                break;
-            case EAST:
-                if (!exploredMap.isObstacleCell(row + 1, col + 2) && !exploredMap.isObstacleCell(row, col + 2) && !exploredMap.isObstacleCell(row - 1, col + 2)) {
-                    return true;
-                }
-                break;
-            case SOUTH:
-                if (!exploredMap.isObstacleCell(row - 2, col - 1) && !exploredMap.isObstacleCell(row - 2, col) && !exploredMap.isObstacleCell(row - 2, col + 1)) {
-                    return true;
-                }
-                break;
-            case WEST:
-                if (!exploredMap.isObstacleCell(row + 1, col - 2) && !exploredMap.isObstacleCell(row, col - 2) && !exploredMap.isObstacleCell(row - 1, col - 2)) {
-                    return true;
-                }
-                break;
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns the movement to execute to get from one direction to another.
-     */
-    private Actions getTargetMove(Direction a, Direction b) {
-        switch (a) {
-            case NORTH:
-                switch (b) {
-                    case NORTH:
-                        return Actions.ERROR;
-                    case SOUTH:
-                        return Actions.FACE_LEFT;
-                    case WEST:
-                        return Actions.FACE_LEFT;
-                    case EAST:
-                        return Actions.FACE_RIGHT;
-                }
-                break;
-            case SOUTH:
-                switch (b) {
-                    case NORTH:
-                        return Actions.FACE_LEFT;
-                    case SOUTH:
-                        return Actions.ERROR;
-                    case WEST:
-                        return Actions.FACE_RIGHT;
-                    case EAST:
-                        return Actions.FACE_LEFT;
-                }
-                break;
-            case WEST:
-                switch (b) {
-                    case NORTH:
-                        return Actions.FACE_RIGHT;
-                    case SOUTH:
-                        return Actions.FACE_LEFT;
-                    case WEST:
-                        return Actions.ERROR;
-                    case EAST:
-                        return Actions.FACE_LEFT;
-                }
-                break;
-            case EAST:
-                switch (b) {
-                    case NORTH:
-                        return Actions.FACE_LEFT;
-                    case SOUTH:
-                        return Actions.FACE_RIGHT;
-                    case WEST:
-                        return Actions.FACE_LEFT;
-                    case EAST:
-                        return Actions.ERROR;
-                }
-        }
-        return Actions.ERROR;
-    }
-
-    /**
      * Prints the fastest path from the Stack object.
      */
-    private void printFastestPath(Stack<Cell> path) {
+    @Override
+    protected void printFastestPath(Stack<Cell> path) {
         System.out.println("\nLooped " + loopCount + " times.");
         System.out.println("The number of steps is: " + (path.size() - 1) + "\n");
 
