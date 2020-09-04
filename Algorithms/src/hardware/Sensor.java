@@ -119,7 +119,6 @@ public class Sensor {
             int row = this.getBoardY() + (rowDisplacement * i);
             int col = this.getBoardX() + (colDisplacement * i);
             if (!explorationMap.checkValidCell(row, col)) {
-                System.out.printf("Cell[%d, %d] is not valid", col, row);
                 return i;
             }
 //            explorationMap.getCell(row, col).setExplored(true);
@@ -164,7 +163,8 @@ public class Sensor {
             int row = this.getBoardY() + (rowDispl * i);
             int col = this.getBoardX() + (colDispl * i);
             if (!explorationMap.checkValidCell(row, col)) {
-                System.out.println("Cell[" + col + ", " + row + "]" + "is not valid"); return;
+                System.out.println("Cell[" + col + ", " + row + "]" + "is not valid");
+                return;
             }
 //            System.out.println("[!SETEXPLORED@" + i + "] Cell[" + col + ", " + row + "]");
             explorationMap.getCell(row, col).setExplored(true);
