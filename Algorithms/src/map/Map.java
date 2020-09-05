@@ -53,7 +53,7 @@ public class Map extends JPanel {
 //        System.out.println("[Function executed] createVirtualWalls() " + row + ", " + col);
         // Set true walls
         if ((row == 0) || (row == MapSettings.MAP_ROWS - 1) || (col == 0) || (col == MapSettings.MAP_COLS - 1)) {
-            this.grid[row][col].setVirtualWall(true); return;
+            this.grid[row][col].setVirtualWall(true);
         }
         // Set obstacle virtual walls
         if (this.grid[row][col].isObstacle()) {
