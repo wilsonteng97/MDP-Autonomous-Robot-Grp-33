@@ -4,10 +4,7 @@ import hardware.Agent;
 import hardware.AgentSettings;
 import map.Cell;
 import map.Map;
-import map.MapSettings;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Stack;
 
 abstract public class FastestPathAlgo {
