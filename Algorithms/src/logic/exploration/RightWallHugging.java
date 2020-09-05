@@ -1,14 +1,8 @@
 package logic.exploration;
 
 import hardware.Agent;
-import hardware.AgentSettings;
+import hardware.AgentSettings.Actions;
 import map.Map;
-import map.MapSettings;
-import map.Cell;
-import hardware.AgentSettings.*;
-import logic.fastestpath.AStarHeuristicSearch;
-
-import java.util.Scanner;
 
 public class RightWallHugging extends ExplorationAlgo {
     public RightWallHugging(Map exploredMap, Map realMap, Agent bot, int coverageLimit, int timeLimit) {

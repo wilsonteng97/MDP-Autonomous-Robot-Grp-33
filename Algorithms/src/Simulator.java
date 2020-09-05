@@ -2,8 +2,8 @@ import hardware.Agent;
 import hardware.AgentSettings;
 import logic.exploration.ExplorationAlgo;
 import logic.exploration.RightWallHugging;
-import logic.fastestpath.AStarHeuristicSearch;
 import logic.fastestpath.FastestPathAlgo;
+import logic.fastestpath.AStarHeuristicSearch;
 import map.Map;
 import map.MapSettings;
 import network.NetworkMgr;
@@ -186,7 +186,7 @@ public class Simulator {
                     }
                 }
 
-                AStarHeuristicSearch fastestPath;
+                FastestPathAlgo fastestPath;
                 fastestPath = new AStarHeuristicSearch(explorationMap, agt);
 
                 fastestPath.runFastestPath(MapSettings.GOAL_ROW, MapSettings.GOAL_COL);
@@ -212,9 +212,10 @@ public class Simulator {
 
                 if (!sim) {
                     // Transmit signal to start Agent
+                    NetworkMgr.getInstance().sendMsg(null, NetworkMgr.BOT_START);
                 }
 
-                ((RightWallHugging) exploration).runExploration();
+                exploration.runExploration();
 
                 if (!sim) {
                     new FastestPath().execute();
