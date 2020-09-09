@@ -8,6 +8,7 @@ import map.Cell;
 import map.Map;
 import map.MapSettings;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -270,7 +271,6 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
                 this.exploredMap.repaint();
 
                 // During exploration, use sensor data to update exploredMap.
-                // TODO get update sensor
                 if (explorationMode) {
                     bot.setSensors();
                     bot.senseEnv(this.exploredMap, this.realMap);
@@ -280,31 +280,31 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
         }
         else {
             // TODO real bot
-//            int fCount = 0;
-//            for (Actions x : movements) {
-//                if (x == Actions.FORWARD) {
-//                    fCount++;
-//                    if (fCount == 10) {
-//                        bot.moveForwardMultiple(fCount);
-//                        fCount = 0;
-//                        exploredMap.repaint();
-//                    }
-//                } else if (x == MOVEMENT.RIGHT || x == MOVEMENT.LEFT) {
-//                    if (fCount > 0) {
-//                        bot.moveForwardMultiple(fCount);
-//                        fCount = 0;
-//                        exploredMap.repaint();
-//                    }
-//
-//                    bot.move(x);
-//                    exploredMap.repaint();
-//                }
-//            }
-//
-//            if (fCount > 0) {
-//                bot.moveForwardMultiple(fCount);
-//                exploredMap.repaint();
-//            }
+            int fCount = 0;
+            for (Actions x : movements) {
+                if (x == Actions.FORWARD) {
+                    fCount++;
+                    if (fCount == 10) {
+                        bot.takeAction(Actions.FORWARD, fCount, exploredMap, realMap);
+                        fCount = 0;
+                        exploredMap.repaint();
+                    }
+                } else if (x == Actions.FACE_RIGHT || x == Actions.FACE_LEFT) {
+                    if (fCount > 0) {
+                        bot.takeAction(Actions.FORWARD, fCount, exploredMap, realMap);
+                        fCount = 0;
+                        exploredMap.repaint();
+                    }
+
+                    bot.takeAction(x, 1, exploredMap, realMap);
+                    exploredMap.repaint();
+                }
+            }
+
+            if (fCount > 0) {
+                bot.takeAction(Actions.FORWARD, fCount, exploredMap, realMap);
+                exploredMap.repaint();
+            }
         }
 
         System.out.println("\nMovements: " + outputString.toString());

@@ -2,6 +2,7 @@ package hardware;
 
 import map.Map;
 import map.MapSettings;
+import network.NetworkMgr;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -198,6 +199,7 @@ public class Agent {
 
             case ALIGN_FRONT:
             case ALIGN_RIGHT:
+            case CALIBRATE:
                 agtDir = calibrate(action, explorationMap, map); break;
 
             case ERROR:
@@ -238,6 +240,7 @@ public class Agent {
         switch(action) {
             case ALIGN_FRONT:
             case ALIGN_RIGHT:
+            case CALIBRATE:
                 break;
         }
         this.setSensors();
@@ -254,8 +257,6 @@ public class Agent {
             case FACE_REVERSE:
                 this.agtDir = AgentSettings.Direction.reverse(agtDir); break;
         }
-//        this.setSensors();
-//        this.senseEnv(explorationMap, map);
         return agtDir;
     }
 
@@ -308,15 +309,11 @@ public class Agent {
                 System.out.println("Error in Agent.move()!" + action + " " + agtDir);
                 break;
         }
-//        setSensors();
-//        senseEnv(explorationMap, map);
-//        System.out.println("br");
 
         // TODO real bot: send AgentSettings.Direction
-        if (!sim) {}
+        if (!sim) {sendMovement(action);}
 
         updateEnteredGoal();
-        System.out.printf("[Function completed] move(%s)\n", action);
         return agtDir;
     }
 
@@ -325,14 +322,11 @@ public class Agent {
      * (with the help of sensors)
      */
     public int[] senseEnv(Map explorationMap, Map map) {
-//        System.out.println("[Function executed] senseEnv");
         int[] result = new int[sensorLst.size()];
         int sensorCount = 0;
 
         if (sim) {
-//            System.out.println(" -> Is simulator");
             for (Sensor s : sensorLst) {
-//                System.out.println(" -> 1st loop executed | " + s.getId());
                 result[sensorCount] = s.simDetect(explorationMap, map);
                 sensorCount++;
             }
@@ -341,7 +335,6 @@ public class Agent {
         }
         sensorCount = 0;
         for (Sensor s : sensorLst) {
-//            System.out.println(" -> 2nd loop executed | [" + s.getId() + "]");
             s.realDetect(explorationMap, result[sensorCount]);
             sensorCount++;
         }
@@ -397,7 +390,11 @@ public class Agent {
     /**
      * !FIXME For real run, Network interface with Android Methods
      */
-    public void transmitAction(AgentSettings.Actions action) {
-        takeAction(action);
+    private void sendMovement(AgentSettings.Actions m) {
+        NetworkMgr comm = NetworkMgr.getInstance();
+        comm.sendMsg(AgentSettings.Actions.print(m) + "", NetworkMgr.INSTRUCTIONS);
+        if (m != AgentSettings.Actions.CALIBRATE) {
+            comm.sendMsg(this.getAgtRow() + "," + this.getAgtCol() + "," + AgentSettings.Direction.print(this.getAgtDir()), NetworkMgr.BOT_POS);
+        }
     }
 }

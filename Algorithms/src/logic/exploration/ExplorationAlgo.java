@@ -6,6 +6,7 @@ import logic.fastestpath.AStarHeuristicSearch;
 import map.Cell;
 import map.Map;
 import map.MapSettings;
+import network.NetworkMgr;
 
 import java.util.Scanner;
 
@@ -29,33 +30,35 @@ abstract public class ExplorationAlgo {
 
     public void runExploration() {
         // FIXME check for real bot connection
-//        if (bot.getRealBot()) {
-//            System.out.println("Starting calibration...");
-//
-//            CommMgr.getCommMgr().recvMsg();
-//            if (bot.getRealBot()) {
-//                bot.move(MOVEMENT.LEFT, false);
-//                CommMgr.getCommMgr().recvMsg();
-//                bot.move(MOVEMENT.CALIBRATE, false);
-//                CommMgr.getCommMgr().recvMsg();
-//                bot.move(MOVEMENT.LEFT, false);
-//                CommMgr.getCommMgr().recvMsg();
-//                bot.move(MOVEMENT.CALIBRATE, false);
-//                CommMgr.getCommMgr().recvMsg();
-//                bot.move(MOVEMENT.RIGHT, false);
-//                CommMgr.getCommMgr().recvMsg();
-//                bot.move(MOVEMENT.CALIBRATE, false);
-//                CommMgr.getCommMgr().recvMsg();
-//                bot.move(MOVEMENT.RIGHT, false);
-//            }
-//
-//            while (true) {
-//                System.out.println("Waiting for EX_START...");
-//                String msg = CommMgr.getCommMgr().recvMsg();
-//                String[] msgArr = msg.split(";");
-//                if (msgArr[0].equals(CommMgr.EX_START)) break;
-//            }
-//        }
+        if (!bot.isSim()) {
+            System.out.println("Starting calibration...");
+
+            NetworkMgr.getInstance().receiveMsg();
+
+            // TODO initial calibration
+            if (bot.isSim()) {
+                bot.takeAction(AgentSettings.Actions.FACE_LEFT, 0, exploredMap, realMap);
+                NetworkMgr.getInstance().receiveMsg();
+                bot.takeAction(AgentSettings.Actions.CALIBRATE);
+                NetworkMgr.getInstance().receiveMsg();
+                bot.takeAction(AgentSettings.Actions.FACE_LEFT, 0, exploredMap, realMap);
+                NetworkMgr.getInstance().receiveMsg();
+                bot.takeAction(AgentSettings.Actions.CALIBRATE);
+                NetworkMgr.getInstance().receiveMsg();
+                bot.takeAction(AgentSettings.Actions.FACE_RIGHT, 0, exploredMap, realMap);
+                NetworkMgr.getInstance().receiveMsg();
+                bot.takeAction(AgentSettings.Actions.CALIBRATE);
+                NetworkMgr.getInstance().receiveMsg();
+                bot.takeAction(AgentSettings.Actions.FACE_RIGHT, 0, exploredMap, realMap);
+            }
+
+            while (true) {
+                System.out.println("Waiting for EX_START...");
+                String msg = NetworkMgr.getInstance().receiveMsg();
+                String[] msgArr = msg.split(";");
+                if (msgArr[0].equals(NetworkMgr.EXP_START)) break;
+            }
+        }
 
         // Explore
         System.out.println("Starting exploration...");
@@ -69,9 +72,9 @@ abstract public class ExplorationAlgo {
 
         explorationLoop(bot.getAgtY(), bot.getAgtX());
 
-//        if (bot.getRealBot()) {
-//            CommMgr.getCommMgr().sendMsg(null, CommMgr.BOT_START);
-//        }
+        if (!bot.isSim()) {
+            NetworkMgr.getInstance().sendMsg(null, NetworkMgr.BOT_START);
+        }
 //        senseAndRepaint();
         senseAndRepaint();
     }
@@ -99,7 +102,7 @@ abstract public class ExplorationAlgo {
                     break;
                 }
             }
-            Scanner scanner = new Scanner(System.in);
+//            Scanner scanner = new Scanner(System.in);
 //            scanner.nextLine();
         } while (areaExplored <= coverageLimit && System.currentTimeMillis() <= endTime);
 
@@ -218,15 +221,15 @@ abstract public class ExplorationAlgo {
         System.out.println(", " + areaExplored + " Cells");
         System.out.println((System.currentTimeMillis() - startTime) / 1000 + " Seconds");
 
-        // TODO realbot
-//        if (bot.getRealBot()) {
-//            turnBotDirection(DIRECTION.WEST);
-//            moveBot(MOVEMENT.CALIBRATE);
-//            turnBotDirection(DIRECTION.SOUTH);
-//            moveBot(MOVEMENT.CALIBRATE);
-//            turnBotDirection(DIRECTION.WEST);
-//            moveBot(MOVEMENT.CALIBRATE);
-//        }
+        // realbot
+        if (!bot.isSim()) {
+            turnBotDirection(AgentSettings.Direction.WEST);
+            moveBot(AgentSettings.Actions.CALIBRATE);
+            turnBotDirection(AgentSettings.Direction.SOUTH);
+            moveBot(AgentSettings.Actions.CALIBRATE);
+            turnBotDirection(AgentSettings.Direction.WEST);
+            moveBot(AgentSettings.Actions.CALIBRATE);
+        }
         turnBotDirection(AgentSettings.Direction.NORTH);
         System.out.println("Went home");
     }
@@ -286,8 +289,6 @@ abstract public class ExplorationAlgo {
 //            CommMgr commMgr = CommMgr.getCommMgr();
 //            commMgr.recvMsg();
 //        }
-
-        // TODO realbot
 //        if (bot.getRealBot() && !calibrationMode) {
 //            calibrationMode = true;
 //
@@ -308,7 +309,7 @@ abstract public class ExplorationAlgo {
 //            calibrationMode = false;
 //        }
     }
-    // TODO
+
     /**
      * Sets the bot's sensors, processes the sensor data and repaints the map.
      */

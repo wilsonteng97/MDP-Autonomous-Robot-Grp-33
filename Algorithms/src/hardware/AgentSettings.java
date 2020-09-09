@@ -92,7 +92,7 @@ public class AgentSettings {
 
         FORWARD, BACKWARD, MOVE_LEFT, MOVE_RIGHT,   // Move with reference to the direction Agent is facing.
         FACE_LEFT, FACE_RIGHT, FACE_REVERSE,        // Change Direction of Agent
-        ALIGN_FRONT, ALIGN_RIGHT,                   // Calibrate Robot, only used for real runs
+        ALIGN_FRONT, ALIGN_RIGHT, CALIBRATE,                  // Calibrate Robot, only used for real runs
 
         RESET_ROBOT,                                // Reset Agent, sensors to initial position/direction.
                                                     // If applicable, reset Waypoint too.
