@@ -1,17 +1,17 @@
 package logic.fastestpath;
 
+import hardware.Agent;
+import hardware.AgentSettings;
+import hardware.AgentSettings.Actions;
+import hardware.AgentSettings.Direction;
 import map.Cell;
 import map.Map;
 import map.MapSettings;
-import hardware.Agent;
-import hardware.AgentSettings;
-import hardware.AgentSettings.Direction;
-import hardware.AgentSettings.Actions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Stack;
 import java.util.Scanner;
+import java.util.Stack;
 
 
 
