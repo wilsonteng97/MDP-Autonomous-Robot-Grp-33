@@ -33,7 +33,7 @@ public class Simulator {
     private static int coverageLimit = 300;                                     // coverage limit
 
     private static final NetworkMgr comm = NetworkMgr.getInstance();
-    private static final boolean sim = true;
+    private static final boolean sim = false;
 
 
     public static void main(String[] args) {
@@ -198,12 +198,14 @@ public class Simulator {
         // Exploration Class for Multithreading
         class Exploration extends SwingWorker<Integer, String> {
             protected Integer doInBackground() throws Exception {
+                System.out.println("In [Exploration] class");
                 int row, col;
 
                 row = MapSettings.START_ROW;
                 col = MapSettings.START_COL;
 
-                explorationMap.setAllUnexplored(); dummyMap.setAllUnexplored();
+                explorationMap.setAllUnexplored();
+                if (dummyMap != null && sim) dummyMap.setAllUnexplored();
                 agt.setAgtCtrCoord(row, col);
                 explorationMap.repaint();
 

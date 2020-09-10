@@ -30,27 +30,28 @@ abstract public class ExplorationAlgo {
 
     public void runExploration() {
         // FIXME check for real bot connection
+        System.out.println("[runExploration] executed");
         if (!bot.isSim()) {
             System.out.println("Starting calibration...");
 
             NetworkMgr.getInstance().receiveMsg();
 
             // TODO initial calibration
-            if (bot.isSim()) {
-                bot.takeAction(AgentSettings.Actions.FACE_LEFT, 0, exploredMap, realMap);
-                NetworkMgr.getInstance().receiveMsg();
-                bot.takeAction(AgentSettings.Actions.CALIBRATE);
-                NetworkMgr.getInstance().receiveMsg();
-                bot.takeAction(AgentSettings.Actions.FACE_LEFT, 0, exploredMap, realMap);
-                NetworkMgr.getInstance().receiveMsg();
-                bot.takeAction(AgentSettings.Actions.CALIBRATE);
-                NetworkMgr.getInstance().receiveMsg();
-                bot.takeAction(AgentSettings.Actions.FACE_RIGHT, 0, exploredMap, realMap);
-                NetworkMgr.getInstance().receiveMsg();
-                bot.takeAction(AgentSettings.Actions.CALIBRATE);
-                NetworkMgr.getInstance().receiveMsg();
-                bot.takeAction(AgentSettings.Actions.FACE_RIGHT, 0, exploredMap, realMap);
-            }
+//            if (!bot.isSim()) {
+//                bot.takeAction(AgentSettings.Actions.FACE_LEFT, 0, exploredMap, realMap);
+//                NetworkMgr.getInstance().receiveMsg();
+//                bot.takeAction(AgentSettings.Actions.CALIBRATE);
+//                NetworkMgr.getInstance().receiveMsg();
+//                bot.takeAction(AgentSettings.Actions.FACE_LEFT, 0, exploredMap, realMap);
+//                NetworkMgr.getInstance().receiveMsg();
+//                bot.takeAction(AgentSettings.Actions.CALIBRATE);
+//                NetworkMgr.getInstance().receiveMsg();
+//                bot.takeAction(AgentSettings.Actions.FACE_RIGHT, 0, exploredMap, realMap);
+//                NetworkMgr.getInstance().receiveMsg();
+//                bot.takeAction(AgentSettings.Actions.CALIBRATE);
+//                NetworkMgr.getInstance().receiveMsg();
+//                bot.takeAction(AgentSettings.Actions.FACE_RIGHT, 0, exploredMap, realMap);
+//            }
 
             while (true) {
                 System.out.println("Waiting for EX_START...");
