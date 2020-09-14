@@ -3,6 +3,7 @@ package network;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 
 public class NetworkMgr {
 
@@ -38,7 +39,7 @@ public class NetworkMgr {
     private static NetworkMgr nwMgr = null;
 
     public NetworkMgr() {
-        this.ipAddr = "192.168.33.1";
+        this.ipAddr = "localhost";
         this.port = 5040;
     }
 
@@ -142,12 +143,22 @@ public class NetworkMgr {
     public String receiveMsg() {
         try {
             System.out.println("[receiveMsg()] Receiving Message...");
-            String receivedMsg = in.readLine();
-            System.out.println(receivedMsg);
-            if (receivedMsg != null && receivedMsg.length() > 0) {
-                System.out.println("[receiveMsg()] Received Message: "+receivedMsg);
-                return receivedMsg;
+            String receivedMsg;
+            InputStream din=socket.getInputStream();
+            while (true) {
+                if(din.available()!=0){
+                    byte[] data321 = new byte[512];
+                    din.read(data321);
+                    receivedMsg=new String(data321, StandardCharsets.UTF_8);
+
+                    if (receivedMsg != null && receivedMsg.length() > 0) {
+                        System.out.println("[receiveMsg()] Received Message: "+receivedMsg);
+                        return receivedMsg;
+                    }
+                }
             }
+
+
         } catch (IOException e) {
             System.out.println("[receiveMsg()] Receiving Message Failed (IOException)!");
             return receiveMsg();
