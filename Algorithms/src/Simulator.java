@@ -2,10 +2,11 @@ import hardware.Agent;
 import hardware.AgentSettings;
 import logic.exploration.ExplorationAlgo;
 import logic.exploration.RightWallHugging;
-import logic.fastestpath.AStarHeuristicSearch;
 import logic.fastestpath.FastestPathAlgo;
+import logic.fastestpath.AStarHeuristicSearch;
 import map.Map;
 import map.MapSettings;
+import network.NetworkMgr;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,17 +26,18 @@ public class Simulator {
     private static Agent agt;
     private static AgentSettings.Direction startDir = AgentSettings.START_DIR;  // Agent Start Direction
 
-    private static Map dummyMap = null;                                          // real map
-    private static Map explorationMap = null;                                      // exploration map
+    private static Map dummyMap = null;                                         // real map
+    private static Map explorationMap = null;                                   // exploration map
 
     private static int timeLimit = 3600;                                        // time limit
     private static int coverageLimit = 300;                                     // coverage limit
 
-//    private static final NetworkMngr comm = NetworkMngr.getMngr();
-    private static final boolean sim = true;
+    private static final NetworkMgr comm = NetworkMgr.getInstance();
+    private static final boolean sim = false;
+
 
     public static void main(String[] args) {
-//        if (!sim) comm.openConnection();
+        if (!sim) comm.startConn();
 
         agt = new Agent(MapSettings.START_ROW, MapSettings.START_COL, sim);
         if (sim) {
@@ -177,9 +179,14 @@ public class Simulator {
 
                 if (!sim) {
                     // Transmit signal to get Agent to start. Initiate handshake signals.
+                    while (true) {
+                        System.out.println("Waiting for FP_START...");
+                        String msg = comm.receiveMsg();
+                        if (msg.equals(NetworkMgr.FP_START)) break;
+                    }
                 }
 
-                AStarHeuristicSearch fastestPath;
+                FastestPathAlgo fastestPath;
                 fastestPath = new AStarHeuristicSearch(explorationMap, agt);
 
                 fastestPath.runFastestPath(MapSettings.GOAL_ROW, MapSettings.GOAL_COL);
@@ -191,12 +198,14 @@ public class Simulator {
         // Exploration Class for Multithreading
         class Exploration extends SwingWorker<Integer, String> {
             protected Integer doInBackground() throws Exception {
+                System.out.println("In [Exploration] class");
                 int row, col;
 
                 row = MapSettings.START_ROW;
                 col = MapSettings.START_COL;
 
-                explorationMap.setAllUnexplored(); dummyMap.setAllUnexplored();
+                explorationMap.setAllUnexplored();
+                if (dummyMap != null && sim) dummyMap.setAllUnexplored();
                 agt.setAgtCtrCoord(row, col);
                 explorationMap.repaint();
 
@@ -205,9 +214,10 @@ public class Simulator {
 
                 if (!sim) {
                     // Transmit signal to start Agent
+                    NetworkMgr.getInstance().sendMsg(null, NetworkMgr.BOT_START);
                 }
 
-                ((RightWallHugging) exploration).runExploration();
+                exploration.runExploration();
 
                 if (!sim) {
                     new FastestPath().execute();

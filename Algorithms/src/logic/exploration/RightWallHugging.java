@@ -1,14 +1,8 @@
 package logic.exploration;
 
 import hardware.Agent;
-import hardware.AgentSettings;
+import hardware.AgentSettings.Actions;
 import map.Map;
-import map.MapSettings;
-import map.Cell;
-import hardware.AgentSettings.*;
-import logic.fastestpath.AStarHeuristicSearch;
-
-import java.util.Scanner;
 
 public class RightWallHugging extends ExplorationAlgo {
     public RightWallHugging(Map exploredMap, Map realMap, Agent bot, int coverageLimit, int timeLimit) {
@@ -22,24 +16,24 @@ public class RightWallHugging extends ExplorationAlgo {
     protected void nextMove() {
         System.out.println("Bot Direction: " + bot.getAgtDir());
         if (lookRight()) {
-            System.out.println("Right Clear");
+//            System.out.println("[DEBUG] Right Clear");
             moveBot(Actions.FACE_RIGHT);
             if (lookForward()) {
-                System.out.println("  ->Forward Clear");
+//                System.out.println("  ->[DEBUG]Forward Clear");
                 moveBot(Actions.FORWARD);
             }
         } else if (lookForward()) {
-            System.out.println("Forward Clear");
+//            System.out.println("[DEBUG]Forward Clear");
             moveBot(Actions.FORWARD);
         } else if (lookLeft()) {
-            System.out.println("Left Clear");
+//            System.out.println("[DEBUG]Left Clear");
             moveBot(Actions.FACE_LEFT);
             if (lookForward()) {
-                System.out.println("  ->Forward Clear");
+//                System.out.println("  ->[DEBUG]Forward Clear");
                 moveBot(Actions.FORWARD);
             }
         } else {
-            System.out.println("Reverse Direction");
+//            System.out.println("[DEBUG]Reverse Direction");
             moveBot(Actions.FACE_RIGHT);
             moveBot(Actions.FACE_RIGHT);
         }
