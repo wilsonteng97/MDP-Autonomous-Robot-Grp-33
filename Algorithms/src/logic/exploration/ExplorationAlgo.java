@@ -30,11 +30,11 @@ abstract public class ExplorationAlgo {
 
     public void runExploration() {
         // FIXME check for real bot connection
-        System.out.println("[runExploration] executed");
+//        System.out.println("[DEBUG: runExploration] executed");
         if (!bot.isSim()) {
             System.out.println("Starting calibration...");
 
-            NetworkMgr.getInstance().receiveMsg();
+//            NetworkMgr.getInstance().receiveMsg();
 
             // TODO initial calibration
 //            if (!bot.isSim()) {
@@ -56,8 +56,9 @@ abstract public class ExplorationAlgo {
             while (true) {
                 System.out.println("Waiting for EX_START...");
                 String msg = NetworkMgr.getInstance().receiveMsg();
-                String[] msgArr = msg.split(";");
-                if (msgArr[0].equals(NetworkMgr.EXP_START)) break;
+//                String[] msgArr = msg.split(";");
+//                if (msgArr[0].equals(NetworkMgr.EXP_START)) break;
+                if (msg.equals(NetworkMgr.EXP_START)) break;
             }
         }
 
@@ -69,14 +70,14 @@ abstract public class ExplorationAlgo {
         endTime = startTime + (timeLimit * 1000);
 
         areaExplored = calculateAreaExplored();
-        System.out.println("Explored Area: " + areaExplored);
+        System.out.println("Starting state - area explored: " + areaExplored);
+        System.out.println();
 
         explorationLoop(bot.getAgtY(), bot.getAgtX());
 
         if (!bot.isSim()) {
             NetworkMgr.getInstance().sendMsg(null, NetworkMgr.BOT_START);
         }
-//        senseAndRepaint();
         senseAndRepaint();
     }
 
@@ -100,11 +101,12 @@ abstract public class ExplorationAlgo {
 
             if (bot.getAgtY() == r && bot.getAgtX() == c) {
                 if (areaExplored >= 100) {
+                    System.out.println("Exploration finished in advance!");
                     break;
                 }
             }
-//            Scanner scanner = new Scanner(System.in);
-//            scanner.nextLine();
+            Scanner scanner = new Scanner(System.in);
+            scanner.nextLine();
         } while (areaExplored <= coverageLimit && System.currentTimeMillis() <= endTime);
 
         goHome();
@@ -114,7 +116,7 @@ abstract public class ExplorationAlgo {
      * Returns true if the right side of the robot is free to move into.
      */
     protected boolean lookRight() {
-        System.out.println("[Function executed] lookRight()");
+//        System.out.println("[DEBUG: Function executed] lookRight()");
         switch (bot.getAgtDir()) {
             case NORTH:
                 return eastFree();
@@ -132,7 +134,7 @@ abstract public class ExplorationAlgo {
      * Returns true if the robot is free to move forward.
      */
     protected boolean lookForward() {
-        System.out.println("[Function executed] lookForward()");
+//        System.out.println("[DEBUG: Function executed] lookForward()");
         switch (bot.getAgtDir()) {
             case NORTH:
                 return northFree();
@@ -150,7 +152,7 @@ abstract public class ExplorationAlgo {
      * * Returns true if the left side of the robot is free to move into.
      */
     protected boolean lookLeft() {
-        System.out.println("[Function executed] lookLeft()");
+//        System.out.println("[DEBUG: Function executed] lookLeft()");
         switch (bot.getAgtDir()) {
             case NORTH:
                 return westFree();
@@ -168,7 +170,7 @@ abstract public class ExplorationAlgo {
      * Returns true if the robot can move to the north cell.
      */
     protected boolean northFree() {
-        System.out.println("[Function executed] northFree()");
+//        System.out.println("[DEBUG: Function executed] northFree()");
         int botRow = bot.getAgtY();
         int botCol = bot.getAgtX();
         return (isExploredNotObstacle(botRow + 1, botCol - 1) && isExploredAndFree(botRow + 1, botCol) && isExploredNotObstacle(botRow + 1, botCol + 1));
@@ -178,7 +180,7 @@ abstract public class ExplorationAlgo {
      * Returns true if the robot can move to the east cell.
      */
     protected boolean eastFree() {
-        System.out.println("[Function executed] eastFree()");
+//        System.out.println("[DEBUG: Function executed] eastFree()");
         int botRow = bot.getAgtY();
         int botCol = bot.getAgtX();
         return (isExploredNotObstacle(botRow - 1, botCol + 1) && isExploredAndFree(botRow, botCol + 1) && isExploredNotObstacle(botRow + 1, botCol + 1));
@@ -188,7 +190,7 @@ abstract public class ExplorationAlgo {
      * Returns true if the robot can move to the south cell.
      */
     protected boolean southFree() {
-        System.out.println("[Function executed] southFree()");
+//        System.out.println("[DEBUG: Function executed] southFree()");
         int botRow = bot.getAgtY();
         int botCol = bot.getAgtX();
         return (isExploredNotObstacle(botRow - 1, botCol - 1) && isExploredAndFree(botRow - 1, botCol) && isExploredNotObstacle(botRow - 1, botCol + 1));
@@ -198,7 +200,7 @@ abstract public class ExplorationAlgo {
      * Returns true if the robot can move to the west cell.
      */
     protected boolean westFree() {
-        System.out.println("[Function executed] westFree()");
+//        System.out.println("[DEBUG: Function executed] westFree()");
         int botRow = bot.getAgtY();
         int botCol = bot.getAgtX();
         return (isExploredNotObstacle(botRow - 1, botCol - 1) && isExploredAndFree(botRow, botCol - 1) && isExploredNotObstacle(botRow + 1, botCol - 1));
@@ -239,7 +241,7 @@ abstract public class ExplorationAlgo {
      * Returns true for cells that are explored and not obstacles.
      */
     protected boolean isExploredNotObstacle(int r, int c) {
-        System.out.println(exploredMap.getCell(r, c));
+//        System.out.println(exploredMap.getCell(r, c));
         if (exploredMap.checkValidCell(r, c)) {
             Cell tmp = exploredMap.getCell(r, c);
             return (tmp.isExplored() && !tmp.isObstacle());
@@ -251,7 +253,7 @@ abstract public class ExplorationAlgo {
      * Returns true for cells that are explored, not virtual walls and not obstacles.
      */
     protected boolean isExploredAndFree(int r, int c) {
-        System.out.println(exploredMap.getCell(r, c));
+//        System.out.println(exploredMap.getCell(r, c));
         if (exploredMap.checkValidCell(r, c)) {
             Cell b = exploredMap.getCell(r, c);
             return (b.isExplored() && !b.isVirtualWall() && !b.isObstacle());

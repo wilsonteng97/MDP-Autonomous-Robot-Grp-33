@@ -262,7 +262,7 @@ public class Agent {
 
     // TODO MOVE_LEFT & MOVE_RIGHT
     public AgentSettings.Direction move(AgentSettings.Actions action, int steps, Map explorationMap, Map map) {
-        System.out.printf("[Function executed] move(%s)\n", action);
+//        System.out.printf("[DEBUG: Function executed] move(%s)\n", action);
         if (sim) {
             // Emulate real AgentSettings.Direction by pausing execution.
             try {

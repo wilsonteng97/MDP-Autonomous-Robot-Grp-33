@@ -115,7 +115,7 @@ public class NetworkMgr {
             }
             out.write(outputMsg);
             out.flush(); msgCounter++;
-            System.out.println("[sendMsg() | " + msgCounter + "] Message : \n" + outputMsg);
+            System.out.println("[sendMsg() | " + msgCounter + "] Message: " + outputMsg);
         }
         catch (IOException e) {
             System.out.println("[sendMsg()] Sending Message Failed (IOException)!");
@@ -139,26 +139,57 @@ public class NetworkMgr {
 
     }
 
+    // A naive receiveMsg()
+//     public String receiveMsg() {
+//         try {
+//             System.out.println("[receiveMsg()] Receiving Message...");
+//             String receivedMsg, parsedMsg;
+//             StringBuilder msgParser = new StringBuilder();
+//             InputStream din=socket.getInputStream();
+//             while (true) {
+//                 if(din.available()!=0){
+//                     byte[] data321 = new byte[512];
+//                     din.read(data321);
+//                     receivedMsg=new String(data321, StandardCharsets.UTF_8);
+//                     for (int i = 0, n = receivedMsg.length(); i < n; i++) {
+//                         char c = receivedMsg.charAt(i);
+//                         msgParser.append(c);
+//                         if (c == '|') {
+//                             break;
+//                         }
+//                     }
+//                     parsedMsg = msgParser.toString();
+// //                    System.out.println("Message Length: " + parsedMsg.length());
+
+//                     if (parsedMsg != null && parsedMsg.length() > 0) {
+//                         System.out.println("[receiveMsg()] Received Message: "+parsedMsg);
+//                         return parsedMsg;
+//                     }
+//                 }
+//             }
+
+
+//         } catch (IOException e) {
+//             System.out.println("[receiveMsg()] Receiving Message Failed (IOException)!");
+//             return receiveMsg();
+//         } catch (Exception e) {
+//             System.out.println("[receiveMsg()] Receiving Message Failed!"); e.printStackTrace();
+//         }
+//         return null;
+//     }
+
     // Wait and receive Message
     public String receiveMsg() {
         try {
             System.out.println("[receiveMsg()] Receiving Message...");
             String receivedMsg;
-            InputStream din=socket.getInputStream();
             while (true) {
-                if(din.available()!=0){
-                    byte[] data321 = new byte[512];
-                    din.read(data321);
-                    receivedMsg=new String(data321, StandardCharsets.UTF_8);
-
+                    receivedMsg = in.readLine();
                     if (receivedMsg != null && receivedMsg.length() > 0) {
                         System.out.println("[receiveMsg()] Received Message: "+receivedMsg);
                         return receivedMsg;
-                    }
                 }
             }
-
-
         } catch (IOException e) {
             System.out.println("[receiveMsg()] Receiving Message Failed (IOException)!");
             return receiveMsg();
