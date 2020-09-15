@@ -6,13 +6,13 @@ from Algorithms import Algorithm
 from Arduino import Arduino
 # from Android import Android
 
+
 from socket import error as SocketError
 import errno
 
 ANDROID_HEADER = 'AND'.encode()
 ARDUINO_HEADER = 'ARD'.encode()
 ALGORITHM_HEADER = 'ALG'.encode()
-
 
 class MultiProcessCommunication:
     def __init__(self):
@@ -38,8 +38,6 @@ class MultiProcessCommunication:
 
 
 #		self.status = Status.IDLE
-                
-        
 #		self.dropped_connection = Value('i',0)
 
 

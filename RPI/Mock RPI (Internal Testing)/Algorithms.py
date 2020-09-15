@@ -5,6 +5,7 @@ AlgoBufferSize = 512
 WIFI_IP = 'localhost'
 WIFI_PORT = 5000
 
+
 #To kill port: sudo lsof -i:5040 -> sudo kill -9 <pid>
 class Algorithm:
 	def __init__(self, host=WIFI_IP, port=WIFI_PORT):
