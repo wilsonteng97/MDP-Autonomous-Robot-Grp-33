@@ -106,12 +106,13 @@ public class NetworkMgr {
         try {
             System.out.println("[sendMsg()] Sending Message...");
             String outputMsg;
+            // FIXME finalize message format here
             if (msg == null) {
                 outputMsg = msgType + "\n";
             } else if (msgType.equals(MAP_STRINGS) || msgType.equals(BOT_POS)) {
                 outputMsg = msgType + " " + msg + "\n";
             } else {
-                outputMsg = msgType + "\n" + msg + "\n";
+                outputMsg = msgType + " " + msg + "\n";
             }
             out.write(outputMsg);
             out.flush(); msgCounter++;

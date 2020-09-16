@@ -33,7 +33,7 @@ public class Simulator {
     private static int coverageLimit = 300;                                     // coverage limit
 
     private static final NetworkMgr comm = NetworkMgr.getInstance();
-    private static final boolean sim = false;
+    private static final boolean sim = true;
 
 
     public static void main(String[] args) {
