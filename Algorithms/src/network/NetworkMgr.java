@@ -39,7 +39,7 @@ public class NetworkMgr {
     private static NetworkMgr nwMgr = null;
 
     public NetworkMgr() {
-        this.ipAddr = "localhost";
+        this.ipAddr = "192.168.33.1";
         this.port = 5040;
     }
 
