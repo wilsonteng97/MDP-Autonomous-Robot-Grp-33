@@ -121,9 +121,7 @@ public class Sensor {
             if (!explorationMap.checkValidCell(row, col)) {
                 return i;
             }
-//            explorationMap.getCell(row, col).setExplored(true);
             if (simMap.getCell(row, col).isObstacle()) {
-//                explorationMap.getCell(row, col).setObstacle(true);
                 return i;
             }
         }

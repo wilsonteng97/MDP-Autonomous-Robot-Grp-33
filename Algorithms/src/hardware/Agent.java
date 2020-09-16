@@ -338,7 +338,7 @@ public class Agent {
             s.realDetect(explorationMap, result[sensorCount]);
             sensorCount++;
         }
-        System.out.println("Sensor Readings -> " + result[0] + " | " +  + result[1] + " | " +  + result[2] + " | " +  + result[3] + " | " +  + result[4] + " | " +  + result[5] + " | ");
+//        System.out.println("Sensor Readings -> " + result[0] + " | " +  + result[1] + " | " +  + result[2] + " | " +  + result[3] + " | " +  + result[4] + " | " +  + result[5] + " | ");
 
 //        String[] mapStrings = MapDescriptor.generateMapDescriptor(explorationMap);
 //        comm.sendMsg(mapStrings[0] + " " + mapStrings[1], CommMgr.MAP_STRINGS);

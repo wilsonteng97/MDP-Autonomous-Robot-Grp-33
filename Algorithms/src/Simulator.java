@@ -29,7 +29,7 @@ public class Simulator {
     private static Map dummyMap = null;                                         // real map
     private static Map explorationMap = null;                                   // exploration map
 
-    private static int timeLimit = 3600;                                        // time limit
+    private static int timeLimit = 3600;                                        // in seconds
     private static int coverageLimit = 300;                                     // coverage limit
 
     private static final NetworkMgr comm = NetworkMgr.getInstance();

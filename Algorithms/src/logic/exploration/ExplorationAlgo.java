@@ -18,7 +18,9 @@ abstract public class ExplorationAlgo {
     protected final int timeLimit;    // in second
     protected int areaExplored;
     protected long startTime; // in millisecond
+    protected long currentTime;
     protected long endTime;   // in millisecond
+    Scanner scanner = new Scanner(System.in);
 
     public ExplorationAlgo(Map exploredMap, Map realMap, Agent bot, int coverageLimit, int timeLimit) {
         this.exploredMap = exploredMap;
@@ -105,11 +107,50 @@ abstract public class ExplorationAlgo {
                     break;
                 }
             }
-            Scanner scanner = new Scanner(System.in);
-            scanner.nextLine();
-        } while (areaExplored <= coverageLimit && System.currentTimeMillis() <= endTime);
+            currentTime = System.currentTimeMillis();
+//            scanner.nextLine();
 
-        goHome();
+        } while (areaExplored <= coverageLimit && currentTime <= endTime);
+        if (areaExplored == 300) {
+            goHome();
+        } else if (areaExplored == coverageLimit && areaExplored < 300 || currentTime > endTime && areaExplored < 300) {
+            // Exceed coverage or time limit
+            if (areaExplored == coverageLimit) System.out.printf("Reached coverage limit, successfully explored %d grids\n", areaExplored);
+            if (currentTime > endTime) System.out.printf("Reached time limit, exploration has taken %d second(s)\n", currentTime);
+            System.out.println("Arena not fully explored, goHome() may incur errors, enter \"yes\" to continue: ");
+            String userInput = scanner.nextLine();
+            if (userInput.equals("yes")) goHome();
+        } else {
+            // not breaking limit, but arena not fully explored
+            goHome(); // reset bot
+            System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
+            AStarHeuristicSearch keepExploring;
+            Cell unExploredCell, targetCell;
+            int unExploredRow, unExploredCol;
+            while (areaExplored != coverageLimit) {
+                keepExploring = new AStarHeuristicSearch(exploredMap, bot, realMap);
+                unExploredCell = findClosestUnexplored();
+                unExploredRow = unExploredCell.getRow(); unExploredCol = unExploredCell.getCol();
+                // find the adjacent explored cell
+                targetCell = findReachable(unExploredRow, unExploredCol);
+                if (targetCell == null) {
+                    System.out.println("Invalid Map!");
+                    break;
+                }
+                keepExploring.runFastestPath(targetCell.getRow(), targetCell.getCol());
+//                goHome();
+                System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
+
+                areaExplored = calculateAreaExplored();
+                System.out.println("Area explored: " + areaExplored);
+//                scanner.nextLine();
+            }
+            goHome();
+            System.out.println("Exploration Completed!");
+            System.out.println("Area explored: " + areaExplored);
+        }
+
+
     }
 
     /**
@@ -235,6 +276,60 @@ abstract public class ExplorationAlgo {
         }
         turnBotDirection(AgentSettings.Direction.NORTH);
         System.out.println("Went home");
+    }
+
+    /**
+     * Returns the closest unexplored and reachable cell
+     */
+    protected Cell findClosestUnexplored() {
+        for (int col = 0; col < MapSettings.MAP_COLS; col++) {
+            for (int row = 0; row < MapSettings.MAP_ROWS; row++) {
+                if (isUnexploredNotObstacle(row, col)) {
+                    return exploredMap.getCell(row, col);
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Return a reachable cell around an target cell
+     */
+    protected Cell findReachable(int row, int col) {
+        // loop through the 9x9 grid
+        for (int r = row-1; r <= row+1; r++) {
+            for (int c = col-1; c <= col+1; c++) {
+                if (exploredMap.checkValidCell(r, c)) {
+                    Cell tmp = exploredMap.getCell(r, c);
+                    if (!tmp.isObstacle() && !exploredMap.getCell(r-1, c).isVirtualWall() && !exploredMap.getCell(r+1, c).isVirtualWall()) return tmp;
+                    else if (!tmp.isObstacle() && !exploredMap.getCell(r, c-1).isVirtualWall() && !exploredMap.getCell(r, c+1).isVirtualWall()) return tmp;
+                    else continue;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns true for cells that are unexplored and not obstacles.
+     */
+    protected boolean isUnexploredNotObstacle(int r, int c) {
+        if (exploredMap.checkValidCell(r, c)) {
+            Cell tmp = exploredMap.getCell(r, c);
+            return (!tmp.isExplored() && !tmp.isObstacle());
+        }
+        return false;
+    }
+
+    /**
+     * Returns true for cells that are unexplored, not virtual walls and not obstacles.
+     */
+    protected boolean isUnexploredAndFree(int r, int c) {
+        if (exploredMap.checkValidCell(r, c)) {
+            Cell b = exploredMap.getCell(r, c);
+            return (!b.isExplored() && !b.isVirtualWall() && !b.isObstacle());
+        }
+        return false;
     }
 
     /**
