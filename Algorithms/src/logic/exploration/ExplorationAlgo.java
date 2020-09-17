@@ -156,10 +156,8 @@ abstract public class ExplorationAlgo {
             System.out.println("Visited all cells!");
 
             goHome();
-            System.out.println("Exploration Completed!");
-            System.out.println("Area explored: " + areaExplored);
         }
-
+        System.out.println("Exploration Completed!");
     }
 
     /**
