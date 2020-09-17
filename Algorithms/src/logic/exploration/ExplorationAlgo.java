@@ -8,7 +8,6 @@ import map.Map;
 import map.MapSettings;
 import network.NetworkMgr;
 
-import java.awt.image.AreaAveragingScaleFilter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -141,7 +140,6 @@ abstract public class ExplorationAlgo {
                 keepExploring = new AStarHeuristicSearch(exploredMap, bot, realMap);
                 keepExploring.runFastestPath(targetRow, targetCol);
             }
-            System.out.println("Visited blocked cells");
 
             // visit surrounding cells of those unvisited cells
             Cell destCell;
@@ -155,42 +153,12 @@ abstract public class ExplorationAlgo {
                 keepExploring = new AStarHeuristicSearch(exploredMap, bot, realMap);
                 keepExploring.runFastestPath(destCell.getRow(), destCell.getCol());
             }
-            System.out.println("Visited all cells");
+            System.out.println("Visited all cells!");
 
             goHome();
             System.out.println("Exploration Completed!");
             System.out.println("Area explored: " + areaExplored);
         }
-//        else {
-//            // not breaking limit, but arena not fully explored
-//            goHome(); // reset bot
-//            System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
-//            AStarHeuristicSearch keepExploring;
-//            Cell unExploredCell, targetCell;
-//            int unExploredRow, unExploredCol;
-//            while (areaExplored != coverageLimit) {
-//                keepExploring = new AStarHeuristicSearch(exploredMap, bot, realMap);
-//                unExploredCell = findClosestUnexplored();
-//                unExploredRow = unExploredCell.getRow(); unExploredCol = unExploredCell.getCol();
-//                // find the adjacent explored cell
-//                targetCell = findReachable(unExploredRow, unExploredCol);
-//                if (targetCell == null) {
-//                    System.out.println("Invalid Map!");
-//                    break;
-//                }
-//                keepExploring.runFastestPath(targetCell.getRow(), targetCell.getCol());
-////                goHome();
-//                System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
-//
-//                areaExplored = calculateAreaExplored();
-//                System.out.println("Area explored: " + areaExplored);
-////                scanner.nextLine();
-//            }
-//            goHome();
-//            System.out.println("Exploration Completed!");
-//            System.out.println("Area explored: " + areaExplored);
-//        }
-
 
     }
 
@@ -437,46 +405,6 @@ abstract public class ExplorationAlgo {
     }
 
     /**
-     * Return a reachable cell around an target cell
-     */
-    protected Cell findReachable(int row, int col) {
-        // loop through the 9x9 grid
-        for (int r = row-1; r <= row+1; r++) {
-            for (int c = col-1; c <= col+1; c++) {
-                if (exploredMap.checkValidCell(r, c)) {
-                    Cell tmp = exploredMap.getCell(r, c);
-                    if (!tmp.isObstacle() && !exploredMap.getCell(r-1, c).isVirtualWall() && !exploredMap.getCell(r+1, c).isVirtualWall()) return tmp;
-                    else if (!tmp.isObstacle() && !exploredMap.getCell(r, c-1).isVirtualWall() && !exploredMap.getCell(r, c+1).isVirtualWall()) return tmp;
-                    else continue;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns true for cells that are unexplored and not obstacles.
-     */
-    protected boolean isUnexploredNotObstacle(int r, int c) {
-        if (exploredMap.checkValidCell(r, c)) {
-            Cell tmp = exploredMap.getCell(r, c);
-            return (!tmp.isExplored() && !tmp.isObstacle());
-        }
-        return false;
-    }
-
-    /**
-     * Returns true for cells that are unexplored, not virtual walls and not obstacles.
-     */
-    protected boolean isUnexploredAndFree(int r, int c) {
-        if (exploredMap.checkValidCell(r, c)) {
-            Cell b = exploredMap.getCell(r, c);
-            return (!b.isExplored() && !b.isVirtualWall() && !b.isObstacle());
-        }
-        return false;
-    }
-
-    /**
      * Returns true for cells that are explored and not obstacles.
      */
     protected boolean isExploredNotObstacle(int r, int c) {
@@ -492,7 +420,6 @@ abstract public class ExplorationAlgo {
      * Returns true for cells that are explored, not virtual walls and not obstacles.
      */
     protected boolean isExploredAndFree(int r, int c) {
-//        System.out.println(exploredMap.getCell(r, c));
         if (exploredMap.checkValidCell(r, c)) {
             Cell b = exploredMap.getCell(r, c);
             return (b.isExplored() && !b.isVirtualWall() && !b.isObstacle());
