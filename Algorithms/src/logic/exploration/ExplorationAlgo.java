@@ -8,7 +8,12 @@ import map.Map;
 import map.MapSettings;
 import network.NetworkMgr;
 
+import java.awt.image.AreaAveragingScaleFilter;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Scanner;
+import java.util.Queue;
+import java.util.HashSet;
 
 abstract public class ExplorationAlgo {
     protected final Map exploredMap;
@@ -120,35 +125,53 @@ abstract public class ExplorationAlgo {
             System.out.println("Arena not fully explored, goHome() may incur errors, enter \"yes\" to continue: ");
             String userInput = scanner.nextLine();
             if (userInput.equals("yes")) goHome();
-        } else {
+        }
+        else {
             // not breaking limit, but arena not fully explored
             goHome(); // reset bot
             System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
             AStarHeuristicSearch keepExploring;
-            Cell unExploredCell, targetCell;
-            int unExploredRow, unExploredCol;
-            while (areaExplored != coverageLimit) {
+            ArrayList<Cell> unExploredCells = findUnexplored();
+            int targetRow, targetCol;
+            for (Cell targetCell : unExploredCells) {
+                targetRow = targetCell.getRow();
+                targetCol = targetCell.getCol();
                 keepExploring = new AStarHeuristicSearch(exploredMap, bot, realMap);
-                unExploredCell = findClosestUnexplored();
-                unExploredRow = unExploredCell.getRow(); unExploredCol = unExploredCell.getCol();
-                // find the adjacent explored cell
-                targetCell = findReachable(unExploredRow, unExploredCol);
-                if (targetCell == null) {
-                    System.out.println("Invalid Map!");
-                    break;
-                }
-                keepExploring.runFastestPath(targetCell.getRow(), targetCell.getCol());
-//                goHome();
-                System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
-
-                areaExplored = calculateAreaExplored();
-                System.out.println("Area explored: " + areaExplored);
-//                scanner.nextLine();
+                keepExploring.runFastestPath(targetRow, targetCol);
             }
             goHome();
             System.out.println("Exploration Completed!");
             System.out.println("Area explored: " + areaExplored);
         }
+//        else {
+//            // not breaking limit, but arena not fully explored
+//            goHome(); // reset bot
+//            System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
+//            AStarHeuristicSearch keepExploring;
+//            Cell unExploredCell, targetCell;
+//            int unExploredRow, unExploredCol;
+//            while (areaExplored != coverageLimit) {
+//                keepExploring = new AStarHeuristicSearch(exploredMap, bot, realMap);
+//                unExploredCell = findClosestUnexplored();
+//                unExploredRow = unExploredCell.getRow(); unExploredCol = unExploredCell.getCol();
+//                // find the adjacent explored cell
+//                targetCell = findReachable(unExploredRow, unExploredCol);
+//                if (targetCell == null) {
+//                    System.out.println("Invalid Map!");
+//                    break;
+//                }
+//                keepExploring.runFastestPath(targetCell.getRow(), targetCell.getCol());
+////                goHome();
+//                System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
+//
+//                areaExplored = calculateAreaExplored();
+//                System.out.println("Area explored: " + areaExplored);
+////                scanner.nextLine();
+//            }
+//            goHome();
+//            System.out.println("Exploration Completed!");
+//            System.out.println("Area explored: " + areaExplored);
+//        }
 
 
     }
@@ -280,16 +303,53 @@ abstract public class ExplorationAlgo {
 
     /**
      * Returns the closest unexplored and reachable cell
+     * Assumes bot at starting position
      */
-    protected Cell findClosestUnexplored() {
-        for (int col = 0; col < MapSettings.MAP_COLS; col++) {
-            for (int row = 0; row < MapSettings.MAP_ROWS; row++) {
-                if (isUnexploredNotObstacle(row, col)) {
-                    return exploredMap.getCell(row, col);
+//    protected Cell findClosestUnexplored() {
+//        for (int col = 0; col < MapSettings.MAP_COLS; col++) {
+//            for (int row = 0; row < MapSettings.MAP_ROWS; row++) {
+//                if (isUnexploredNotObstacle(row, col)) {
+//                    return exploredMap.getCell(row, col);
+//                }
+//            }
+//        }
+//        return null;
+//    }
+
+    protected ArrayList<Cell> findUnexplored() {
+        int cellChecked = 0;
+        Cell curCell, topCell, rightCell;
+        int curRow, curCol;
+        Queue<Cell> queue= new LinkedList<>();
+        HashSet<Cell> hasSeen = new HashSet<>();
+        ArrayList<Cell> result = new ArrayList<>();
+
+        curCell = exploredMap.getCell(1, 1);
+        queue.add(curCell);
+        hasSeen.add(curCell);
+        while (queue.size() != 0) {
+            curCell = queue.remove();
+            curRow = curCell.getRow(); curCol = curCell.getCol();
+            if (!curCell.isObstacle() && !curCell.isExplored() && !curCell.isVirtualWall()) result.add(curCell);
+
+            if (curRow + 1 < MapSettings.MAP_ROWS && curCol < MapSettings.MAP_COLS) {
+                topCell = exploredMap.getCell(curRow + 1, curCol);
+                if (!hasSeen.contains(topCell)) {
+                    hasSeen.add(topCell);
+                    queue.add(topCell);
+                }
+            }
+
+            if (curRow < MapSettings.MAP_ROWS && curCol + 1 < MapSettings.MAP_COLS) {
+                rightCell = exploredMap.getCell(curRow, curCol + 1);
+                if (!hasSeen.contains(rightCell)) {
+                    hasSeen.add(rightCell);
+                    queue.add(rightCell);
                 }
             }
         }
-        return null;
+        System.out.println("Has checked " + hasSeen.size() + " cells");
+        return result;
     }
 
     /**
