@@ -130,8 +130,10 @@ abstract public class ExplorationAlgo {
             // not breaking limit, but arena not fully explored
             goHome(); // reset bot
             System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
+
+            // visit unvisited(blocked) cells
             AStarHeuristicSearch keepExploring;
-            ArrayList<Cell> unExploredCells = findUnexplored();
+            ArrayList<Cell> unExploredCells = findUnexploredAndCanVisit();
             int targetRow, targetCol;
             for (Cell targetCell : unExploredCells) {
                 targetRow = targetCell.getRow();
@@ -139,6 +141,22 @@ abstract public class ExplorationAlgo {
                 keepExploring = new AStarHeuristicSearch(exploredMap, bot, realMap);
                 keepExploring.runFastestPath(targetRow, targetCol);
             }
+            System.out.println("Visited blocked cells");
+
+            // visit surrounding cells of those unvisited cells
+            Cell destCell;
+            unExploredCells = findUnexplored();
+            System.out.println("Unexplored cells: " + unExploredCells.size());
+            for (Cell targetCell : unExploredCells) {
+                targetRow = targetCell.getRow();
+                targetCol = targetCell.getCol();
+                destCell = findSurroundingReachable(targetRow, targetCol);
+                System.out.println(destCell);
+                keepExploring = new AStarHeuristicSearch(exploredMap, bot, realMap);
+                keepExploring.runFastestPath(destCell.getRow(), destCell.getCol());
+            }
+            System.out.println("Visited all cells");
+
             goHome();
             System.out.println("Exploration Completed!");
             System.out.println("Area explored: " + areaExplored);
@@ -302,22 +320,10 @@ abstract public class ExplorationAlgo {
     }
 
     /**
-     * Returns the closest unexplored and reachable cell
-     * Assumes bot at starting position
+     * Do the BFS from start position and find those cells that have not been visited and can be reached by bot
+     * @return ArrayList of qualified cells
      */
-//    protected Cell findClosestUnexplored() {
-//        for (int col = 0; col < MapSettings.MAP_COLS; col++) {
-//            for (int row = 0; row < MapSettings.MAP_ROWS; row++) {
-//                if (isUnexploredNotObstacle(row, col)) {
-//                    return exploredMap.getCell(row, col);
-//                }
-//            }
-//        }
-//        return null;
-//    }
-
-    protected ArrayList<Cell> findUnexplored() {
-        int cellChecked = 0;
+    protected ArrayList<Cell> findUnexploredAndCanVisit() {
         Cell curCell, topCell, rightCell;
         int curRow, curCol;
         Queue<Cell> queue= new LinkedList<>();
@@ -348,8 +354,86 @@ abstract public class ExplorationAlgo {
                 }
             }
         }
-        System.out.println("Has checked " + hasSeen.size() + " cells");
         return result;
+    }
+
+    /**
+     * Find all unexplored cell (can or cannot be reached by bot)
+     * @return ArrayList of all unexplored cells
+     */
+    protected ArrayList<Cell> findUnexplored() {
+        Cell curCell, topCell, rightCell;
+        int curRow, curCol;
+        Queue<Cell> queue= new LinkedList<>();
+        HashSet<Cell> hasSeen = new HashSet<>();
+        ArrayList<Cell> result = new ArrayList<>();
+
+        curCell = exploredMap.getCell(1, 1);
+        queue.add(curCell);
+        hasSeen.add(curCell);
+        while (queue.size() != 0) {
+            curCell = queue.remove();
+            curRow = curCell.getRow(); curCol = curCell.getCol();
+            if (!curCell.isExplored() ) result.add(curCell);
+
+            if (curRow + 1 < MapSettings.MAP_ROWS && curCol < MapSettings.MAP_COLS) {
+                topCell = exploredMap.getCell(curRow + 1, curCol);
+                if (!hasSeen.contains(topCell)) {
+                    hasSeen.add(topCell);
+                    queue.add(topCell);
+                }
+            }
+
+            if (curRow < MapSettings.MAP_ROWS && curCol + 1 < MapSettings.MAP_COLS) {
+                rightCell = exploredMap.getCell(curRow, curCol + 1);
+                if (!hasSeen.contains(rightCell)) {
+                    hasSeen.add(rightCell);
+                    queue.add(rightCell);
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * find the closest reachable cell that is not blocked by obstacle near the target cell
+     * @return
+     */
+    protected Cell findSurroundingReachable(int row, int col) {
+        boolean leftClear = true, rightClear = true, topClear = true, botClear = true;
+        int offset = 1;
+        Cell tmpCell;
+        while (true) {
+            // bot
+            if (row - offset >= 0) {
+                tmpCell = exploredMap.getCell(row - offset, col);
+                if (tmpCell.isObstacle()) botClear = false;
+                else if (botClear && !tmpCell.isObstacle() && !tmpCell.isVirtualWall()) return tmpCell;
+            }
+
+            // left
+            if (col - offset >= 0) {
+                tmpCell = exploredMap.getCell(row, col - offset);
+                if (tmpCell.isObstacle()) leftClear = false;
+                else if (leftClear && !tmpCell.isObstacle() && !tmpCell.isVirtualWall()) return tmpCell;
+            }
+
+            // right
+            if (row + offset < MapSettings.MAP_ROWS) {
+                tmpCell = exploredMap.getCell(row + offset, col);
+                if (tmpCell.isObstacle()) rightClear = false;
+                else if (rightClear && !tmpCell.isObstacle() && !tmpCell.isVirtualWall()) return tmpCell;
+            }
+
+            // top
+            if (col + offset < MapSettings.MAP_COLS) {
+                tmpCell = exploredMap.getCell(row, col + offset);
+                if (tmpCell.isObstacle()) topClear = false;
+                else if (topClear && !tmpCell.isObstacle() && !tmpCell.isVirtualWall()) return tmpCell;
+            }
+
+            offset++;
+        }
     }
 
     /**
