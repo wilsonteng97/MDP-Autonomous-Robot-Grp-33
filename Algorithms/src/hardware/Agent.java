@@ -54,8 +54,13 @@ public class Agent {
     public Agent(int centreY, int centreX, boolean sim) {
         this.ctrY = centreY; this.ctrX = centreX; this.agtDir = AgentSettings.START_DIR;
         this.enteredGoal = false;
-        this.speed = AgentSettings.SPEED / SimulatorSettings.SIM_ACCELERATION;
-        this.turnSpeed = AgentSettings.TURN_SPEED / SimulatorSettings.SIM_ACCELERATION;
+        if (sim) {
+            this.speed = AgentSettings.SPEED / SimulatorSettings.SIM_ACCELERATION;
+            this.turnSpeed = AgentSettings.TURN_SPEED / SimulatorSettings.SIM_ACCELERATION;
+        } else {
+            this.speed = AgentSettings.SPEED;
+            this.turnSpeed = AgentSettings.TURN_SPEED;
+        }
         this.setSim(sim);
 
         sensorLst = new ArrayList<Sensor>();

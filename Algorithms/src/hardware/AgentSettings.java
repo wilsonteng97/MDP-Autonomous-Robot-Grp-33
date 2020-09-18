@@ -5,6 +5,7 @@ public class AgentSettings {
     public static final Direction START_DIR = Direction.NORTH;
     public static final int SPEED = 1000;                           // delay between movements (ms)
     public static final int TURN_SPEED = 2000;                      // delay between movements (ms)
+    public static final int CALIBERATE_SPEED = 3000;                      // delay between movements (ms)
 
     public static final int GOAL_ROW = 18;                          // row no. of goal cell
     public static final int GOAL_COL = 13;                          // col no. of goal cell

@@ -24,7 +24,7 @@ abstract public class ExplorationAlgo {
     protected int areaExplored;
     protected long startTime; // in millisecond
     protected long currentTime;
-    protected long endTime;   // in millisecond
+
     Scanner scanner = new Scanner(System.in);
 
     public ExplorationAlgo(Map exploredMap, Map realMap, Agent bot, int coverageLimit, int timeLimit) {
@@ -32,9 +32,9 @@ abstract public class ExplorationAlgo {
         this.realMap = realMap;
         this.bot = bot;
         this.coverageLimit = coverageLimit;
-        this.timeLimit = timeLimit;
+        this.timeLimit = timeLimit * 1000;
 
-        System.out.println("[coverageLimit && timeLimit] " + coverageLimit + " | " + timeLimit);
+        System.out.println("[coverageLimit && timeLimit(s)] " + coverageLimit + " | " + timeLimit);
     }
 
     public void runExploration() {
@@ -76,7 +76,7 @@ abstract public class ExplorationAlgo {
 
         // prepare for timing
         startTime = System.currentTimeMillis();
-        endTime = getEndTime(startTime, timeLimit);         // startTime + (timeLimit * 1000);
+//        endTime = getEndTime(startTime, timeLimit);         // startTime + (timeLimit * 1000);
 
         areaExplored = calculateAreaExplored();
         System.out.println("Starting state - area explored: " + areaExplored);
@@ -100,7 +100,9 @@ abstract public class ExplorationAlgo {
      * 3. System.currentTimeMillis() > endTime
      */
     protected void explorationLoop(int r, int c) {
+        System.out.println("[coverageLimit + timeLimit] " + coverageLimit + " | " + timeLimit);
 
+        long elapsedTime = 0;
         do {
             nextMove();
             System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
@@ -115,25 +117,25 @@ abstract public class ExplorationAlgo {
                     break;
                 }
             }
-            currentTime = System.currentTimeMillis();
+            elapsedTime = getElapsedTime();
 //            scanner.nextLine();
-
-        } while (areaExplored <= coverageLimit && currentTime <= endTime);
+            System.out.println("[doWhile loop elapsed time] " + getElapsedTime());
+        } while (areaExplored <= coverageLimit && elapsedTime < timeLimit);
 
         if (areaExplored == 300) {
 //            System.out.println("[explorationLoop()] goHome()");
             goHome();
-        } else if ((areaExplored >= coverageLimit && areaExplored < 300) || (currentTime >= endTime && areaExplored < 300)) {
+        } else if ((areaExplored >= coverageLimit && areaExplored < 300) || (elapsedTime >= timeLimit && areaExplored < 300)) {
             // Exceed coverage or time limit
 //            System.out.println("[explorationLoop()] Exceed coverage or time limit");
             if (areaExplored == coverageLimit) System.out.printf("Reached coverage limit, successfully explored %d grids\n", areaExplored);
-            if (currentTime > endTime) System.out.printf("Reached time limit, exploration has taken %d millisecond(ms)\n", getElapsedTime(currentTime, startTime));
+            if (elapsedTime >= timeLimit) System.out.printf("Reached time limit, exploration has taken %d millisecond(ms)\n", elapsedTime);
             System.out.println("Arena not fully explored, goHome() may incur errors, enter \"yes\" to continue: ");
             String userInput = scanner.nextLine();
             if (userInput.equals("yes")) goHome();
         } else {
 //            System.out.println("[explorationLoop()] Not breaking limit, but arena not fully explored");
-//            System.out.println("areaExplored " + areaExplored + " | CoverageLimit " + coverageLimit + " | currentTime " + currentTime + " | endTime " + endTime);
+//            System.out.println("areaExplored " + areaExplored + " | CoverageLimit " + coverageLimit + " | timeLimit " + timeLimit + " | elapsedTime " + elapsedTime);
             goHome(); // reset bot
             System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
 
@@ -568,13 +570,9 @@ abstract public class ExplorationAlgo {
         }
     }
 
-    protected long getElapsedTime(long startTime, long currentTime) {
-        if (bot.isSim()) return (currentTime - startTime) * SimulatorSettings.SIM_ACCELERATION;
-        else return (currentTime - startTime);
-    }
-
-    protected long getEndTime(long startTime, int timeLimit) {
-        if (bot.isSim()) return startTime + (timeLimit / SimulatorSettings.SIM_ACCELERATION * 1000);
-        else return startTime + (timeLimit * 1000);
+    protected long getElapsedTime() {
+        currentTime = System.currentTimeMillis();
+        if (bot.isSim()) return Math.abs(currentTime - startTime) * SimulatorSettings.SIM_ACCELERATION;
+        else return Math.abs(currentTime - startTime);
     }
 }

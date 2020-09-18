@@ -310,6 +310,7 @@ public class Simulator {
                         String time = timeTF.getText();
                         String[] timeArr = time.split(":");
                         timeLimit = (Integer.parseInt(timeArr[0]) * 60) + Integer.parseInt(timeArr[1]);
+                        System.out.println("[btn_TimeExploration()] " + timeLimit);
                         CardLayout cl = ((CardLayout) _mapCards.getLayout());
                         cl.show(_mapCards, "EXPLORATION");
                         new TimeExploration().execute();
@@ -373,6 +374,7 @@ public class Simulator {
                     public void mousePressed(MouseEvent e) {
                         coverageExploDialog.setVisible(false);
                         coverageLimit = (int) ((Integer.parseInt(coverageTF.getText())) * MapSettings.MAP_SIZE / 100.0);
+                        System.out.println("[btn_CoverageExploration()] " + coverageLimit);
                         new CoverageExploration().execute();
                         CardLayout cl = ((CardLayout) _mapCards.getLayout());
                         cl.show(_mapCards, "EXPLORATION");
