@@ -281,6 +281,28 @@ public class Simulator {
                 JTextField timeTF = new JTextField(5);
                 JButton timeSaveButton = new JButton("Run");
 
+                timeTF.addKeyListener(new KeyListener() {
+                    @Override
+                    public void keyTyped(KeyEvent e) {}
+
+                    @Override
+                    public void keyPressed(KeyEvent e) {
+                        if (e.getKeyCode()==KeyEvent.VK_ENTER) {
+                            timeExploDialog.setVisible(false);
+                            String time = timeTF.getText();
+                            String[] timeArr = time.split(":");
+                            timeLimit = (Integer.parseInt(timeArr[0]) * 60) + Integer.parseInt(timeArr[1]);
+                            System.out.println("[btn_TimeExploration()] " + timeLimit);
+                            CardLayout cl = ((CardLayout) _mapCards.getLayout());
+                            cl.show(_mapCards, "EXPLORATION");
+                            new TimeExploration().execute();
+                        }
+                    }
+
+                    @Override
+                    public void keyReleased(KeyEvent e) {}
+                });
+
                 timeSaveButton.addMouseListener(new MouseAdapter() {
                     public void mousePressed(MouseEvent e) {
                         timeExploDialog.setVisible(false);
@@ -325,6 +347,28 @@ public class Simulator {
                 coverageExploDialog.setLayout(new FlowLayout());
                 JTextField coverageTF = new JTextField(5);
                 JButton coverageSaveButton = new JButton("Run");
+
+                coverageTF.addKeyListener(new KeyListener() {
+                    @Override
+                    public void keyTyped(KeyEvent e) {}
+
+                    @Override
+                    public void keyPressed(KeyEvent e) {
+                        if (e.getKeyCode()==KeyEvent.VK_ENTER) {
+                            coverageExploDialog.setVisible(false);
+                            String time = coverageTF.getText();
+                            String[] timeArr = time.split(":");
+                            timeLimit = (Integer.parseInt(timeArr[0]) * 60) + Integer.parseInt(timeArr[1]);
+                            System.out.println("[btn_TimeExploration()] " + timeLimit);
+                            CardLayout cl = ((CardLayout) _mapCards.getLayout());
+                            cl.show(_mapCards, "EXPLORATION");
+                            new TimeExploration().execute();
+                        }
+                    }
+
+                    @Override
+                    public void keyReleased(KeyEvent e) {}
+                });
 
                 coverageSaveButton.addMouseListener(new MouseAdapter() {
                     public void mousePressed(MouseEvent e) {
