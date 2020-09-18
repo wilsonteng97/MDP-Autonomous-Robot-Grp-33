@@ -7,6 +7,7 @@ import logic.fastestpath.AStarHeuristicSearch;
 import map.Map;
 import map.MapSettings;
 import network.NetworkMgr;
+import utils.MapDescriptorFormat;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,6 +17,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import static utils.FileIO.loadMap;
+import static utils.MapDescriptorFormat.generateMapDescriptorFormat;
 
 public class Simulator {
     private static final boolean sim = true;
@@ -35,6 +37,8 @@ public class Simulator {
     private static int coverageLimit = 300;                                     // coverage limit
 
     private static final NetworkMgr comm = NetworkMgr.getInstance();
+
+    private static String[] stringMDF;
 
     public static void main(String[] args) {
         if (!sim) comm.startConn();
@@ -223,6 +227,7 @@ public class Simulator {
                     new FastestPath().execute();
                 }
 
+                stringMDF = generateMapDescriptorFormat(explorationMap);
                 return 111;
             }
         }
