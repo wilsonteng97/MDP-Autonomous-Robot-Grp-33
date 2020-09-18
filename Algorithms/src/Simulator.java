@@ -357,13 +357,11 @@ public class Simulator {
                     public void keyPressed(KeyEvent e) {
                         if (e.getKeyCode()==KeyEvent.VK_ENTER) {
                             coverageExploDialog.setVisible(false);
-                            String time = coverageTF.getText();
-                            String[] timeArr = time.split(":");
-                            timeLimit = (Integer.parseInt(timeArr[0]) * 60) + Integer.parseInt(timeArr[1]);
-                            System.out.println("[btn_TimeExploration()] " + timeLimit);
+                            coverageLimit = (int) ((Integer.parseInt(coverageTF.getText())) * MapSettings.MAP_SIZE / 100.0);
+                            System.out.println("[btn_CoverageExploration()] " + coverageLimit);
+                            new CoverageExploration().execute();
                             CardLayout cl = ((CardLayout) _mapCards.getLayout());
                             cl.show(_mapCards, "EXPLORATION");
-                            new TimeExploration().execute();
                         }
                     }
 
