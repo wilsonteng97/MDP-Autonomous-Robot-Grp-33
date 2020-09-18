@@ -18,6 +18,8 @@ import java.awt.event.MouseEvent;
 import static utils.FileIO.loadMap;
 
 public class Simulator {
+    private static final boolean sim = true;
+
     private static JFrame _appFrame = null;                                     // application JFrame
 
     private static JPanel _mapCards = null;                                     // JPanel for map views
@@ -33,8 +35,6 @@ public class Simulator {
     private static int coverageLimit = 300;                                     // coverage limit
 
     private static final NetworkMgr comm = NetworkMgr.getInstance();
-    private static final boolean sim = true;
-
 
     public static void main(String[] args) {
         if (!sim) comm.startConn();
