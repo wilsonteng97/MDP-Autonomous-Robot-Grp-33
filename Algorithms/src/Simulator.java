@@ -8,6 +8,7 @@ import map.Map;
 import map.MapSettings;
 import network.NetworkMgr;
 import utils.MapDescriptorFormat;
+import utils.SimulatorSettings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,7 +21,7 @@ import static utils.FileIO.loadMap;
 import static utils.MapDescriptorFormat.generateMapDescriptorFormat;
 
 public class Simulator {
-    private static final boolean sim = true;
+    private static final boolean sim = SimulatorSettings.SIM;
 
     private static JFrame _appFrame = null;                                     // application JFrame
 
