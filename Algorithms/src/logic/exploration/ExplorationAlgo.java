@@ -7,6 +7,7 @@ import map.Cell;
 import map.Map;
 import map.MapSettings;
 import network.NetworkMgr;
+import utils.SimulatorSettings;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -18,8 +19,8 @@ abstract public class ExplorationAlgo {
     protected final Map exploredMap;
     protected final Map realMap;
     protected final Agent bot;
-    protected final int coverageLimit;
-    protected final int timeLimit;    // in second
+    protected int coverageLimit = 300;
+    protected int timeLimit = 3600;    // in second
     protected int areaExplored;
     protected long startTime; // in millisecond
     protected long currentTime;
@@ -32,6 +33,8 @@ abstract public class ExplorationAlgo {
         this.bot = bot;
         this.coverageLimit = coverageLimit;
         this.timeLimit = timeLimit;
+
+        System.out.println("[coverageLimit && timeLimit] " + coverageLimit + " | " + timeLimit);
     }
 
     public void runExploration() {
@@ -73,7 +76,7 @@ abstract public class ExplorationAlgo {
 
         // prepare for timing
         startTime = System.currentTimeMillis();
-        endTime = startTime + (timeLimit * 1000);
+        endTime = getEndTime(startTime, timeLimit);         // startTime + (timeLimit * 1000);
 
         areaExplored = calculateAreaExplored();
         System.out.println("Starting state - area explored: " + areaExplored);
@@ -97,8 +100,6 @@ abstract public class ExplorationAlgo {
      * 3. System.currentTimeMillis() > endTime
      */
     protected void explorationLoop(int r, int c) {
-        if (coverageLimit < 0) coverageLimit = 300;
-        if (timeLimit < 0) timeLimit = 3600;
 
         do {
             nextMove();
@@ -120,17 +121,19 @@ abstract public class ExplorationAlgo {
         } while (areaExplored <= coverageLimit && currentTime <= endTime);
 
         if (areaExplored == 300) {
+//            System.out.println("[explorationLoop()] goHome()");
             goHome();
-        } else if (areaExplored == coverageLimit && areaExplored < 300 || currentTime > endTime && areaExplored < 300) {
+        } else if ((areaExplored >= coverageLimit && areaExplored < 300) || (currentTime >= endTime && areaExplored < 300)) {
             // Exceed coverage or time limit
+//            System.out.println("[explorationLoop()] Exceed coverage or time limit");
             if (areaExplored == coverageLimit) System.out.printf("Reached coverage limit, successfully explored %d grids\n", areaExplored);
-            if (currentTime > endTime) System.out.printf("Reached time limit, exploration has taken %d second(s)\n", currentTime);
+            if (currentTime > endTime) System.out.printf("Reached time limit, exploration has taken %d millisecond(ms)\n", getElapsedTime(currentTime, startTime));
             System.out.println("Arena not fully explored, goHome() may incur errors, enter \"yes\" to continue: ");
             String userInput = scanner.nextLine();
             if (userInput.equals("yes")) goHome();
-        }
-        else {
-            // not breaking limit, but arena not fully explored
+        } else {
+//            System.out.println("[explorationLoop()] Not breaking limit, but arena not fully explored");
+//            System.out.println("areaExplored " + areaExplored + " | CoverageLimit " + coverageLimit + " | currentTime " + currentTime + " | endTime " + endTime);
             goHome(); // reset bot
             System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
 
@@ -563,5 +566,15 @@ abstract public class ExplorationAlgo {
             moveBot(AgentSettings.Actions.FACE_RIGHT);
             moveBot(AgentSettings.Actions.FACE_RIGHT);
         }
+    }
+
+    protected long getElapsedTime(long startTime, long currentTime) {
+        if (bot.isSim()) return (currentTime - startTime) * SimulatorSettings.SIM_ACCELERATION;
+        else return (currentTime - startTime);
+    }
+
+    protected long getEndTime(long startTime, int timeLimit) {
+        if (bot.isSim()) return startTime + (timeLimit / SimulatorSettings.SIM_ACCELERATION * 1000);
+        else return startTime + (timeLimit * 1000);
     }
 }

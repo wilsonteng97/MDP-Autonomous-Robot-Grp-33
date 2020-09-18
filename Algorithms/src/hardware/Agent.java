@@ -3,6 +3,7 @@ package hardware;
 import map.Map;
 import map.MapSettings;
 import network.NetworkMgr;
+import utils.SimulatorSettings;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 public class Agent {
     private int ctrY; private int ctrX;
     private int speed;
+    private int turnSpeed;
     private int detectCount;
     private boolean enteredGoal;
     private boolean rightDistAlign = false;
@@ -52,7 +54,8 @@ public class Agent {
     public Agent(int centreY, int centreX, boolean sim) {
         this.ctrY = centreY; this.ctrX = centreX; this.agtDir = AgentSettings.START_DIR;
         this.enteredGoal = false;
-        this.speed = AgentSettings.SPEED;
+        this.speed = AgentSettings.SPEED / SimulatorSettings.SIM_ACCELERATION;
+        this.turnSpeed = AgentSettings.TURN_SPEED / SimulatorSettings.SIM_ACCELERATION;
         this.setSim(sim);
 
         sensorLst = new ArrayList<Sensor>();
@@ -249,6 +252,15 @@ public class Agent {
     }
 
     public AgentSettings.Direction changeDir(AgentSettings.Actions action, Map explorationMap, Map map) {
+        if (sim) {
+            // Emulate real AgentSettings.Direction by pausing execution.
+            try {
+                TimeUnit.MILLISECONDS.sleep(turnSpeed);
+            } catch (InterruptedException e) {
+                System.out.println("Something went wrong in Robot.changeDir()!");
+            }
+        }
+
         switch (action) {
             case FACE_LEFT:
                 this.agtDir = AgentSettings.Direction.antiClockwise90(agtDir); break;

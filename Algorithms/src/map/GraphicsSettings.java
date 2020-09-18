@@ -13,7 +13,7 @@ public class GraphicsSettings {
     public static final Color C_OBSTACLE = Color.BLACK;
     public static final Color C_VIRTUALWALL = Color.PINK;
 
-    public static final Color C_ROBOT = Color.PINK;
+    public static final Color C_ROBOT = Color.YELLOW;
     public static final Color C_ROBOT_DIR = Color.RED;
 
     public static final int ROBOT_W = 70;
