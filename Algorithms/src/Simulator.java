@@ -18,7 +18,7 @@ import java.awt.event.MouseEvent;
 import static utils.FileIO.loadMap;
 
 public class Simulator {
-    private static final boolean sim = false;
+    private static final boolean sim = true;
 
     private static JFrame _appFrame = null;                                     // application JFrame
 
