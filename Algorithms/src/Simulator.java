@@ -278,7 +278,7 @@ public class Simulator {
                 JDialog timeExploDialog = new JDialog(_appFrame, "Time-Limited Exploration", true);
                 timeExploDialog.setSize(400, 60);
                 timeExploDialog.setLayout(new FlowLayout());
-                final JTextField timeTF = new JTextField(5);
+                JTextField timeTF = new JTextField(5);
                 JButton timeSaveButton = new JButton("Run");
 
                 timeSaveButton.addMouseListener(new MouseAdapter() {
@@ -323,7 +323,7 @@ public class Simulator {
                 JDialog coverageExploDialog = new JDialog(_appFrame, "Coverage-Limited Exploration", true);
                 coverageExploDialog.setSize(400, 60);
                 coverageExploDialog.setLayout(new FlowLayout());
-                final JTextField coverageTF = new JTextField(5);
+                JTextField coverageTF = new JTextField(5);
                 JButton coverageSaveButton = new JButton("Run");
 
                 coverageSaveButton.addMouseListener(new MouseAdapter() {

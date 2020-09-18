@@ -97,6 +97,9 @@ abstract public class ExplorationAlgo {
      * 3. System.currentTimeMillis() > endTime
      */
     protected void explorationLoop(int r, int c) {
+        if (coverageLimit < 0) coverageLimit = 300;
+        if (timeLimit < 0) timeLimit = 3600;
+
         do {
             nextMove();
             System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
@@ -115,6 +118,7 @@ abstract public class ExplorationAlgo {
 //            scanner.nextLine();
 
         } while (areaExplored <= coverageLimit && currentTime <= endTime);
+
         if (areaExplored == 300) {
             goHome();
         } else if (areaExplored == coverageLimit && areaExplored < 300 || currentTime > endTime && areaExplored < 300) {
