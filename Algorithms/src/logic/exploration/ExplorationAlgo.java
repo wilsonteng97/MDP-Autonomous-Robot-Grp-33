@@ -327,7 +327,7 @@ abstract public class ExplorationAlgo {
         areaExplored = calculateAreaExplored();
         System.out.printf("%.2f%% Coverage", (areaExplored / 300.0) * 100.0);
         System.out.println(", " + areaExplored + " Cells");
-        System.out.println((System.currentTimeMillis() - startTime) / 1000 + " Seconds");
+        System.out.println((getElapsedTime()) / 1000 + " Seconds");
 
         // realbot
         if (!bot.isSim()) {
