@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
 import static utils.SimulatorSettings.SIM;
-import static utils.SimulatorSettings.goHomeSlowSleep;
+import static utils.SimulatorSettings.GOHOMESLOW_SLEEP;
 
 abstract public class ExplorationAlgo {
     protected final Map exploredMap;
