@@ -7,6 +7,8 @@ import logic.fastestpath.AStarHeuristicSearch;
 import map.Map;
 import map.MapSettings;
 import network.NetworkMgr;
+import utils.MapDescriptorFormat;
+import utils.SimulatorSettings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,8 +18,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import static utils.FileIO.loadMap;
+import static utils.MapDescriptorFormat.generateMapDescriptorFormat;
 
 public class Simulator {
+    private static final boolean sim = SimulatorSettings.SIM;
+
     private static JFrame _appFrame = null;                                     // application JFrame
 
     private static JPanel _mapCards = null;                                     // JPanel for map views
@@ -29,12 +34,12 @@ public class Simulator {
     private static Map dummyMap = null;                                         // real map
     private static Map explorationMap = null;                                   // exploration map
 
-    private static int timeLimit = 3600;                                        // time limit
+    private static int timeLimit = 3600;                                        // in seconds
     private static int coverageLimit = 300;                                     // coverage limit
 
     private static final NetworkMgr comm = NetworkMgr.getInstance();
-    private static final boolean sim = true;
 
+    private static String[] stringMDF;
 
     public static void main(String[] args) {
         if (!sim) comm.startConn();
@@ -223,6 +228,7 @@ public class Simulator {
                     new FastestPath().execute();
                 }
 
+                stringMDF = generateMapDescriptorFormat(explorationMap);
                 return 111;
             }
         }
@@ -273,8 +279,30 @@ public class Simulator {
                 JDialog timeExploDialog = new JDialog(_appFrame, "Time-Limited Exploration", true);
                 timeExploDialog.setSize(400, 60);
                 timeExploDialog.setLayout(new FlowLayout());
-                final JTextField timeTF = new JTextField(5);
+                JTextField timeTF = new JTextField(5);
                 JButton timeSaveButton = new JButton("Run");
+
+                timeTF.addKeyListener(new KeyListener() {
+                    @Override
+                    public void keyTyped(KeyEvent e) {}
+
+                    @Override
+                    public void keyPressed(KeyEvent e) {
+                        if (e.getKeyCode()==KeyEvent.VK_ENTER) {
+                            timeExploDialog.setVisible(false);
+                            String time = timeTF.getText();
+                            String[] timeArr = time.split(":");
+                            timeLimit = (Integer.parseInt(timeArr[0]) * 60) + Integer.parseInt(timeArr[1]);
+                            System.out.println("[btn_TimeExploration()] " + timeLimit);
+                            CardLayout cl = ((CardLayout) _mapCards.getLayout());
+                            cl.show(_mapCards, "EXPLORATION");
+                            new TimeExploration().execute();
+                        }
+                    }
+
+                    @Override
+                    public void keyReleased(KeyEvent e) {}
+                });
 
                 timeSaveButton.addMouseListener(new MouseAdapter() {
                     public void mousePressed(MouseEvent e) {
@@ -282,6 +310,7 @@ public class Simulator {
                         String time = timeTF.getText();
                         String[] timeArr = time.split(":");
                         timeLimit = (Integer.parseInt(timeArr[0]) * 60) + Integer.parseInt(timeArr[1]);
+                        System.out.println("[btn_TimeExploration()] " + timeLimit);
                         CardLayout cl = ((CardLayout) _mapCards.getLayout());
                         cl.show(_mapCards, "EXPLORATION");
                         new TimeExploration().execute();
@@ -318,13 +347,34 @@ public class Simulator {
                 JDialog coverageExploDialog = new JDialog(_appFrame, "Coverage-Limited Exploration", true);
                 coverageExploDialog.setSize(400, 60);
                 coverageExploDialog.setLayout(new FlowLayout());
-                final JTextField coverageTF = new JTextField(5);
+                JTextField coverageTF = new JTextField(5);
                 JButton coverageSaveButton = new JButton("Run");
+
+                coverageTF.addKeyListener(new KeyListener() {
+                    @Override
+                    public void keyTyped(KeyEvent e) {}
+
+                    @Override
+                    public void keyPressed(KeyEvent e) {
+                        if (e.getKeyCode()==KeyEvent.VK_ENTER) {
+                            coverageExploDialog.setVisible(false);
+                            coverageLimit = (int) ((Integer.parseInt(coverageTF.getText())) * MapSettings.MAP_SIZE / 100.0);
+                            System.out.println("[btn_CoverageExploration()] " + coverageLimit);
+                            new CoverageExploration().execute();
+                            CardLayout cl = ((CardLayout) _mapCards.getLayout());
+                            cl.show(_mapCards, "EXPLORATION");
+                        }
+                    }
+
+                    @Override
+                    public void keyReleased(KeyEvent e) {}
+                });
 
                 coverageSaveButton.addMouseListener(new MouseAdapter() {
                     public void mousePressed(MouseEvent e) {
                         coverageExploDialog.setVisible(false);
                         coverageLimit = (int) ((Integer.parseInt(coverageTF.getText())) * MapSettings.MAP_SIZE / 100.0);
+                        System.out.println("[btn_CoverageExploration()] " + coverageLimit);
                         new CoverageExploration().execute();
                         CardLayout cl = ((CardLayout) _mapCards.getLayout());
                         cl.show(_mapCards, "EXPLORATION");

@@ -3,7 +3,9 @@ package hardware;
 public class AgentSettings {
     // Agent Start Direction
     public static final Direction START_DIR = Direction.NORTH;
-    public static final int SPEED = 100;                // delay between movements (ms)
+    public static final int SPEED = 1000;                           // delay between movements (ms)
+    public static final int TURN_SPEED = 2000;                      // delay between movements (ms)
+    public static final int CALIBERATE_SPEED = 3000;                      // delay between movements (ms)
 
     public static final int GOAL_ROW = 18;                          // row no. of goal cell
     public static final int GOAL_COL = 13;                          // col no. of goal cell
@@ -17,16 +19,16 @@ public class AgentSettings {
 //    public static final int CALIBRATE_AFTER = 3;        //Calibrate After number of moves
 
     public static final int MOVE_STEPS = 1;
-    public static final int MOVE_SPEED = 5000;	        // Delays before movement (Lower = faster) in milliseconds
+    public static final int MOVE_SPEED = 2000;	        // Delays before movement (Lower = faster) in milliseconds
     public static final long WAIT_TIME = 5000;	        // Time waiting before retransmitting in milliseconds
     public static final short CAMERA_RANGE = 4;
 
     // Sensors default range (In grids)
     public static final int SHORT_MIN = 1;
-    public static final int SHORT_MAX = 3;
+    public static final int SHORT_MAX = 5;
 
-    public static final int LONG_MIN = 1;
-    public static final int LONG_MAX = 5;
+    public static final int LONG_MIN = 2;
+    public static final int LONG_MAX = 7;
 
     public static final double RIGHT_THRES = 0.5;       // Threshold value or right sensor will calibrate once exceeded
     public static final double RIGHT_DIS_THRES_CLOSE = 1.0;

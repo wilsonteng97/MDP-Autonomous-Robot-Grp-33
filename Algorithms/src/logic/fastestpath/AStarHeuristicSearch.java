@@ -232,7 +232,8 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
 
         ArrayList<Actions> movements = new ArrayList<>();
 
-        Agent tempBot = new Agent(1, 1, true);
+        Agent tempBot = new Agent(bot.getAgtY(), bot.getAgtX(), true);
+        tempBot.setAgtDir(bot.getAgtDir());
         tempBot.setSpeed(0);
         while ((tempBot.getAgtRow() != goalRow) || (tempBot.getAgtCol() != goalCol)) {
 //            System.out.println("Checking " + temp);
@@ -259,6 +260,7 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
         }
 
         if (bot.isSim() || explorationMode) {
+            System.out.println("[ASTAR] in exploration mode");
             for (Actions x : movements) {
                 if (x == Actions.FORWARD) {
                     if (!canMoveForward()) {
