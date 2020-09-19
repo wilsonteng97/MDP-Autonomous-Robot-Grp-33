@@ -16,6 +16,10 @@ import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.Queue;
 import java.util.HashSet;
+import java.util.concurrent.TimeUnit;
+
+import static utils.SimulatorSettings.SIM;
+import static utils.SimulatorSettings.goHomeSlowSleep;
 
 abstract public class ExplorationAlgo {
     protected final Map exploredMap;
@@ -134,8 +138,25 @@ abstract public class ExplorationAlgo {
             elapsedTime = getElapsedTime();
             if (areaExplored >= coverageLimit) System.out.printf("Reached coverage limit, successfully explored %d grids\n", areaExplored);
             if (elapsedTime >= timeLimit) System.out.printf("Reached time limit, exploration has taken %d millisecond(ms)\n", elapsedTime);
+
+            if (SIM) {
+                System.out.println("Arena not fully explored, goHomeSlow() option can be chosen, enter \"Y\" or \"y\" to continue: ");
+                String userInput = scanner.nextLine();
+                if (userInput.toLowerCase().equals("y")) {
+                    try {
+                        System.out.println("[explorationLoop()] Agent sleeping for " + goHomeSlowSleep/1000 + " second(s) before executing goHomeSlow()");
+                        TimeUnit.MILLISECONDS.sleep(goHomeSlowSleep);
+                    } catch (InterruptedException e) {
+                        System.out.println("[explorationLoop()] Sleeping interruption exception");
+                    }
+                    goHomeSlow();
+                } else {
+                    System.out.println("goHomeSlow() option not chosen, robot will be stationary.");
+                }
+            } else {
                 goHomeSlow();
-                goHome();
+            }
+
         } else {
 //            System.out.println("[explorationLoop()] Not breaking limit, but arena not fully explored");
 //            System.out.println("areaExplored " + areaExplored + " | CoverageLimit " + coverageLimit + " | timeLimit " + timeLimit + " | elapsedTime " + elapsedTime);
@@ -624,7 +645,7 @@ abstract public class ExplorationAlgo {
 
     protected long getElapsedTime() {
         currentTime = System.currentTimeMillis();
-        if (bot.isSim()) return Math.abs(currentTime - startTime) * SimulatorSettings.SIM_ACCELERATION;
+        if (SIM) return Math.abs(currentTime - startTime) * SimulatorSettings.SIM_ACCELERATION;
         else return Math.abs(currentTime - startTime);
     }
 }
