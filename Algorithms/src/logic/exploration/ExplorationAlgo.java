@@ -30,7 +30,9 @@ abstract public class ExplorationAlgo {
     protected int areaExplored;
     protected long startTime; // in millisecond
     protected long currentTime;
+
     ArrayList<Actions> actionsTaken = new ArrayList<>();
+
 
     Scanner scanner = new Scanner(System.in);
 
@@ -135,6 +137,7 @@ abstract public class ExplorationAlgo {
         } else if ((areaExplored >= coverageLimit && areaExplored < 300) || (elapsedTime >= timeLimit && areaExplored < 300)) {
             // Exceed coverage or time limit
 //            System.out.println("[explorationLoop()] Exceed coverage or time limit");
+
             elapsedTime = getElapsedTime();
             if (areaExplored >= coverageLimit) System.out.printf("Reached coverage limit, successfully explored %d grids\n", areaExplored);
             if (elapsedTime >= timeLimit) System.out.printf("Reached time limit, exploration has taken %d millisecond(ms)\n", elapsedTime);
@@ -144,8 +147,8 @@ abstract public class ExplorationAlgo {
                 String userInput = scanner.nextLine();
                 if (userInput.toLowerCase().equals("y")) {
                     try {
-                        System.out.println("[explorationLoop()] Agent sleeping for " + goHomeSlowSleep/1000 + " second(s) before executing goHomeSlow()");
-                        TimeUnit.MILLISECONDS.sleep(goHomeSlowSleep);
+                        System.out.println("[explorationLoop()] Agent sleeping for " + GOHOMESLOW_SLEEP/1000 + " second(s) before executing goHomeSlow()");
+                        TimeUnit.MILLISECONDS.sleep(GOHOMESLOW_SLEEP);
                     } catch (InterruptedException e) {
                         System.out.println("[explorationLoop()] Sleeping interruption exception");
                     }
@@ -162,6 +165,7 @@ abstract public class ExplorationAlgo {
 //            System.out.println("areaExplored " + areaExplored + " | CoverageLimit " + coverageLimit + " | timeLimit " + timeLimit + " | elapsedTime " + elapsedTime);
             goHomeSlow(); // reset bot
             goHome();
+
             System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
 
             // visit unvisited(blocked) cells
