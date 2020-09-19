@@ -57,7 +57,7 @@ public class Map extends JPanel {
         }
         // Set obstacle virtual walls
         if (this.grid[row][col].isObstacle()) {
-            System.out.printf(" ->grid[%d][%d] is obstacle\n", row, col);
+//            System.out.printf(" ->grid[%d][%d] is obstacle\n", row, col);
 //            if (inStartZone(row, col) || inGoalZone(row, col)) return;
             for (int r = row - 1; r <= row + 1; r++)
                 for (int c = col - 1; c <= col + 1; c++)

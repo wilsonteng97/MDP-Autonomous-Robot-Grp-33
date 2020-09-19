@@ -16,6 +16,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 import static utils.FileIO.loadMap;
 import static utils.MapDescriptorFormat.generateMapDescriptorFormat;
@@ -33,7 +34,6 @@ public class Simulator {
 
     private static Map dummyMap = null;                                         // real map
     private static Map explorationMap = null;                                   // exploration map
-
     private static int timeLimit = 3600;                                        // in seconds
     private static int coverageLimit = 300;                                     // coverage limit
 

@@ -4,5 +4,5 @@ public class SimulatorSettings {
 
     public static final boolean SIM = true;
 
-    public static final int SIM_ACCELERATION = 25;   // The number of times simulation is accelerated by.
+    public static final int SIM_ACCELERATION = 20;   // The number of times simulation is accelerated by.
 }
