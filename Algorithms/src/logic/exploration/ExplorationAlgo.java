@@ -2,6 +2,8 @@ package logic.exploration;
 
 import hardware.Agent;
 import hardware.AgentSettings;
+import hardware.AgentSettings.Actions;
+import hardware.AgentSettings.Direction;
 import logic.fastestpath.AStarHeuristicSearch;
 import map.Cell;
 import map.Map;
@@ -14,6 +16,10 @@ import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.Queue;
 import java.util.HashSet;
+import java.util.concurrent.TimeUnit;
+
+import static utils.SimulatorSettings.SIM;
+import static utils.SimulatorSettings.goHomeSlowSleep;
 
 abstract public class ExplorationAlgo {
     protected final Map exploredMap;
@@ -24,6 +30,9 @@ abstract public class ExplorationAlgo {
     protected int areaExplored;
     protected long startTime; // in millisecond
     protected long currentTime;
+
+    ArrayList<Actions> actionsTaken = new ArrayList<>();
+
 
     Scanner scanner = new Scanner(System.in);
 
@@ -47,19 +56,19 @@ abstract public class ExplorationAlgo {
 
             // TODO initial calibration
 //            if (!bot.isSim()) {
-//                bot.takeAction(AgentSettings.Actions.FACE_LEFT, 0, exploredMap, realMap);
+//                bot.takeAction(Actions.FACE_LEFT, 0, exploredMap, realMap);
 //                NetworkMgr.getInstance().receiveMsg();
-//                bot.takeAction(AgentSettings.Actions.CALIBRATE);
+//                bot.takeAction(Actions.CALIBRATE);
 //                NetworkMgr.getInstance().receiveMsg();
-//                bot.takeAction(AgentSettings.Actions.FACE_LEFT, 0, exploredMap, realMap);
+//                bot.takeAction(Actions.FACE_LEFT, 0, exploredMap, realMap);
 //                NetworkMgr.getInstance().receiveMsg();
-//                bot.takeAction(AgentSettings.Actions.CALIBRATE);
+//                bot.takeAction(Actions.CALIBRATE);
 //                NetworkMgr.getInstance().receiveMsg();
-//                bot.takeAction(AgentSettings.Actions.FACE_RIGHT, 0, exploredMap, realMap);
+//                bot.takeAction(Actions.FACE_RIGHT, 0, exploredMap, realMap);
 //                NetworkMgr.getInstance().receiveMsg();
-//                bot.takeAction(AgentSettings.Actions.CALIBRATE);
+//                bot.takeAction(Actions.CALIBRATE);
 //                NetworkMgr.getInstance().receiveMsg();
-//                bot.takeAction(AgentSettings.Actions.FACE_RIGHT, 0, exploredMap, realMap);
+//                bot.takeAction(Actions.FACE_RIGHT, 0, exploredMap, realMap);
 //            }
 
             while (true) {
@@ -128,15 +137,35 @@ abstract public class ExplorationAlgo {
         } else if ((areaExplored >= coverageLimit && areaExplored < 300) || (elapsedTime >= timeLimit && areaExplored < 300)) {
             // Exceed coverage or time limit
 //            System.out.println("[explorationLoop()] Exceed coverage or time limit");
-            if (areaExplored == coverageLimit) System.out.printf("Reached coverage limit, successfully explored %d grids\n", areaExplored);
+
+            elapsedTime = getElapsedTime();
+            if (areaExplored >= coverageLimit) System.out.printf("Reached coverage limit, successfully explored %d grids\n", areaExplored);
             if (elapsedTime >= timeLimit) System.out.printf("Reached time limit, exploration has taken %d millisecond(ms)\n", elapsedTime);
-            System.out.println("Arena not fully explored, goHome() may incur errors, enter \"yes\" to continue: ");
-            String userInput = scanner.nextLine();
-            if (userInput.equals("yes")) goHome();
+
+            if (SIM) {
+                System.out.println("Arena not fully explored, goHomeSlow() option can be chosen, enter \"Y\" or \"y\" to continue: ");
+                String userInput = scanner.nextLine();
+                if (userInput.toLowerCase().equals("y")) {
+                    try {
+                        System.out.println("[explorationLoop()] Agent sleeping for " + GOHOMESLOW_SLEEP/1000 + " second(s) before executing goHomeSlow()");
+                        TimeUnit.MILLISECONDS.sleep(GOHOMESLOW_SLEEP);
+                    } catch (InterruptedException e) {
+                        System.out.println("[explorationLoop()] Sleeping interruption exception");
+                    }
+                    goHomeSlow();
+                } else {
+                    System.out.println("goHomeSlow() option not chosen, robot will be stationary.");
+                }
+            } else {
+                goHomeSlow();
+            }
+
         } else {
 //            System.out.println("[explorationLoop()] Not breaking limit, but arena not fully explored");
 //            System.out.println("areaExplored " + areaExplored + " | CoverageLimit " + coverageLimit + " | timeLimit " + timeLimit + " | elapsedTime " + elapsedTime);
-            goHome(); // reset bot
+            goHomeSlow(); // reset bot
+            goHome();
+
             System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
 
             // visit unvisited(blocked) cells
@@ -148,6 +177,16 @@ abstract public class ExplorationAlgo {
                 targetCol = targetCell.getCol();
                 keepExploring = new AStarHeuristicSearch(exploredMap, bot, realMap);
                 keepExploring.runFastestPath(targetRow, targetCol);
+
+                elapsedTime = getElapsedTime();
+                if (areaExplored >= coverageLimit) {
+                    System.out.printf("Reached coverage limit, successfully explored %d grids\n", areaExplored);
+                    break;
+                }
+                if (elapsedTime >= timeLimit) {
+                    System.out.printf("Reached time limit, exploration has taken %d millisecond(ms)\n", elapsedTime);
+                    break;
+                }
             }
 
             // visit surrounding cells of those unvisited cells
@@ -161,8 +200,17 @@ abstract public class ExplorationAlgo {
                 System.out.println(destCell);
                 keepExploring = new AStarHeuristicSearch(exploredMap, bot, realMap);
                 keepExploring.runFastestPath(destCell.getRow(), destCell.getCol());
+
+                elapsedTime = getElapsedTime();
+                if (areaExplored >= coverageLimit) {
+                    System.out.printf("Reached coverage limit, successfully explored %d grids\n", areaExplored);
+                    break;
+                }
+                if (elapsedTime >= timeLimit) {
+                    System.out.printf("Reached time limit, exploration has taken %d millisecond(ms)\n", elapsedTime);
+                    break;
+                }
             }
-            System.out.println("Visited all cells!");
 
             goHome();
         }
@@ -283,15 +331,26 @@ abstract public class ExplorationAlgo {
 
         // realbot
         if (!bot.isSim()) {
-            turnBotDirection(AgentSettings.Direction.WEST);
-            moveBot(AgentSettings.Actions.CALIBRATE);
-            turnBotDirection(AgentSettings.Direction.SOUTH);
-            moveBot(AgentSettings.Actions.CALIBRATE);
-            turnBotDirection(AgentSettings.Direction.WEST);
-            moveBot(AgentSettings.Actions.CALIBRATE);
+            turnBotDirection(Direction.WEST);
+            moveBot(Actions.CALIBRATE);
+            turnBotDirection(Direction.SOUTH);
+            moveBot(Actions.CALIBRATE);
+            turnBotDirection(Direction.WEST);
+            moveBot(Actions.CALIBRATE);
         }
-        turnBotDirection(AgentSettings.Direction.NORTH);
+        turnBotDirection(Direction.NORTH);
         System.out.println("Went home");
+    }
+
+    /**
+     * Send bot back home following the original route
+     * Shall only be used in simulation
+     */
+    protected void goHomeSlow() {
+        ArrayList<Actions> reversedActions = reverseActions();
+        for (Actions m : reversedActions) {
+            moveBot(m);
+        }
     }
 
     /**
@@ -450,11 +509,29 @@ abstract public class ExplorationAlgo {
     }
 
     /**
+     * reverse the action list, should only be used in simulation mode;
+     */
+    protected ArrayList<Actions> reverseActions() {
+        ArrayList<Actions> reversedActions = new ArrayList<>();
+        reversedActions.add(Actions.FACE_RIGHT);
+        reversedActions.add(Actions.FACE_RIGHT);
+
+        for (int i = 0; i < actionsTaken.size(); i++) {
+            Actions m = actionsTaken.get(actionsTaken.size() - 1 - i);
+            if (m == Actions.FORWARD) reversedActions.add(Actions.FORWARD);
+            else if (m == Actions.FACE_LEFT) reversedActions.add(Actions.FACE_RIGHT);
+            else if (m == Actions.FACE_RIGHT) reversedActions.add(Actions.FACE_LEFT);
+        }
+        return reversedActions;
+    }
+
+    /**
      * Moves the bot, repaints the map and calls senseAndRepaint().
      */
-    protected void moveBot(AgentSettings.Actions m) {
+    protected void moveBot(Actions m) {
 //        System.out.println("[Agent Dir] " + bot.getAgtDir());
         System.out.println("Action executed: " + m);
+        actionsTaken.add(m);
         bot.takeAction(m, 1, exploredMap, realMap);
         senseAndRepaint();
 
@@ -554,25 +631,25 @@ abstract public class ExplorationAlgo {
     /**
      * Turns the robot to the required direction.
      */
-    protected void turnBotDirection(AgentSettings.Direction targetDir) {
+    protected void turnBotDirection(Direction targetDir) {
         int numOfTurn = Math.abs(bot.getAgtDir().ordinal() - targetDir.ordinal()) / 2;
         if (numOfTurn > 2) numOfTurn = numOfTurn % 2;
 
         if (numOfTurn == 1) {
-            if (AgentSettings.Direction.clockwise90(bot.getAgtDir()) == targetDir) {
-                moveBot(AgentSettings.Actions.FACE_RIGHT);
+            if (Direction.clockwise90(bot.getAgtDir()) == targetDir) {
+                moveBot(Actions.FACE_RIGHT);
             } else {
-                moveBot(AgentSettings.Actions.FACE_LEFT);
+                moveBot(Actions.FACE_LEFT);
             }
         } else if (numOfTurn == 2) {
-            moveBot(AgentSettings.Actions.FACE_RIGHT);
-            moveBot(AgentSettings.Actions.FACE_RIGHT);
+            moveBot(Actions.FACE_RIGHT);
+            moveBot(Actions.FACE_RIGHT);
         }
     }
 
     protected long getElapsedTime() {
         currentTime = System.currentTimeMillis();
-        if (bot.isSim()) return Math.abs(currentTime - startTime) * SimulatorSettings.SIM_ACCELERATION;
+        if (SIM) return Math.abs(currentTime - startTime) * SimulatorSettings.SIM_ACCELERATION;
         else return Math.abs(currentTime - startTime);
     }
 }
