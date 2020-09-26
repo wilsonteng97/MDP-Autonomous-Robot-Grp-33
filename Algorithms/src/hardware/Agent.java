@@ -42,18 +42,28 @@ public class Agent {
     private AgentSettings.Actions prevAction;
 
     private ArrayList<Sensor> sensorLst;
-    private final Sensor SR1;     // SR1
-    private final Sensor SR2;     // SR2
-    private final Sensor SR3;     // SR3
-    private final Sensor LR1;     // LRLeftTop
-    private final Sensor SR4;     // SRRightTop
-    private final Sensor SR5;     // SRRightBtm
+    private Sensor SR1;     // SR1
+    private Sensor SR2;     // SR2
+    private Sensor SR3;     // SR3
+    private Sensor LR1;     // LRLeftTop
+    private Sensor SR4;     // SRRightTop
+    private Sensor SR5;     // SRRightBtm
 
     private boolean sim;
 
     public Agent(int centreY, int centreX, boolean sim) {
-        this.ctrY = centreY; this.ctrX = centreX; this.agtDir = AgentSettings.START_DIR;
-        this.enteredGoal = false;
+        this.ctrY = centreY; this.ctrX = centreX;
+        this.agtDir = AgentSettings.START_DIR; this.enteredGoal = false;
+
+        this.setSim(sim);
+        this.initSpeed();
+        this.initSensors();
+    }
+
+    /**
+     * Agent Init Methods
+     */
+    public void initSpeed() {
         if (sim) {
             this.speed = AgentSettings.SPEED / SimulatorSettings.SIM_ACCELERATION;
             this.turnSpeed = AgentSettings.TURN_SPEED / SimulatorSettings.SIM_ACCELERATION;
@@ -61,8 +71,9 @@ public class Agent {
             this.speed = AgentSettings.SPEED;
             this.turnSpeed = AgentSettings.TURN_SPEED;
         }
-        this.setSim(sim);
+    }
 
+    public void initSensors() {
         sensorLst = new ArrayList<Sensor>();
 
         // 3 Front SR Sensors same direction (Initialized with respect to Agent's Direction)
@@ -87,6 +98,20 @@ public class Agent {
         sensorLst.add(SR1); sensorLst.add(SR2); sensorLst.add(SR3);
         sensorLst.add(LR1);
         sensorLst.add(SR4); sensorLst.add(SR5);
+    }
+
+    /**
+     * Reset Agent Method
+     */
+    public void resetAgt() {
+        if (sim) {
+            this.ctrY = MapSettings.START_ROW;
+            this.ctrX = MapSettings.START_COL;
+        }
+        this.agtDir = AgentSettings.START_DIR; this.enteredGoal = false;
+
+        this.initSpeed();
+        this.initSensors();
     }
 
     /**
