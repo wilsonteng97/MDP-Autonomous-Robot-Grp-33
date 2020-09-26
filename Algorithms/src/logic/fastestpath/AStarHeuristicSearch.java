@@ -8,7 +8,6 @@ import map.Cell;
 import map.Map;
 import map.MapSettings;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
