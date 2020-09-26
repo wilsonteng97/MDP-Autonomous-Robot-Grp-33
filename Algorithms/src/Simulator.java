@@ -126,7 +126,8 @@ public class Simulator {
 
                         @Override
                         public void keyPressed(KeyEvent e) {
-                            if (e.getKeyCode()==KeyEvent.VK_ENTER){
+                            if (e.getKeyCode()==KeyEvent.VK_ENTER) {
+                                explorationMap.resetMap();
                                 loadMapDialog.setVisible(false);
                                 loadMap(dummyMap, loadTF.getText());
                                 CardLayout cl = ((CardLayout) _mapCards.getLayout());
@@ -143,6 +144,7 @@ public class Simulator {
 
                     loadMapButton.addMouseListener(new MouseAdapter() {
                         public void mousePressed(MouseEvent e) {
+                            explorationMap.resetMap();
                             loadMapDialog.setVisible(false);
                             loadMap(dummyMap, loadTF.getText());
                             CardLayout cl = ((CardLayout) _mapCards.getLayout());
