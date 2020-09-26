@@ -3,7 +3,9 @@ package network;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
+
+import static utils.SimulatorSettings.NETWORK_IP_ADDRESS;
+import static utils.SimulatorSettings.NETWORK_PORT;
 
 public class NetworkMgr {
 
@@ -39,8 +41,8 @@ public class NetworkMgr {
     private static NetworkMgr nwMgr = null;
 
     public NetworkMgr() {
-        this.ipAddr = "192.168.33.1";
-        this.port = 5040;
+        this.ipAddr = NETWORK_IP_ADDRESS;
+        this.port = NETWORK_PORT;
     }
 
     public static NetworkMgr getInstance() {

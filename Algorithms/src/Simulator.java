@@ -2,12 +2,11 @@ import hardware.Agent;
 import hardware.AgentSettings;
 import logic.exploration.ExplorationAlgo;
 import logic.exploration.RightWallHugging;
-import logic.fastestpath.FastestPathAlgo;
 import logic.fastestpath.AStarHeuristicSearch;
+import logic.fastestpath.FastestPathAlgo;
 import map.Map;
 import map.MapSettings;
 import network.NetworkMgr;
-import utils.MapDescriptorFormat;
 import utils.SimulatorSettings;
 
 import javax.swing.*;
@@ -16,7 +15,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 
 import static utils.FileIO.loadMap;
 import static utils.MapDescriptorFormat.generateMapDescriptorFormat;

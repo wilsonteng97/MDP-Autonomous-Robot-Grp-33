@@ -1,6 +1,7 @@
 package utils;
 
-import map.*;
+import map.Map;
+import map.MapSettings;
 
 public class MapDescriptorFormat {
 
