@@ -67,8 +67,8 @@ void loop() {
     */
 while (Serial.available()>0){
  char command=Serial.read();
- Serial.print(command);
-  int value=3;    
+ Serial.println(command);
+  int value=2;    
 
     switch (command) {
       case 'W':

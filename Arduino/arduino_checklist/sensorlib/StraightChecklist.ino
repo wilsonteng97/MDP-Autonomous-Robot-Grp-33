@@ -6,7 +6,7 @@
 
 const int LEFT_PULSE = 3; // LEFT M1 Pulse
 const int RIGHT_PULSE = 11; // RIGHT M2 Pulse
-const int MOVE_FAST_SPEED = 375;
+const int MOVE_FAST_SPEED = 370;
 const int MOVE_MAX_SPEED = 310;
 const int MOVE_MIN_SPEED = 200;
 const int TURN_MAX_SPEED = 260;
@@ -15,18 +15,19 @@ const int TURN_TICKS_L = 770;
 const int TURN_TICKS_R = 763;
 const int TICKS[10] = {545, 1155, 1760, 2380, 2985, 3615, 4195, 4775, 5370};
 const double DIST_WALL_CENTER_BOX = 1.58;
-const double kp = 0.5, ki = 0, kd = 0;
+const double kp = 0.02, ki = 0, kd = 0.0124; // Arena 1
+//KP 0.02 KD 0.009
 
 int TENCM_TICKS_OFFSET = 0;
 
-double tick_R = 0;
 double tick_L = 0;
+double tick_R = 0;
 double speed_O = 0;
-double previous_tick_R = 0;
+double previous_tick_L = 0;
 double previous_error = 0;
 
 DualVNH5019MotorShield md;
-PID myPID(&tick_R, &speed_O, &tick_L, kp, ki, kd, DIRECT);
+PID myPID(&tick_L, &speed_O, &tick_R, kp, ki, kd, DIRECT);
 
 //--------------------------Motor Codes-------------------------------
 void setupMotorEncoder() {
@@ -59,13 +60,13 @@ void moveForward(int distance) {
     currentSpeed = MOVE_MAX_SPEED;
   }
   double offset = 0;
-  int last_tick_R = 0;
-  while (tick_R <= distance || tick_L <= distance) {
-    if ((tick_R - last_tick_R) >= 10 || tick_R == 0 || tick_R == last_tick_R) {
-      last_tick_R = tick_R;
+  int last_tick_L = 0;
+  while (tick_L <= distance || tick_R <= distance) {
+    if ((tick_L - last_tick_L) >= 10 || tick_L == 0 || tick_L == last_tick_L) {
+      last_tick_L = tick_L;
       offset += 0.1;
     }
-    if (myPID.Compute() || tick_R == last_tick_R) {
+    if (myPID.Compute() || tick_L == last_tick_L) {
       if (offset >= 1)
         md.setSpeeds(currentSpeed + speed_O, currentSpeed - speed_O);
       else
@@ -86,13 +87,13 @@ void moveBackwards(int distance) {
     currentSpeed = MOVE_MAX_SPEED;
   }
   double offset = 0;
-  long last_tick_R = 0;
-  while (tick_R <= distance || tick_L <= distance) {
-    if ((tick_R - last_tick_R) >= 10 || tick_R == 0 || tick_R == last_tick_R) {
-      last_tick_R = tick_R;
+  long last_tick_L = 0;
+  while (tick_L <= distance || tick_R <= distance) {
+    if ((tick_L - last_tick_L) >= 10 || tick_L == 0 || tick_L == last_tick_L) {
+      last_tick_L = tick_L;
       offset += 0.1;
     }
-    if (myPID.Compute() || tick_R == last_tick_R) {
+    if (myPID.Compute() || tick_L == last_tick_L) {
       if (offset >= 1)
         md.setSpeeds(-(currentSpeed + speed_O), -(currentSpeed - speed_O));
       else
@@ -113,15 +114,15 @@ void moveForwardFast(int distance) {
     currentSpeed = MOVE_FAST_SPEED;
   }
   double offset = 0;
-  int last_tick_R = 0;
-  while (tick_R <= distance || tick_L <= distance) {
-    if (distance - tick_R < 150)
+  int last_tick_L = 0;
+  while (tick_L <= distance || tick_R <= distance) {
+    if (distance - tick_L < 150)
       currentSpeed = 150;
-    if ((tick_R - last_tick_R) >= 10 || tick_R == 0 || tick_R == last_tick_R) {
-      last_tick_R = tick_R;
+    if ((tick_L - last_tick_L) >= 10 || tick_L == 0 || tick_L == last_tick_L) {
+      last_tick_L = tick_L;
       offset += 0.1;
     }
-    if (myPID.Compute() || tick_R == last_tick_R) {
+    if (myPID.Compute() || tick_L == last_tick_L) {
       if (offset >= 1)
         md.setSpeeds(currentSpeed + speed_O, currentSpeed - speed_O);
       else
@@ -142,15 +143,15 @@ void moveBackwardsFast(int distance) {
     currentSpeed = MOVE_FAST_SPEED;
   }
   double offset = 0;
-  long last_tick_R = 0;
-  while (tick_R <= distance || tick_L <= distance) {
-    if (distance - tick_R < 150)
+  long last_tick_L = 0;
+  while (tick_L <= distance || tick_R <= distance) {
+    if (distance - tick_L < 150)
       currentSpeed = 150;
-    if ((tick_R - last_tick_R) >= 10 || tick_R == 0 || tick_R == last_tick_R) {
-      last_tick_R = tick_R;
+    if ((tick_L - last_tick_L) >= 10 || tick_L == 0 || tick_L == last_tick_L) {
+      last_tick_L = tick_L;
       offset += 0.1;
     }
-    if (myPID.Compute() || tick_R == last_tick_R) {
+    if (myPID.Compute() || tick_L == last_tick_L) {
       if (offset >= 1)
         md.setSpeeds(-(currentSpeed + speed_O), -(currentSpeed - speed_O));
       else
@@ -175,17 +176,17 @@ void moveForwardCalibrate(int distance) {
     currentSpeed = MOVE_MAX_SPEED;
   }
   double offset = 0;
-  int last_tick_R = 0;
-  while (tick_R <= distance || tick_L <= distance) {
-    if ((tick_R - last_tick_R) >= 10 || tick_R == 0 || tick_R == last_tick_R) {
-      last_tick_R = tick_R;
+  int last_tick_L = 0;
+  while (tick_L <= distance || tick_R <= distance) {
+    if ((tick_L - last_tick_L) >= 10 || tick_L == 0 || tick_L == last_tick_L) {
+      last_tick_L = tick_L;
       offset += 0.1;
     }
-    if (myPID.Compute() || tick_R == last_tick_R) {
+    if (myPID.Compute() || tick_L == last_tick_L) {
       if (offset >= 1 || distance < 110)
-        md.setSpeeds(currentSpeed + speed_O, currentSpeed - speed_O);
+        md.setSpeeds(-(currentSpeed + speed_O), -(currentSpeed - speed_O));
       else
-        md.setSpeeds(offset * (currentSpeed + speed_O), offset * (currentSpeed - speed_O));
+        md.setSpeeds(-1* offset * (currentSpeed + speed_O),-1* offset * (currentSpeed - speed_O));
     }
   }
   initializeMotor_End();
@@ -207,17 +208,17 @@ void moveBackwardsCalibrate(int distance) {
     currentSpeed = MOVE_MAX_SPEED;
   }
   double offset = 0;
-  long last_tick_R = 0;
-  while (tick_R <= distance || tick_L <= distance) {
-    if ((tick_R - last_tick_R) >= 10 || tick_R == 0 || tick_R == last_tick_R) {
-      last_tick_R = tick_R;
+  long last_tick_L = 0;
+  while (tick_L <= distance || tick_R <= distance) {
+    if ((tick_L - last_tick_L) >= 10 || tick_L == 0 || tick_L == last_tick_L) {
+      last_tick_L = tick_L;
       offset += 0.1;
     }
-    if (myPID.Compute() || tick_R == last_tick_R) {
+    if (myPID.Compute() || tick_L == last_tick_L) {
       if (offset >= 1 || distance < 110)
-        md.setSpeeds(-(currentSpeed + speed_O), -(currentSpeed - speed_O));
+        md.setSpeeds((currentSpeed + speed_O), (currentSpeed - speed_O));
       else
-        md.setSpeeds(-(offset * (currentSpeed + speed_O)), -(offset * (currentSpeed - speed_O)));
+        md.setSpeeds((offset * (currentSpeed + speed_O)), (offset * (currentSpeed - speed_O)));
     }
   }
   initializeMotor_End();
@@ -229,7 +230,7 @@ void turnLeft() {
   double currentSpeed = TURN_MAX_SPEED;
   double offset = 0;
 
-  while (tick_R < TURN_TICKS_L || tick_L < TURN_TICKS_L) {
+  while (tick_L < TURN_TICKS_L || tick_R < TURN_TICKS_L) {
     //    offset = computePID();
     if (myPID.Compute())
       md.setSpeeds(-(currentSpeed + speed_O), currentSpeed - speed_O);
@@ -244,7 +245,7 @@ void turnRight() {
   double currentSpeed = TURN_MAX_SPEED;
   double offset = 0;
 
-  while (tick_R < (TURN_TICKS_R + 10) || tick_L < (TURN_TICKS_R + 10)) {
+  while (tick_L < (TURN_TICKS_R + 10) || tick_R < (TURN_TICKS_R + 10)) {
     //    offset = computePID();
     if (myPID.Compute())
       md.setSpeeds((currentSpeed + speed_O), -(currentSpeed - speed_O));
@@ -260,7 +261,7 @@ void rotateLeft(int distance) {
   double offset = 0;
   if (distance < 3)
     return;
-  while (tick_R < distance || tick_L < distance) {
+  while (tick_L < distance || tick_R < distance) {
     //    offset = computePID();
     if (myPID.Compute())
       md.setSpeeds(-(currentSpeed + speed_O), currentSpeed - speed_O);
@@ -275,7 +276,7 @@ void rotateRight(int distance) {
   double offset = 0;
   if (distance < 3)
     return;
-  while (tick_R < distance || tick_L < distance) {
+  while (tick_L < distance || tick_R < distance) {
     //    offset = computePID();
     if (myPID.Compute())
       md.setSpeeds((currentSpeed + speed_O), -(currentSpeed - speed_O));
@@ -414,23 +415,23 @@ double getMin(double f1, double f2, double f3) {
 }
 
 void leftMotorTime() {
-  tick_L++;
-}
-
-void rightMotorTime() {
   tick_R++;
 }
 
+void rightMotorTime() {
+  tick_L++;
+}
+
 void initializeTick() {
-  tick_R = 0;
   tick_L = 0;
+  tick_R = 0;
   speed_O = 0;
-  previous_tick_R = 0;
+  previous_tick_L = 0;
 }
 
 void initializeMotor_Start() {
   md.setSpeeds(0, 0);
-  md.setBrakes(0, 0);
+  md.setBrakes(400, 400);
 }
 
 void initializeMotor_End() {

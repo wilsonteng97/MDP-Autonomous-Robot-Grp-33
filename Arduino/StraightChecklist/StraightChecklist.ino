@@ -16,7 +16,7 @@ unsigned long timeWidthL = 0;              // motor A period
 unsigned long timeWidthR = 0;              // motor B period                  
 unsigned long printTime = 0;
 
-float setDistance = 150;
+float setDistance = 80;
 float setTickDistance = 0;
 
 const unsigned long SAMPLE_COUNT = 20;
@@ -68,7 +68,7 @@ void setup() {
   pinMode (RIGHT_ENCODER, INPUT); //set digital pin 11 as input
   attachPCINT(digitalPinToPCINT(LEFT_ENCODER), incTicksL, HIGH);
   attachPCINT(digitalPinToPCINT(RIGHT_ENCODER), incTicksR, HIGH);
-  delay(3000);
+  delay(1000);
   setpointInit = 80;
   setTickDistance = distToTicks(setDistance);
   Serial.print("Distance is "); Serial.print(setDistance); Serial.print(" cm, or "); Serial.print(setTickDistance); Serial.println(" ticks.");
