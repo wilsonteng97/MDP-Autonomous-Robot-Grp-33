@@ -11,13 +11,12 @@ const int MOVE_MAX_SPEED = 310;
 const int MOVE_MIN_SPEED = 200;
 const int TURN_MAX_SPEED = 260;
 const int ROTATE_MAX_SPEED = 150;
-const int TURN_TICKS_L = 770;
-const int TURN_TICKS_R = 763;
+const int TURN_TICKS_L = 395;
+const int TURN_TICKS_R = 389;
 const int TICKS[10] = {545, 1155, 1760, 2380, 2985, 3615, 4195, 4775, 5370};
 const double DIST_WALL_CENTER_BOX = 1.58;
 const double kp = 0.02, ki = 0, kd = 0.0124; // Arena 1
 //KP 0.02 KD 0.009
-
 int TENCM_TICKS_OFFSET = 0;
 
 double tick_L = 0;
@@ -224,7 +223,7 @@ void moveBackwardsCalibrate(int distance) {
   initializeMotor_End();
 }
 
-void turnLeft() {
+void turnRight() {
   initializeTick();
   initializeMotor_Start();
   double currentSpeed = TURN_MAX_SPEED;
@@ -239,7 +238,7 @@ void turnLeft() {
   initializeLeftTurnEnd();
 }
 
-void turnRight() {
+void turnLeft() {
   initializeTick();
   initializeMotor_Start();
   double currentSpeed = TURN_MAX_SPEED;
