@@ -163,9 +163,10 @@ void moveBackwardsFast(int distance) {
 void moveForwardCalibrate(int distance) {
   initializeTick();
   initializeMotor_Start();
-  distance = cmToTicksCalibrate(distance);
-  if (distance < 3)
+  Serial.println(distance);
+  if (distance < 6)
     return;
+  distance = cmToTicksCalibrate(distance);
   double currentSpeed = 0;
   //  Serial.print("HELLO: ");
   //  Serial.println(distance);
@@ -319,39 +320,41 @@ void alignFront() {
   double diff_dis;
   int moved = 0;
   double previous_turn = 0;
-  if (getFrontIR1_Block() != 1 || getFrontIR3_Block() != 1 ) {
-    do {
-      diff_dis = getMin(getFrontIR1(), getFrontIR2(), getFrontIR3()) - DIST_WALL_CENTER_BOX;
-      if (diff_dis > 0) {
-        moveForwardCalibrate(abs(diff_dis));
-      } else {
-        moveBackwardsCalibrate(abs(diff_dis));
-      }
-      delay(2);
-      diff_dis = getMin(getFrontIR1(), getFrontIR2(), getFrontIR3()) - DIST_WALL_CENTER_BOX;
-      moved++;
-    } while (abs(diff_dis) > 0.2 && moved < 15);
-    return;
+//  if (getFrontIR1_Block() != 1 || getFrontIR3_Block() != 1 ) {
+//    do {
+//      diff_dis = getMin(getFrontIR1(), getFrontIR3(), getFrontIR2()) - DIST_WALL_CENTER_BOX;
+//      if (diff_dis > 0) {
+//        moveForwardCalibrate(abs(diff_dis));
+//      } else {
+//        moveBackwardsCalibrate(abs(diff_dis));
+//      }
+//      delay(2);
+//      diff_dis = getMin(getFrontIR1(), getFrontIR3(), getFrontIR2()) - DIST_WALL_CENTER_BOX;
+//      moved++;
+//    } while (abs(diff_dis) > 0.2 && moved < 15);
+//    return;
   }
   delay(2);
   moved = 0;
   double diff = getFrontIR1() - getFrontIR3();
-  while (abs(diff) >= 0.4 && moved < 15) {
+  Serial.print("difference between IR1 and 3: ");
+  Serial.println(diff);
+  while (abs(diff) >= 0.2 && moved < 15) {
     moved++;
     previous_turn = abs(diff * 5);
     if (diff > 0) {
-      rotateLeft(previous_turn);
-      diff = getFrontIR1() - getFrontIR3();
-      if (getFrontIR1_Block() != getFrontIR3_Block()) {
-        rotateRight(previous_turn);
-        break;
-      }
-    } else {
       rotateRight(previous_turn);
       diff = getFrontIR1() - getFrontIR3();
-      if (getFrontIR1_Block() != getFrontIR3_Block()) {
-        rotateRight(previous_turn);
-        break;
+//      if (getFrontIR1_Block() != getFrontIR3_Block()) {
+//        rotateLeft(previous_turn);
+//        break;
+//      }
+    } else {
+      rotateLeft(previous_turn);
+      diff = getFrontIR1() - getFrontIR3();
+//      if (getFrontIR1_Block() != getFrontIR3_Block()) {
+//        rotateLeft(previous_turn);
+//        break;
       }
     }
     delay(2);
@@ -359,32 +362,32 @@ void alignFront() {
   delay(2);
   moved = 0;
   do {
-    diff_dis = getMin(getFrontIR1(), getFrontIR2(), getFrontIR3()) - DIST_WALL_CENTER_BOX;
+    diff_dis = getMin(getFrontIR1(), getFrontIR3(), getFrontIR2()) - DIST_WALL_CENTER_BOX;
     if (diff_dis > 0) {
       moveForwardCalibrate(abs(diff_dis));
     } else {
       moveBackwardsCalibrate(abs(diff_dis));
     }
     delay(2);
-    diff_dis = getMin(getFrontIR1(), getFrontIR2(), getFrontIR3()) - DIST_WALL_CENTER_BOX;
+    diff_dis = getMin(getFrontIR1(), getFrontIR3(), getFrontIR2()) - DIST_WALL_CENTER_BOX;
     moved++;
   } while (abs(diff_dis) > 0.2 && moved < 20);
   moved = 0;
   delay(2);
-  diff = getFrontIR1() - getFrontIR3();
-  while (abs(diff) >= 0.4 && moved < 15) {
+  diff = getFrontIR1() - getFrontIR2();
+  while (abs(diff) >= 0.2 && moved < 15) {
     moved++;
     previous_turn = abs(diff * 5);
     if (diff > 0) {
-      rotateLeft(previous_turn);
-      diff = getFrontIR1() - getFrontIR3();
-      if (getFrontIR1_Block() != getFrontIR3_Block())
-        rotateRight(previous_turn);
-    } else {
       rotateRight(previous_turn);
-      diff = getFrontIR1() - getFrontIR3();
-      if (getFrontIR1_Block() != getFrontIR3_Block())
-        rotateRight(previous_turn);
+      diff = getFrontIR1() - getFrontIR2();
+//      if (getFrontIR1_Block() != getFrontIR2_Block())
+//        rotateLeft(previous_turn);
+    } else {
+      rotateLeft(previous_turn);
+      diff = getFrontIR1() - getFrontIR2();
+//      if (getFrontIR1_Block() != getFrontIR2_Block())
+//        rotateLeft(previous_turn);
     }
     delay(2);
   }
