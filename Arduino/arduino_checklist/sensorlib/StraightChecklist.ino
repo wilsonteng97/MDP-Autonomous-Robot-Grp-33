@@ -284,27 +284,31 @@ void rotateRight(int distance) {
 }
 
 void alignRight() {
+  Serial.println(getRightIR1());
+  Serial.println(getRightIR2());
   delay(2);
   double diff = getRightIR1() - getRightIR2();
   int rotated = 0;
-  while (abs(diff) >= 0.4 && getRightIR1_Block() == getRightIR2_Block() && rotated < 15) {
+  while (abs(diff) >= 0.05 && rotated < 100) {
     rotated++;
     if (diff > 0) {
-      rotateLeft(abs(diff * 5));
+      rotateRight(abs(diff * 10));
       diff = getRightIR1() - getRightIR2();
       if (getRightIR1_Block() != getRightIR2_Block()) {
-        rotateRight(abs(diff * 4));
+//        rotateLeft(abs(diff * 1));
         diff = getRightIR1() - getRightIR2();
       }
     } else {
-      rotateRight(abs(diff * 5));
+      rotateLeft(abs(diff * 10));
       diff = getRightIR1() - getRightIR2();
       if (getRightIR1_Block() != getRightIR2_Block()) {
-        rotateLeft(abs(diff * 4));
+//        rotateRight(abs(diff * 1));
         diff = getRightIR1() - getRightIR2();
       }
     }
     delay(1);
+  Serial.println(getRightIR1());
+  Serial.println(getRightIR2());
   }
   delay(2);
 }
