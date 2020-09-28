@@ -289,7 +289,7 @@ void alignRight() {
   delay(2);
   double diff = getRightIR1() - getRightIR2();
   int rotated = 0;
-  while (abs(diff) >= 0.05 && rotated < 100) {
+  while (abs(diff) >= 0.10 && rotated < 20) {
     rotated++;
     if (diff > 0) {
       rotateRight(abs(diff * 10));
@@ -307,6 +307,7 @@ void alignRight() {
       }
     }
     delay(1);
+  Serial.println(rotated);
   Serial.println(getRightIR1());
   Serial.println(getRightIR2());
   }
