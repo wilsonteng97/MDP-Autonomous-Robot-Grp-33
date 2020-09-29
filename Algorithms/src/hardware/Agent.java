@@ -377,6 +377,7 @@ public class Agent {
             // Get Sensor readings from Network Manager.
             NetworkMgr comm = NetworkMgr.getInstance();
             String msg = comm.receiveMsg();
+            System.out.println(msg);
             String[] msgArr = msg.split("\\|");
 
             result[0] = Integer.parseInt(msgArr[0]);

@@ -2,7 +2,7 @@ package hardware;
 
 public class AgentSettings {
     // Agent Start Direction
-    public static final Direction START_DIR = Direction.NORTH;
+    public static final Direction START_DIR = Direction.EAST;
     public static final int SPEED = 1000;                           // delay between movements (ms)
     public static final int TURN_SPEED = 2000;                      // delay between movements (ms)
     public static final int CALIBERATE_SPEED = 3000;                      // delay between movements (ms)

@@ -109,13 +109,19 @@ public class NetworkMgr {
             System.out.println("[sendMsg()] Sending Message...");
             String outputMsg;
             // FIXME finalize message format here
-            if (msg == null) {
-                outputMsg = msgType + "\n";
-            } else if (msgType.equals(MAP_STRINGS) || msgType.equals(BOT_POS)) {
-                outputMsg = msgType + " " + msg + "\n";
+            if (msgType == INSTRUCTIONS) {
+                outputMsg = msg;
             } else {
-                outputMsg = msgType + " " + msg + "\n";
+                outputMsg = msg;
             }
+
+//            if (msg == null) {
+//                outputMsg = msgType + "\n";
+//            } else if (msgType.equals(MAP_STRINGS) || msgType.equals(BOT_POS)) {
+//                outputMsg = msgType + " " + msg + "\n";
+//            } else {
+//                outputMsg = msgType + " " + msg + "\n";
+//            }
             out.write(outputMsg);
             out.flush(); msgCounter++;
             System.out.println("[sendMsg() | " + msgCounter + "] Message: " + outputMsg);
@@ -186,9 +192,12 @@ public class NetworkMgr {
         try {
             System.out.println("[receiveMsg()] Receiving Message...");
             String receivedMsg;
+//            StringBuilder sb = new StringBuilder();
             while (true) {
-                    receivedMsg = in.readLine();
-                    if (receivedMsg != null && receivedMsg.length() > 0) {
+                receivedMsg = in.readLine();
+//                    sb.append(receivedMsg);
+                if (receivedMsg != null && receivedMsg.length() > 0) {
+//                if (receivedMsg=="|" && sb.length() > 1) {
                         System.out.println("[receiveMsg()] Received Message: "+receivedMsg);
                         return receivedMsg;
                 }
