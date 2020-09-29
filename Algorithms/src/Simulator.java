@@ -220,7 +220,7 @@ public class Simulator {
 
                 if (!sim) {
                     // Transmit signal to start Agent
-                    NetworkMgr.getInstance().sendMsg(null, NetworkMgr.BOT_START);
+//                    NetworkMgr.getInstance().sendMsg(null, NetworkMgr.BOT_START);
                 }
 
                 exploration.runExploration();

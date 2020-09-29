@@ -224,27 +224,25 @@ public class Agent {
             case MOVE_LEFT:
             case MOVE_RIGHT:
                 agtDir = move(action, steps, explorationMap, map);
-                NetworkMgr.getInstance().sendMsg(action.toString(), "MOVEMENT");
                 break;
 
             case FACE_LEFT:
             case FACE_RIGHT:
             case FACE_REVERSE:
                 agtDir = changeDir(action, explorationMap, map);
-                NetworkMgr.getInstance().sendMsg(action.toString(), "TURN");
                 break;
 
             case ALIGN_FRONT:
             case ALIGN_RIGHT:
             case CALIBRATE:
                 agtDir = calibrate(action, explorationMap, map);
-                NetworkMgr.getInstance().sendMsg(action.toString(), "CALIBRATE");
                 break;
 
             case ERROR:
             default:
                 break;
         }
+        if (!sim) sendMovement(action);
         return agtDir;
     }
 
@@ -282,8 +280,8 @@ public class Agent {
             case CALIBRATE:
                 break;
         }
-        this.setSensors();
-        this.senseEnv(explorationMap, map);
+//        this.setSensors();
+//        this.senseEnv(explorationMap, map);
         return agtDir;
     }
 
@@ -357,9 +355,6 @@ public class Agent {
                 System.out.println("Error in Agent.move()!" + action + " " + agtDir);
                 break;
         }
-
-        // TODO real bot: send AgentSettings.Direction
-        if (!sim) {sendMovement(action);}
 
         updateEnteredGoal();
         return agtDir;
@@ -441,8 +436,8 @@ public class Agent {
     private void sendMovement(AgentSettings.Actions m) {
         NetworkMgr comm = NetworkMgr.getInstance();
         comm.sendMsg(AgentSettings.Actions.print(m) + "", NetworkMgr.INSTRUCTIONS);
-        if (m != AgentSettings.Actions.CALIBRATE) {
-            comm.sendMsg(this.getAgtRow() + "," + this.getAgtCol() + "," + AgentSettings.Direction.print(this.getAgtDir()), NetworkMgr.BOT_POS);
-        }
+//        if (m != AgentSettings.Actions.CALIBRATE) {
+//            comm.sendMsg(this.getAgtRow() + "," + this.getAgtCol() + "," + AgentSettings.Direction.print(this.getAgtDir()), NetworkMgr.BOT_POS);
+//        }
     }
 }

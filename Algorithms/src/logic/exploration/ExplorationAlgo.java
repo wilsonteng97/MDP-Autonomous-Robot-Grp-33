@@ -56,24 +56,21 @@ abstract public class ExplorationAlgo {
 
             // TODO initial calibration
             if (!bot.isSim()) {
-                bot.takeAction(Actions.FACE_LEFT, 0, exploredMap, realMap);
-                NetworkMgr.getInstance().receiveMsg();
-                bot.takeAction(Actions.CALIBRATE);
-                NetworkMgr.getInstance().receiveMsg();
-                bot.takeAction(Actions.FACE_LEFT, 0, exploredMap, realMap);
-                NetworkMgr.getInstance().receiveMsg();
-                bot.takeAction(Actions.CALIBRATE);
-                NetworkMgr.getInstance().receiveMsg();
-                bot.takeAction(Actions.FACE_RIGHT, 0, exploredMap, realMap);
-                NetworkMgr.getInstance().receiveMsg();
-                bot.takeAction(Actions.CALIBRATE);
-                NetworkMgr.getInstance().receiveMsg();
-                bot.takeAction(Actions.FACE_RIGHT, 0, exploredMap, realMap);
+                // Facing the back
+                bot.takeAction(Actions.ALIGN_FRONT, 0, exploredMap, realMap);
+//                NetworkMgr.getInstance().receiveMsg();
+                bot.takeAction(Actions.FACE_RIGHT);
+//                NetworkMgr.getInstance().receiveMsg();
+                bot.takeAction(Actions.ALIGN_FRONT, 0, exploredMap, realMap);
+//                NetworkMgr.getInstance().receiveMsg();
+                bot.takeAction(Actions.FACE_RIGHT);
+//                NetworkMgr.getInstance().receiveMsg();
             }
 
             while (true) {
-                System.out.println("Waiting for EX_START...");
-                String msg = NetworkMgr.getInstance().receiveMsg();
+                System.out.println("Waiting for ES|...");
+//                String msg = NetworkMgr.getInstance().receiveMsg();
+                String msg = scanner.nextLine();
 //                String[] msgArr = msg.split(";");
 //                if (msgArr[0].equals(NetworkMgr.EXP_START)) break;
                 if (msg.equals(NetworkMgr.EXP_START)) break;
@@ -127,7 +124,7 @@ abstract public class ExplorationAlgo {
                 }
             }
             elapsedTime = getElapsedTime();
-//            scanner.nextLine();
+            scanner.nextLine();
             System.out.println("[doWhile loop elapsed time] " + getElapsedTime());
         } while (areaExplored <= coverageLimit && elapsedTime < timeLimit);
 
