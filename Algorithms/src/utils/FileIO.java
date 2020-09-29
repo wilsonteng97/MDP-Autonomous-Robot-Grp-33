@@ -10,6 +10,7 @@ import static utils.IOsettings.FILE_EXT;
 
 public class FileIO {
     public static Map loadMap(Map map, String filename) {
+        map.resetMap();
         try {
             String basePath = new File("").getAbsolutePath();
             BufferedReader buf;

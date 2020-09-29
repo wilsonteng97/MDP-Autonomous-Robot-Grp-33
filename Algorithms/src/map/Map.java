@@ -13,16 +13,10 @@ import java.util.ArrayList;
  */
 
 public class Map extends JPanel {
-    private final Cell[][] grid;
+    private Cell[][] grid;
 
     private static Agent agt;
     private ArrayList<Point> detectedImg;
-
-    public Map() {
-        grid = new Cell[MapSettings.MAP_ROWS][MapSettings.MAP_COLS];
-        detectedImg = new ArrayList<Point>();
-        initGrid();
-    }
 
     public Map(Agent agt) {
         Map.agt = agt;
@@ -103,10 +97,6 @@ public class Map extends JPanel {
     /**
      * Set grid Methods
      */
-    public void resetGrid() {
-        detectedImg = new ArrayList<Point>();
-        initGrid();
-    }
     public void removePaths() {
         for (int row = 0; row < MapSettings.MAP_ROWS; row++) {
             for (int col = 0; col < MapSettings.MAP_COLS; col++) {
@@ -244,6 +234,17 @@ public class Map extends JPanel {
 //        }
 //        return false;
 //    }
+
+    /**
+     * Reset Map Method
+     */
+    public void resetMap() {
+        grid = new Cell[MapSettings.MAP_ROWS][MapSettings.MAP_COLS];
+        detectedImg = new ArrayList<Point>();
+        initGrid();
+        agt.resetAgt();
+        this.setAllUnexplored();
+    }
 
     /**
      * Graphics Methods
