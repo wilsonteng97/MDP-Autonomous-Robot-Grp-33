@@ -116,13 +116,13 @@ public class AgentSettings {
                 case MOVE_LEFT:
                     return "A|";
                 case START_EXP:
-                    return "ES|";
+                    return "ES";
                 case ALIGN_FRONT:
                     return "V|";
                 case ALIGN_RIGHT:
                     return "B|";
                 case START_FAST:
-                    return "FS|";
+                    return "FS";
                 case ERROR:
                 default:
                     return "E";

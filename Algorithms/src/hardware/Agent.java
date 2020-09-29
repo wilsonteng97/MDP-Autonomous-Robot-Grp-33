@@ -375,6 +375,16 @@ public class Agent {
             }
         } else {
             // Get Sensor readings from Network Manager.
+            NetworkMgr comm = NetworkMgr.getInstance();
+            String msg = comm.receiveMsg();
+            String[] msgArr = msg.split("\\|");
+
+            result[0] = Integer.parseInt(msgArr[0]);
+            result[1] = Integer.parseInt(msgArr[1]);
+            result[2] = Integer.parseInt(msgArr[2]);
+            result[3] = Integer.parseInt(msgArr[3]);
+            result[4] = Integer.parseInt(msgArr[4]);
+            result[5] = Integer.parseInt(msgArr[5]);
         }
         sensorCount = 0;
         for (Sensor s : sensorLst) {

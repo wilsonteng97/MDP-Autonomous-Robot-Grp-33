@@ -58,22 +58,22 @@ abstract public class ExplorationAlgo {
             if (!bot.isSim()) {
                 // Facing the back
                 bot.takeAction(Actions.ALIGN_FRONT, 0, exploredMap, realMap);
-//                NetworkMgr.getInstance().receiveMsg();
+                NetworkMgr.getInstance().receiveMsg();
                 bot.takeAction(Actions.FACE_RIGHT);
-//                NetworkMgr.getInstance().receiveMsg();
+                NetworkMgr.getInstance().receiveMsg();
                 bot.takeAction(Actions.ALIGN_FRONT, 0, exploredMap, realMap);
-//                NetworkMgr.getInstance().receiveMsg();
+                NetworkMgr.getInstance().receiveMsg();
                 bot.takeAction(Actions.FACE_RIGHT);
-//                NetworkMgr.getInstance().receiveMsg();
+                NetworkMgr.getInstance().receiveMsg();
             }
 
             while (true) {
                 System.out.println("Waiting for ES|...");
-//                String msg = NetworkMgr.getInstance().receiveMsg();
-                String msg = scanner.nextLine();
-//                String[] msgArr = msg.split(";");
-//                if (msgArr[0].equals(NetworkMgr.EXP_START)) break;
-                if (msg.equals(NetworkMgr.EXP_START)) break;
+                String msg = NetworkMgr.getInstance().receiveMsg();
+//                String msg = scanner.nextLine();
+                String[] msgArr = msg.split("\\|");
+                if (msgArr[0].equals(NetworkMgr.EXP_START)) break;
+//                if (msg.equals(NetworkMgr.EXP_START)) break;
             }
         }
 
@@ -124,7 +124,7 @@ abstract public class ExplorationAlgo {
                 }
             }
             elapsedTime = getElapsedTime();
-            scanner.nextLine();
+//            scanner.nextLine();
             System.out.println("[doWhile loop elapsed time] " + getElapsedTime());
         } while (areaExplored <= coverageLimit && elapsedTime < timeLimit);
 
