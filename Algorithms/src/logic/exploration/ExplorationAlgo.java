@@ -55,21 +55,21 @@ abstract public class ExplorationAlgo {
 //            NetworkMgr.getInstance().receiveMsg();
 
             // TODO initial calibration
-//            if (!bot.isSim()) {
-//                bot.takeAction(Actions.FACE_LEFT, 0, exploredMap, realMap);
-//                NetworkMgr.getInstance().receiveMsg();
-//                bot.takeAction(Actions.CALIBRATE);
-//                NetworkMgr.getInstance().receiveMsg();
-//                bot.takeAction(Actions.FACE_LEFT, 0, exploredMap, realMap);
-//                NetworkMgr.getInstance().receiveMsg();
-//                bot.takeAction(Actions.CALIBRATE);
-//                NetworkMgr.getInstance().receiveMsg();
-//                bot.takeAction(Actions.FACE_RIGHT, 0, exploredMap, realMap);
-//                NetworkMgr.getInstance().receiveMsg();
-//                bot.takeAction(Actions.CALIBRATE);
-//                NetworkMgr.getInstance().receiveMsg();
-//                bot.takeAction(Actions.FACE_RIGHT, 0, exploredMap, realMap);
-//            }
+            if (!bot.isSim()) {
+                bot.takeAction(Actions.FACE_LEFT, 0, exploredMap, realMap);
+                NetworkMgr.getInstance().receiveMsg();
+                bot.takeAction(Actions.CALIBRATE);
+                NetworkMgr.getInstance().receiveMsg();
+                bot.takeAction(Actions.FACE_LEFT, 0, exploredMap, realMap);
+                NetworkMgr.getInstance().receiveMsg();
+                bot.takeAction(Actions.CALIBRATE);
+                NetworkMgr.getInstance().receiveMsg();
+                bot.takeAction(Actions.FACE_RIGHT, 0, exploredMap, realMap);
+                NetworkMgr.getInstance().receiveMsg();
+                bot.takeAction(Actions.CALIBRATE);
+                NetworkMgr.getInstance().receiveMsg();
+                bot.takeAction(Actions.FACE_RIGHT, 0, exploredMap, realMap);
+            }
 
             while (true) {
                 System.out.println("Waiting for EX_START...");

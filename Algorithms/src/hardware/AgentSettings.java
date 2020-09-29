@@ -104,25 +104,25 @@ public class AgentSettings {
           public static String print(Actions m) {
             switch (m) {
                 case FORWARD:
-                    return "F";
+                    return "W1|";
                 case BACKWARD:
-                    return "B";
+                    return "S|";
                 case FACE_RIGHT:
-                    return "FACE_RIGHT";
+                    return "D|";
                 case MOVE_RIGHT:
-                    return "MR";
+                    return "D|";
                 case FACE_LEFT:
-                    return "FACE_LEFT";
+                    return "A|";
                 case MOVE_LEFT:
-                    return "ML";
+                    return "A|";
                 case START_EXP:
-                    return "START_EXP";
+                    return "ES|";
                 case ALIGN_FRONT:
-                    return "ALIGN_FRONT";
+                    return "V|";
                 case ALIGN_RIGHT:
-                    return "ALIGN_RIGHT";
+                    return "B|";
                 case START_FAST:
-                    return "START_FAST";
+                    return "FS|";
                 case ERROR:
                 default:
                     return "E";

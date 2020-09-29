@@ -223,17 +223,23 @@ public class Agent {
             case BACKWARD:
             case MOVE_LEFT:
             case MOVE_RIGHT:
-                agtDir = move(action, steps, explorationMap, map); break;
+                agtDir = move(action, steps, explorationMap, map);
+                NetworkMgr.getInstance().sendMsg(action.toString(), "MOVEMENT");
+                break;
 
             case FACE_LEFT:
             case FACE_RIGHT:
             case FACE_REVERSE:
-                agtDir = changeDir(action, explorationMap, map); break;
+                agtDir = changeDir(action, explorationMap, map);
+                NetworkMgr.getInstance().sendMsg(action.toString(), "TURN");
+                break;
 
             case ALIGN_FRONT:
             case ALIGN_RIGHT:
             case CALIBRATE:
-                agtDir = calibrate(action, explorationMap, map); break;
+                agtDir = calibrate(action, explorationMap, map);
+                NetworkMgr.getInstance().sendMsg(action.toString(), "CALIBRATE");
+                break;
 
             case ERROR:
             default:
