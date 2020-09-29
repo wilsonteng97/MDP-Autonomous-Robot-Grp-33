@@ -112,7 +112,7 @@ abstract public class ExplorationAlgo {
 
         long elapsedTime = 0;
         do {
-            senseAndRepaint();
+//            senseAndRepaint();
             nextMove();
             System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
 
