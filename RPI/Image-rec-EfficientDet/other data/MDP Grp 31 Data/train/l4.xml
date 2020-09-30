@@ -1,0 +1,26 @@
+<annotation>
+	<folder>l_arrow</folder>
+	<filename>80.jpeg</filename>
+	<path>C:\Users\lowbe\Documents\MDP\to_anno\New folder\l_arrow\80.jpeg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>1080</width>
+		<height>720</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>left_arrow</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>453</xmin>
+			<ymin>71</ymin>
+			<xmax>927</xmax>
+			<ymax>507</ymax>
+		</bndbox>
+	</object>
+</annotation>

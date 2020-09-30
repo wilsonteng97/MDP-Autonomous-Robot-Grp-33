@@ -1,0 +1,26 @@
+<annotation>
+	<folder>test</folder>
+	<filename>20200828_091938.jpg</filename>
+	<path>D:\NTU\MDP\MDP_dataset_resize\test\20200828_091938.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>640</width>
+		<height>480</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>zero</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>289</xmin>
+			<ymin>278</ymin>
+			<xmax>427</xmax>
+			<ymax>419</ymax>
+		</bndbox>
+	</object>
+</annotation>

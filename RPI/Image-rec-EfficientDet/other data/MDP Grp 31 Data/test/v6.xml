@@ -1,0 +1,26 @@
+<annotation>
+	<folder>v</folder>
+	<filename>112.jpeg</filename>
+	<path>C:\Users\lowbe\Documents\MDP\to_anno\v\112.jpeg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>1080</width>
+		<height>720</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>alphabet_v</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>413</xmin>
+			<ymin>201</ymin>
+			<xmax>843</xmax>
+			<ymax>579</ymax>
+		</bndbox>
+	</object>
+</annotation>
