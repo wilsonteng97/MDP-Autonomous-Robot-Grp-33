@@ -1,0 +1,26 @@
+<annotation>
+	<folder>images</folder>
+	<filename>photo_2020-09-17_16-08-14.jpg</filename>
+	<path>C:\Users\xiaoqing\Documents\school stuff\Year 3 Sem 1\CZ3004 MDP\image-rec-3\15_z\images\photo_2020-09-17_16-08-14.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>956</width>
+		<height>1276</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>z</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>396</xmin>
+			<ymin>347</ymin>
+			<xmax>590</xmax>
+			<ymax>565</ymax>
+		</bndbox>
+	</object>
+</annotation>
