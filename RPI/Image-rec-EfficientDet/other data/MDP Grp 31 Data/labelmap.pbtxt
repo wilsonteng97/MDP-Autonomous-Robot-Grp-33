@@ -1,0 +1,60 @@
+item {
+	id: 1
+	name: "up_arrow"
+}
+item {
+	id: 2
+	name: "down_arrow"
+}
+item {
+	id: 3
+	name: "right_arrow"
+}
+item {
+	id: 4
+	name: "left_arrow"
+}
+item {
+	id: 5
+	name: "go"
+}
+item {
+	id: 6
+	name: "six"
+}
+item {
+	id: 7
+	name: "seven"
+}
+item {
+	id: 8
+	name: "eight"
+}
+item {
+	id: 9
+	name: "nine"
+}
+item {
+	id: 10
+	name: "zero"
+}
+item {
+	id: 11
+	name: "alphabet_v"
+}
+item {
+	id: 12
+	name: "alphabet_w"
+}
+item {
+	id: 13
+	name: "alphabet_x"
+}
+item {
+	id: 14
+	name: "alphabet_y"
+}
+item {
+	id: 15
+	name: "alphabet_z"
+}
