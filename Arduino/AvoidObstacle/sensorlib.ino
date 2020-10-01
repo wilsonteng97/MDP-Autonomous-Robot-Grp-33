@@ -12,14 +12,14 @@ RunningMedian rightIR2_Median = RunningMedian(NUM_SAMPLES_MEDIAN);
 RunningMedian leftIR_1_Median = RunningMedian(NUM_SAMPLES_MEDIAN);
 
 
-double frontIR1_Diffs[] = {5.50, 14.75, 24.30, 35.00};//copied array blocks from senior code for block detection
-double frontIR2_Diffs[] = {5.70, 15.65, 24.75, 39.00};//how it works is that for a certain range like 5-15 cm obstacle is considered as one block away
-double frontIR3_Diffs[] = {5.15, 14.55, 23.50, 36.00};//15-25cm is 2 blocks away etc
+double frontIR1_Diffs[] = {20.5, 31.8, 43.08};//copied array blocks from senior code for block detection
+double frontIR2_Diffs[] = {16.91, 26.92, 34.28};//how it works is that for a certain range like 5-15 cm obstacle is considered as one block away
+double frontIR3_Diffs[] = {21.49, 33.03, 41.61};//15-25cm is 2 blocks away etc
 
-double rightIR1_Diffs[] = {6.90, 17.05, 26.75, 41.00};
-double rightIR2_Diffs[] = {7.5, 17.75, 28.75, 47.00};
+double rightIR1_Diffs[] = {19.76, 30.30 ,40.28};
+double rightIR2_Diffs[] = {19.72, 30.51 ,41.30};
 
-double leftIR1_Diffs[] = {20.25, 24.55, 33.2, 42.25, 51.2, 57.20};
+double leftIR1_Diffs[] = {21.50, 31.50, 41.50, 52.50, 62.50,71.50};
 
 double frontIR1_Value = 0, frontIR2_Value = 0, frontIR3_Value = 0;
 double rightIR1_Value = 0, rightIR2_Value = 0, leftIR1_Value = 0;
@@ -102,7 +102,7 @@ int getLeftIR1_Block() {
 
 
 void readFrontSensor_1() {
-  double irDistance = 7236.7/analogRead(A3) - 7.2009;//Front left
+  double irDistance = 6114.6/analogRead(A3) - 3.9535;//Front left S5
   frontIR1_Median.add(irDistance);
   if (frontIR1_Median.getCount() >= NUM_SAMPLES_MEDIAN) {
     if (abs(frontIR1_Median.getHighest() - frontIR1_Median.getLowest()) > 40) {
@@ -121,7 +121,11 @@ void readFrontSensor_1() {
 }
 
 void readFrontSensor_2() {
-  double irDistance = 6044.1/analogRead(A1) - 2.8095;//Middle
+  double irDistance = 0;//Middle S1
+  if (analogRead(A1)>210)
+   irDistance=6149.8/analogRead(A1)-3.7914;
+  else
+    irDistance=4252.5/analogRead(A1) + 4.5429; 
   frontIR2_Median.add(irDistance);
   if (frontIR2_Median.getCount() >= NUM_SAMPLES_MEDIAN) {
     if (abs(frontIR2_Median.getHighest() - frontIR2_Median.getLowest()) > 40) {
@@ -140,7 +144,7 @@ void readFrontSensor_2() {
 }
 
 void readFrontSensor_3() {
-  double irDistance = 6776.4/analogRead(A0) - 8.3595;//Front right
+  double irDistance = 7211.6/analogRead(A0) - 4.9214;//Front right S4
   frontIR3_Median.add(irDistance);
   if (frontIR3_Median.getCount() >= NUM_SAMPLES_MEDIAN) {
     if (abs(frontIR3_Median.getHighest() - frontIR3_Median.getLowest()) > 40) {
@@ -159,7 +163,7 @@ void readFrontSensor_3() {
 }
 
 void readRightSensor_1() {
-  double irDistance = 6188.3/analogRead(A2) - 3.964;//right back
+  double irDistance = 6047.8/analogRead(A2) - 3.868;//right back s2
   rightIR1_Median.add(irDistance);
   if (rightIR1_Median.getCount() >= NUM_SAMPLES_MEDIAN) {
     if (abs(rightIR1_Median.getHighest() - rightIR1_Median.getLowest()) > 40) {
@@ -178,7 +182,7 @@ void readRightSensor_1() {
 }
 
 void readRightSensor_2() {
-  double irDistance = 6063.2/analogRead(A5)- 3.5461;//right front
+  double irDistance = 6268.4/analogRead(A5)- 3.9301;//right front s3
   rightIR2_Median.add(irDistance);
   if (rightIR2_Median.getCount() >= NUM_SAMPLES_MEDIAN) {
     if (abs(rightIR2_Median.getHighest() - rightIR2_Median.getLowest()) > 40) {
@@ -197,13 +201,7 @@ void readRightSensor_2() {
 }
 
 void readLeftSensor_1() {
-  double irDistance=0.0;
-  if (analogRead(A4)>300){
-     irDistance = 12855/analogRead(A4)- 2.1442;//Long Range
-  }
-  else {
-   irDistance = 12855/analogRead(A4)- 4.1442;//Long Range 
-  }
+  double irDistance=13604/analogRead(A4) - 5.5009; //Long range sensor left A4
   leftIR_1_Median.add(irDistance);
   if (leftIR_1_Median.getCount() >= NUM_SAMPLES_MEDIAN) {
     if (abs(leftIR_1_Median.getHighest() - leftIR_1_Median.getLowest()) > 40) {

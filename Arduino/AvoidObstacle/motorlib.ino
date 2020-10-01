@@ -5,15 +5,15 @@
 #define RIGHT_ENCODER 11
 
 // Motor timing
-unsigned long currTime = 0;       // updated on every loop
-unsigned long startTimeL = 0;    // start timing A interrupts
-unsigned long startTimeR = 0;    // start timing B interrupts
-unsigned long tickCountL = 0;     // count the A interrupts
-unsigned long tickCountR = 0;     // count the B interrupts
-unsigned long distanceTicksL = 0;          //distance L
-unsigned long distanceTicksR = 0;          //distance R
-unsigned long timeWidthL = 0;              // motor A period
-unsigned long timeWidthR = 0;              // motor B period                  
+unsigned long currTime = 0;                 // updated on every loop
+unsigned long startTimeL = 0;               // start timing A interrupts
+unsigned long startTimeR = 0;               // start timing B interrupts
+unsigned long tickCountL = 0;               // count the A interrupts
+unsigned long tickCountR = 0;               // count the B interrupts
+unsigned long distanceTicksL = 0;           //distance L
+unsigned long distanceTicksR = 0;           //distance R
+unsigned long timeWidthL = 0;               // motor A period
+unsigned long timeWidthR = 0;               // motor B period                  
 unsigned long printTime = 0;
 unsigned long testTime = 0;
 
@@ -104,6 +104,10 @@ DualVNH5019MotorShield md;
 
 void moveForward(int distance) {
   md.setSpeeds(-calculateSpeedL(setpointInit), -calculateSpeedR(setpointInit));
+  prevOutputL = calculateSpeedL(setpointInit);
+  prevOutputR = calculateSpeedR(setpointInit);
+  errorL1 = setpointInit - currRPML;
+  errorR1 = setpointInit - currRPMR;
   currTime = testTime = startTimeL = startTimeR = micros();
   int distanceInTicks = distToTicks(distance);
   while((distanceTicksL + distanceTicksR)/2 < distanceInTicks) {
@@ -123,9 +127,80 @@ void moveForward(int distance) {
   distanceTicksL = distanceTicksR = 0;
   md.setBrakes(400, 400);
   md.setSpeeds(0, 0);
+  Serial.println("!");
 }
 
-void moveBackward(int distance) {
+void moveBackwards(int distance) {
+  md.setSpeeds(calculateSpeedL(setpointInit), calculateSpeedR(setpointInit));
+  prevOutputL = calculateSpeedL(setpointInit);
+  prevOutputR = calculateSpeedR(setpointInit);
+  currTime = testTime = startTimeL = startTimeR = micros();
+  int distanceInTicks = distToTicks(distance);
+  while((distanceTicksL + distanceTicksR)/2 < distanceInTicks) {
+    //Serial.println(distanceTicksL);
+    currTime = micros();
+    if ((currTime - testTime) >= 100000) {
+      currRPML = calculateRPM(timeWidthL);
+      currRPMR = calculateRPM(timeWidthR);
+      pidControllerBackwards();
+      testTime = currTime;
+      stopIfFault();
+    }
+    else {
+      continue;
+    }
+  }
+  distanceTicksL = distanceTicksR = 0;
+  md.setBrakes(400, 400);
+  md.setSpeeds(0, 0);
+  Serial.println("!");
+}
+
+void rotateRight(int angle) {
+  md.setSpeeds(-calculateSpeedL(setpointInit), calculateSpeedR(setpointInit));
+  currTime = testTime = startTimeL = startTimeR = micros();
+  int angleInTicks =rotToTicks(angle);
+  while((distanceTicksL + distanceTicksR)/2 < angleInTicks) {
+    //Serial.println(distanceTicksL);
+    currTime = micros();
+    if ((currTime - testTime) >= 100000) {
+      currRPML = calculateRPM(timeWidthL);
+      currRPMR = calculateRPM(timeWidthR);
+      pidControllerRight();
+      testTime = currTime;
+      stopIfFault();
+    }
+    else {
+      continue;
+    }
+  }
+  distanceTicksL = distanceTicksR = 0;
+  md.setBrakes(400, 400);
+}
+
+void rotateLeft(int angle) {
+  md.setSpeeds(calculateSpeedL(setpointInit), -calculateSpeedR(setpointInit));
+  currTime = testTime = startTimeL = startTimeR = micros();
+  int angleInTicks =rotToTicks(angle);
+  while((distanceTicksL + distanceTicksR)/2 < angleInTicks) {
+    //Serial.println(distanceTicksL);
+    currTime = micros();
+    if ((currTime - testTime) >= 100000) {
+      currRPML = calculateRPM(timeWidthL);
+      currRPMR = calculateRPM(timeWidthR);
+      pidControllerLeft();
+      testTime = currTime;
+      stopIfFault();
+    }
+    else {
+      continue;
+    }
+  }
+  distanceTicksL = distanceTicksR = 0;
+  md.setBrakes(400, 400);
+}
+
+/*void moveBackward(int distance) {
   md.setSpeeds(calculateSpeedL(setpointInit), calculateSpeedR(setpointInit));
   currTime = testTime = startTimeL = startTimeR = micros();
   int distanceInTicks = distToTicks(distance);
@@ -146,7 +221,7 @@ void moveBackward(int distance) {
   distanceTicksL = distanceTicksR = 0;
   md.setBrakes(400, 400);
   md.setSpeeds(0, 0);
-}
+}*/
 
 void setupMotorEncoder() {
   md.init();
@@ -154,7 +229,7 @@ void setupMotorEncoder() {
   pinMode (RIGHT_ENCODER, INPUT); //set digital pin 11 as input
   attachPCINT(digitalPinToPCINT(LEFT_ENCODER), incTicksL, HIGH);
   attachPCINT(digitalPinToPCINT(RIGHT_ENCODER), incTicksR, HIGH);
-  setpointInit = 60;
+  setpointInit = 80;
 }
 
 void incTicksL() {
@@ -186,29 +261,29 @@ double calculateTimeWidth(double rpm) {
 }
 
 double calcRPMfromSpeedL(double speedL) {
-  double rpmL = 0.3019 * speedL - 7.3771;
+  double rpmL = 0.2951 * speedL - 8.1446;
   return rpmL;
 }
 
 double calcRPMfromSpeedR(double speedR) {
-  double rpmR = 0.2876 * speedR - 7.1982;
+  double rpmR = 0.2828 * speedR - 10.843;
   return rpmR;
 }
 
 double calculateSpeedL(double rpm) {
-  double speedL = 3.3079 * rpm + 24.723 - 5;
+  double speedL = 3.384 * rpm + 27.879;
   return speedL;
 }
 
 double calculateSpeedR(double rpm) {
-  double speedR = 3.4714 * rpm + 25.354;
+  double speedR = 3.5165 * rpm + 39.366;
   return speedR;
 }
 
 void pidControllerForward() {
 
-  double KpL = 2.5, KiL = 0.1, KdL = 0.1;  
-  double KpR = 4, KiR = 0.1, KdR = 0.07; 
+  double KpL = 2, KiL = 0, KdL = 0;  
+  double KpR = 2, KiR = 0, KdR = 0; 
   double kL1 = KpL + KiL + KdL;
   double kL2 = -KpL - 2 * KdL;
   double kL3 = KdL; 
@@ -216,20 +291,18 @@ void pidControllerForward() {
   double kR2 = -KpR - 2 * KdR;
   double kR3 = KdR;
   
-  Serial.println("PID Controller is running...");
+  Serial.print(".");
   //Serial.print("Setpoint RPM = ");
   //Serial.println(setpointInit);
 
-  errorL1 = setpointInit - currRPML;
-  errorR1 = setpointInit - currRPMR;
   
   //PID control law
   
   outputL = prevOutputL + kL1 * errorL1 + kL2 * errorL2 + kL3 * errorL3;
   outputR = prevOutputR + kR1 * errorR1 + kR2 * errorR2 + kR3 * errorR3;
-
-  outputSpeedL = calculateSpeedL(outputL);
-  outputSpeedR = calculateSpeedR(outputR);
+  
+  //outputSpeedL = calculateSpeedL(outputL);
+  //outputSpeedR = calculateSpeedR(outputR);
 
   md.setSpeeds(-outputL, -outputR);
 
@@ -243,10 +316,10 @@ void pidControllerForward() {
   
 }
 
-void pidControllerBackward() {
+void pidControllerBackwards() {
 
-  double KpL = 2.5, KiL = 0.1, KdL = 0.1;  
-  double KpR = 4, KiR = 0.1, KdR = 0.07; 
+  double KpL = 2, KiL = 0, KdL = 0;  
+  double KpR = 0, KiR = 0, KdR = 0; 
   double kL1 = KpL + KiL + KdL;
   double kL2 = -KpL - 2 * KdL;
   double kL3 = KdL; 
@@ -254,7 +327,45 @@ void pidControllerBackward() {
   double kR2 = -KpR - 2 * KdR;
   double kR3 = KdR;
   
-  Serial.println("PID Controller is running...");
+  Serial.print(".");
+  //Serial.print("Setpoint RPM = ");
+  //Serial.println(setpointInit);
+
+  errorL1 = setpointInit - currRPML;
+  errorR1 = setpointInit - currRPMR;
+  
+  //PID control law
+  
+  outputL = prevOutputL + kL1 * errorL1 + kL2 * errorL2 + kL3 * errorL3;
+  outputR = prevOutputR + kR1 * errorR1 + kR2 * errorR2 + kR3 * errorR3;
+
+  //outputSpeedL = calculateSpeedL(outputL);
+  //outputSpeedR = calculateSpeedR(outputR);
+
+  md.setSpeeds(outputL, outputR);
+
+  prevOutputL = outputL;
+  prevOutputR = outputR;
+  
+  errorL3 = errorL2;
+  errorL2 = errorL1;
+  errorR3 = errorR2;
+  errorR2 = errorR1;
+  
+}
+
+void pidControllerRight() {
+
+  double KpL = 3, KiL = 0.1, KdL = 0.1;  
+  double KpR = 3, KiR = 0.1, KdR = 0.1; 
+  double kL1 = KpL + KiL + KdL;
+  double kL2 = -KpL - 2 * KdL;
+  double kL3 = KdL; 
+  double kR1 = KpR + KiR + KdR;
+  double kR2 = -KpR - 2 * KdR;
+  double kR3 = KdR;
+  
+  //Serial.println("PID Controller is running...");
   //Serial.print("Setpoint RPM = ");
   //Serial.println(setpointInit);
 
@@ -269,7 +380,7 @@ void pidControllerBackward() {
   outputSpeedL = calculateSpeedL(outputL);
   outputSpeedR = calculateSpeedR(outputR);
 
-  md.setSpeeds(outputL, outputR);
+  md.setSpeeds(-outputL, outputR);
 
   prevOutputL = outputL;
   prevOutputR = outputR;
@@ -280,6 +391,191 @@ void pidControllerBackward() {
   errorR2 = errorR1;
   
 }
+
+void pidControllerLeft() {
+
+  double KpL = 3, KiL = 0.1, KdL = 0.1;  
+  double KpR = 3, KiR = 0.1, KdR = 0.1; 
+  double kL1 = KpL + KiL + KdL;
+  double kL2 = -KpL - 2 * KdL;
+  double kL3 = KdL; 
+  double kR1 = KpR + KiR + KdR;
+  double kR2 = -KpR - 2 * KdR;
+  double kR3 = KdR;
+  
+  //Serial.println("PID Controller is running...");
+  //Serial.print("Setpoint RPM = ");
+  //Serial.println(setpointInit);
+
+  errorL1 = setpointInit - currRPML;
+  errorR1 = setpointInit - currRPMR;
+  
+  //PID control law
+  
+  outputL = prevOutputL + kL1 * errorL1 + kL2 * errorL2 + kL3 * errorL3;
+  outputR = prevOutputR + kR1 * errorR1 + kR2 * errorR2 + kR3 * errorR3;
+
+  outputSpeedL = calculateSpeedL(outputL);
+  outputSpeedR = calculateSpeedR(outputR);
+
+  md.setSpeeds(outputL, -outputR);
+
+  prevOutputL = outputL;
+  prevOutputR = outputR;
+  
+  errorL3 = errorL2;
+  errorL2 = errorL1;
+  errorR3 = errorR2;
+  errorR2 = errorR1;
+  
+}
+
+void alignRight() {
+  Serial.println(getRightIR1());
+  Serial.println(getRightIR2());
+  delay(2);
+  double diff = getRightIR1() - getRightIR2();
+  int rotated = 0;
+  while (abs(diff) >= 0.10 && rotated < 20) {
+    rotated++;
+    if (diff > 0) {
+      rotateRight(abs(diff * 10));
+      diff = getRightIR1() - getRightIR2();
+      if (getRightIR1_Block() != getRightIR2_Block()) {
+//        rotateLeft(abs(diff * 1));
+        diff = getRightIR1() - getRightIR2();
+      }
+    } else {
+      rotateLeft(abs(diff * 10));
+      diff = getRightIR1() - getRightIR2();
+      if (getRightIR1_Block() != getRightIR2_Block()) {
+//        rotateRight(abs(diff * 1));
+        diff = getRightIR1() - getRightIR2();
+      }
+    }
+    delay(1);
+  Serial.println(rotated);
+  Serial.println(getRightIR1());
+  Serial.println(getRightIR2());
+  }
+  delay(2);
+}
+
+/*void alignFront() {
+  delay(2);
+  double diff_dis;
+  int moved = 0;
+  double previous_turn = 0;
+  if (getFrontIR1_Block() != 1 || getFrontIR3_Block() != 1 ) {
+    do {
+      diff_dis = getMin(getFrontIR1(), getFrontIR3(), getFrontIR2()) - DIST_WALL_CENTER_BOX;
+      if (diff_dis > 0) {
+        moveForwardCalibrate(abs(diff_dis*0.75));
+      } else {
+        moveBackwardsCalibrate(abs(diff_dis*0.75));
+      }
+      delay(2);
+      diff_dis = getMin(getFrontIR1(), getFrontIR3(), getFrontIR2()) - DIST_WALL_CENTER_BOX;
+      moved++;
+    } while (abs(diff_dis) > 0.2 && moved < 15);
+//    return;
+  }
+  delay(2);
+  turnLeft();
+  delay(1000);
+  alignRight();
+  delay(1000);
+  turnRight();
+  turnRight();
+//  moved = 0;
+//  double diff = getFrontIR3()/2 - getFrontIR1();
+//  Serial.print("difference between IR1 and 3: ");
+//  Serial.println(diff);
+//  Serial.println(getFrontIR1());
+//  Serial.println(getFrontIR3());
+//  delay(1000);
+//  int rotated = 0;
+//  while (abs(diff) >= 0.10 && rotated < 20) {
+//    rotated++;
+//    if (diff > 0) {
+//      rotateRight(abs(diff * 5));
+//      diff = getFrontIR3()/2 - getFrontIR1();
+//      if (getFrontIR3_Block() != getFrontIR1_Block()) {
+////        rotateLeft(abs(diff * 1));
+//        diff = getFrontIR3() - getFrontIR1();
+//      }
+//    } else {
+//      rotateLeft(abs(diff * 5));
+//      diff = getFrontIR3()/2 - getFrontIR1();
+//      if (getFrontIR3_Block() != getFrontIR1_Block()) {
+////        rotateRight(abs(diff * 1));
+//        diff = getFrontIR3()/2 - getFrontIR1();
+//      }
+//    }
+//    delay(1);
+//  Serial.println(rotated);
+//  Serial.println(getFrontIR1());
+//  Serial.println(getFrontIR3());
+//  }
+  delay(2);
+//  while (abs(diff) >= 0.2 && moved < 15) {
+//    moved++;
+//    previous_turn = abs(diff * 5);
+//    if (diff > 0) {
+//      Serial.print("rotateRight0 "); Serial.print(previous_turn);
+//      rotateRight(previous_turn);
+//      diff = getFrontIR1() - getFrontIR3();
+////      if (getFrontIR1_Block() != getFrontIR3_Block()) {
+////        rotateLeft(previous_turn);
+////        break;
+////      }
+//    } else {
+//      Serial.print("rotateLeft0 "); Serial.print(previous_turn);
+//      rotateLeft(previous_turn);
+//      diff = getFrontIR1() - getFrontIR3();
+////      if (getFrontIR1_Block() != getFrontIR3_Block()) {
+////        rotateLeft(previous_turn);
+////        break;
+////      }
+//    }
+//    delay(2);
+//  }
+//  delay(2);
+//  moved = 0;
+//  do {
+//    diff_dis = getMin(getFrontIR1(), getFrontIR3(), getFrontIR2()) - DIST_WALL_CENTER_BOX;
+//    if (diff_dis > 0) {
+//      moveForwardCalibrate(abs(diff_dis));
+//    } else {
+//      moveBackwardsCalibrate(abs(diff_dis));
+//    }
+//    delay(2);
+//    diff_dis = getMin(getFrontIR1(), getFrontIR3(), getFrontIR2()) - DIST_WALL_CENTER_BOX;
+//    moved++;
+//  } while (abs(diff_dis) > 0.2 && moved < 20);
+//  moved = 0;
+//  delay(2);
+//  diff = getFrontIR1() - getFrontIR2();
+//  Serial.print(diff);
+//  while (abs(diff) >= 0.2 && moved < 15) {
+//    moved++;
+//    previous_turn = abs(diff * 5);
+//    if (diff > 0) {
+//      Serial.print("rotateRight "); Serial.print(previous_turn);
+//      rotateRight(previous_turn);
+//      diff = getFrontIR1() - getFrontIR2();
+////      if (getFrontIR1_Block() != getFrontIR2_Block())
+////        rotateLeft(previous_turn);
+//    } else {
+//      Serial.print("rotateLeft "); Serial.print(previous_turn);
+//      rotateLeft(previous_turn);
+//      diff = getFrontIR1() - getFrontIR2();
+////      if (getFrontIR1_Block() != getFrontIR2_Block())
+////        rotateLeft(previous_turn);
+//    }
+//    delay(2);
+//  }
+}*/
 
 float distToTicks(float distance) {
   float ticks = distance / 18.85 * 562.25 * 2;
