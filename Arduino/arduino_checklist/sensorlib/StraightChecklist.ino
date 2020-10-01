@@ -1,6 +1,5 @@
 #include <MsTimer2.h>
 #include <PID_v1.h>
-#include <PID_AutoTune_v0.h>
 #include <EnableInterrupt.h>
 #include <DualVNH5019MotorShield.h>
 
@@ -283,20 +282,20 @@ void alignRight() {
   delay(2);
   double diff = getRightIR1() - getRightIR2();
   int rotated = 0;
-  while (abs(diff) >= 0.1 && rotated < 20) {
+  while (abs(diff) >= 0.05 && rotated < 20 && getRightIR1_Block() == getRightIR2_Block()) {
     rotated++;
     if (diff > 0) {
       rotateRight(abs(diff * 5));
       diff = getRightIR1() - getRightIR2();
       if (getRightIR1_Block() != getRightIR2_Block()) {
-        rotateLeft(abs(diff * 4));
+        rotateLeft(abs(diff * 1));
         diff = getRightIR1() - getRightIR2();
       }
     } else {
       rotateLeft(abs(diff * 5));
       diff = getRightIR1() - getRightIR2();
       if (getRightIR1_Block() != getRightIR2_Block()) {
-        rotateRight(abs(diff * 4));
+        rotateRight(abs(diff * 1));
         diff = getRightIR1() - getRightIR2();
       }
     }

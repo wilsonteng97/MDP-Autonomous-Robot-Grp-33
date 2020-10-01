@@ -12,12 +12,12 @@ RunningMedian rightIR2_Median = RunningMedian(NUM_SAMPLES_MEDIAN);
 RunningMedian leftIR_1_Median = RunningMedian(NUM_SAMPLES_MEDIAN);
 
 
-double frontIR1_Diffs[] = {20.5, 31.8, 43.08};//copied array blocks from senior code for block detection
+double frontIR1_Diffs[] = {20.5, 30.00, 35.00};//copied array blocks from senior code for block detection
 double frontIR2_Diffs[] = {16.91, 26.92, 34.28};//how it works is that for a certain range like 5-15 cm obstacle is considered as one block away
-double frontIR3_Diffs[] = {21.49, 33.03, 41.61};//15-25cm is 2 blocks away etc
+double frontIR3_Diffs[] = {21.49, 30.00, 35.00};//15-25cm is 2 blocks away etc
 
-double rightIR1_Diffs[] = {19.76, 30.30 ,40.28};
-double rightIR2_Diffs[] = {19.72, 30.51 ,41.30};
+double rightIR1_Diffs[] = {19.76, 30.30 ,35.00};
+double rightIR2_Diffs[] = {19.72, 30.51 ,35.00};
 
 double leftIR1_Diffs[] = {21.50, 31.50, 41.50, 52.50, 62.50,71.50};
 

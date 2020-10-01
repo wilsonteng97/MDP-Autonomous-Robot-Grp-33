@@ -68,12 +68,14 @@ void loop() {
     */
 while (Serial.available()>0){
  char command=Serial.read();
-  int value=8;    
+  int value=1;    
     switch (command) {
       case 'W':
         moveForward(value * 10);
         delay(10);
         returnSensorReading_Raw();
+        alignRight();
+        delay(10);
         break;
       case 'A':
         for (int k = 0; k < value; k++) {
