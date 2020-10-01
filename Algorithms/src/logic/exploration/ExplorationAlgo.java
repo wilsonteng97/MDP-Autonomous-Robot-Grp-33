@@ -170,8 +170,6 @@ abstract public class ExplorationAlgo {
 
             AStarHeuristicSearch keepExploring;
             ArrayList<Cell> unExploredCells;
-
-            // visit surrounding cells of those unvisited cells
             Cell destCell;
             unExploredCells = findUnexplored();
             int i = 0;
@@ -355,7 +353,7 @@ abstract public class ExplorationAlgo {
         HashSet<Cell> hasSeen = new HashSet<>();
         ArrayList<Cell> result = new ArrayList<>();
 
-        curCell = exploredMap.getCell(MapSettings.MAP_ROWS-1, MapSettings.MAP_COLS-1);
+        curCell = exploredMap.getCell(0, 0);
         queue.add(curCell);
         hasSeen.add(curCell);
         while (queue.size() != 0) {
@@ -363,16 +361,16 @@ abstract public class ExplorationAlgo {
             curRow = curCell.getRow(); curCol = curCell.getCol();
             if (!curCell.isExplored() ) result.add(curCell);
 
-            if (curRow - 1 >= 0 && curCol >= 0) {
-                topCell = exploredMap.getCell(curRow - 1, curCol);
+            if (curRow + 1 < MapSettings.MAP_ROWS && curCol < MapSettings.MAP_COLS) {
+                topCell = exploredMap.getCell(curRow + 1, curCol);
                 if (!hasSeen.contains(topCell)) {
                     hasSeen.add(topCell);
                     queue.add(topCell);
                 }
             }
 
-            if (curRow >= 0 && curCol - 1 >= 0) {
-                rightCell = exploredMap.getCell(curRow, curCol - 1);
+            if (curRow < MapSettings.MAP_ROWS && curCol + 1 < MapSettings.MAP_COLS) {
+                rightCell = exploredMap.getCell(curRow, curCol + 1);
                 if (!hasSeen.contains(rightCell)) {
                     hasSeen.add(rightCell);
                     queue.add(rightCell);
@@ -495,20 +493,18 @@ abstract public class ExplorationAlgo {
 //            CommMgr commMgr = CommMgr.getCommMgr();
 //            commMgr.recvMsg();
         }
-//        if (!bot.isSim() && m != Actions.ALIGN_FRONT && m != Actions.ALIGN_RIGHT) {
-//            if (canAlignRight(bot.getAgtDir()) && canAlignFront(bot.getAgtDir())) {
-//                calibrateBot(Direction.clockwise90(bot.getAgtDir()));
-//                moveBot(Actions.ALIGN_FRONT);
-//                lastCalibrate = 0;
-//            } else if (canAlignRight(bot.getAgtDir())) {
-//                if (lastCalibrate > 1) moveBot(Actions.ALIGN_RIGHT);
-//                else lastCalibrate++;
-//            } else {
-//                lastCalibrate++;
-//            }
-//        }
-
-
+        if (!bot.isSim()) {
+            if (canAlignRight(bot.getAgtDir()) && canAlignFront(bot.getAgtDir())) {
+                moveBot(Actions.ALIGN_RIGHT);
+                calibrateBot(Direction.clockwise90(bot.getAgtDir()));
+                lastCalibrate = 0;
+            } else if (canAlignRight(bot.getAgtDir())) {
+                if (lastCalibrate > 1) moveBot(Actions.ALIGN_RIGHT);
+                else lastCalibrate++;
+            } else {
+                lastCalibrate++;
+            }
+        }
     }
 
     /**
