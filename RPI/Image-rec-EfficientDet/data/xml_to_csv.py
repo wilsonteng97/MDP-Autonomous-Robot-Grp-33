@@ -7,7 +7,8 @@ data_dict = {
 
 }
 
-COLUMN_NAME = ['image_id', 
+COLUMN_NAME = ['image_id',
+                'filename',
                 'width', 
                 'height', 
                 'class', 
@@ -30,7 +31,8 @@ def xml_to_csv(path):
             xmax, ymax = int(member[4][2].text), int(member[4][3].text)
 
 
-            value = (root.find('filename').text,
+            value = (xml_file.rsplit(".")[0],
+                    root.find('filename').text,
                     int(root.find('size')[0].text),
                     int(root.find('size')[1].text),
                     member[0].text,
