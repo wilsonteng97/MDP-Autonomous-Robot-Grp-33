@@ -1,0 +1,26 @@
+<annotation>
+	<folder>Training_Dataset</folder>
+	<filename>resized_IMG_7773.JPG</filename>
+	<path>C:\Users\lowbe\Documents\MDP\Training_Dataset\resized_IMG_7773.JPG</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>640</width>
+		<height>480</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>down_arrow</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>291</xmin>
+			<ymin>39</ymin>
+			<xmax>408</xmax>
+			<ymax>191</ymax>
+		</bndbox>
+	</object>
+</annotation>

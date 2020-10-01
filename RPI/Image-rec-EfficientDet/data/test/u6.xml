@@ -1,0 +1,26 @@
+<annotation>
+	<folder>u_arrow</folder>
+	<filename>96.jpeg</filename>
+	<path>C:\Users\lowbe\Documents\MDP\to_anno\New folder\u_arrow\96.jpeg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>1080</width>
+		<height>720</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>up_arrow</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>484</xmin>
+			<ymin>248</ymin>
+			<xmax>831</xmax>
+			<ymax>589</ymax>
+		</bndbox>
+	</object>
+</annotation>

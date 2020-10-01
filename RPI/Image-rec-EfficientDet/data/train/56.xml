@@ -1,0 +1,26 @@
+<annotation>
+	<folder>6</folder>
+	<filename>56.jpeg</filename>
+	<path>C:\Users\lowbe\Documents\MDP\to_anno\New folder\6\56.jpeg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>1080</width>
+		<height>720</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>six</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>467</xmin>
+			<ymin>142</ymin>
+			<xmax>985</xmax>
+			<ymax>688</ymax>
+		</bndbox>
+	</object>
+</annotation>
