@@ -11,11 +11,11 @@ const int MOVE_MAX_SPEED = 310;
 const int MOVE_MIN_SPEED = 200;
 const int TURN_MAX_SPEED = 260;
 const int ROTATE_MAX_SPEED = 150;
-const int TURN_TICKS_L = 395;
-const int TURN_TICKS_R = 389;
+const int TURN_TICKS_L = 790;
+const int TURN_TICKS_R = 778;
 const int TICKS[10] = {545, 1155, 1760, 2380, 2985, 3615, 4195, 4775, 5370};
 const double DIST_WALL_CENTER_BOX = 1.58;
-const double kp = 0.02, ki = 0, kd = 0.0124; // Arena 1
+const double kp = 0.02668, ki = 0.0, kd = 0.00657; // Arena 1
 //KP 0.02 KD 0.009
 int TENCM_TICKS_OFFSET = 0;
 
@@ -283,20 +283,20 @@ void alignRight() {
   delay(2);
   double diff = getRightIR1() - getRightIR2();
   int rotated = 0;
-  while (abs(diff) >= 0.10 && rotated < 20) {
+  while (abs(diff) >= 0.1 && rotated < 20) {
     rotated++;
     if (diff > 0) {
       rotateRight(abs(diff * 5));
       diff = getRightIR1() - getRightIR2();
       if (getRightIR1_Block() != getRightIR2_Block()) {
-//        rotateLeft(abs(diff * 1));
+        rotateLeft(abs(diff * 4));
         diff = getRightIR1() - getRightIR2();
       }
     } else {
       rotateLeft(abs(diff * 5));
       diff = getRightIR1() - getRightIR2();
       if (getRightIR1_Block() != getRightIR2_Block()) {
-//        rotateRight(abs(diff * 1));
+        rotateRight(abs(diff * 4));
         diff = getRightIR1() - getRightIR2();
       }
     }

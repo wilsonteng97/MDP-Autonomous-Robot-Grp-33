@@ -68,7 +68,7 @@ void loop() {
     */
 while (Serial.available()>0){
  char command=Serial.read();
-  int value=1;    
+  int value=8;    
     switch (command) {
       case 'W':
         moveForward(value * 10);
@@ -122,17 +122,22 @@ void setupSerialConnection() {
 }
 
 void returnSensorReading_Raw() {
+  getFrontIR1();
   Serial.print(getFrontIR1_Block());
   Serial.print("|");
+  getFrontIR2();
   Serial.print(getFrontIR2_Block());
   Serial.print("|");
+  getFrontIR3();
   Serial.print(getFrontIR3_Block());
   Serial.print("|");
+  getLeftIR1();
   Serial.print(getLeftIR1_Block());
   Serial.print("|");
+  getRightIR2();
   Serial.print(getRightIR2_Block());
   Serial.print("|");
-  Serial.print(getRightIR1_Block());  
-  Serial.print(":");
+  getRightIR1();
+  Serial.println(getRightIR1_Block());  
   Serial.flush();
 }

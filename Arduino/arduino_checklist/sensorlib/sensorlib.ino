@@ -12,14 +12,14 @@ RunningMedian rightIR2_Median = RunningMedian(NUM_SAMPLES_MEDIAN);
 RunningMedian leftIR_1_Median = RunningMedian(NUM_SAMPLES_MEDIAN);
 
 
-double frontIR1_Diffs[] = {5.50, 14.75, 24.30, 35.00};//copied array blocks from senior code for block detection
-double frontIR2_Diffs[] = {5.70, 15.65, 24.75, 39.00};//how it works is that for a certain range like 5-15 cm obstacle is considered as one block away
-double frontIR3_Diffs[] = {5.15, 14.55, 23.50, 36.00};//15-25cm is 2 blocks away etc
+double frontIR1_Diffs[] = {15.60, 24.81, 34.04};//copied array blocks from senior code for block detection
+double frontIR2_Diffs[] = {15.68, 24.03, 32.46};//how it works is that for a certain range like 5-15 cm obstacle is considered as one block away
+double frontIR3_Diffs[] = {14.84, 26.57, 35.99};//15-25cm is 2 blocks away etc
 
-double rightIR1_Diffs[] = {6.90, 17.05, 26.75, 41.00};
-double rightIR2_Diffs[] = {7.5, 17.75, 28.75, 47.00};
+double rightIR1_Diffs[] = {15.25, 26.52,36.18};
+double rightIR2_Diffs[] = {14.72, 24.52,34.14 };
 
-double leftIR1_Diffs[] = {20.25, 24.55, 33.2, 42.25, 51.2, 57.20};
+double leftIR1_Diffs[] = {25.00, 36.00, 44.00, 54.50, 58.5};
 
 double frontIR1_Value = 0, frontIR2_Value = 0, frontIR3_Value = 0;
 double rightIR1_Value = 0, rightIR2_Value = 0, leftIR1_Value = 0;
@@ -102,7 +102,7 @@ int getLeftIR1_Block() {
 
 
 void readFrontSensor_1() {
-  double irDistance = 5456.6/analogRead(A3) - 3.3411;//Front left
+  double irDistance = 5389.7/analogRead(A3) - 0.7319;//Front left S5
   frontIR1_Median.add(irDistance);
   if (frontIR1_Median.getCount() >= NUM_SAMPLES_MEDIAN) {
     if (abs(frontIR1_Median.getHighest() - frontIR1_Median.getLowest()) > 40) {
@@ -121,7 +121,7 @@ void readFrontSensor_1() {
 }
 
 void readFrontSensor_2() {
-  double irDistance = 6776.4/analogRead(A1) - 8.3595;//Middle
+  double irDistance = 4650.4/analogRead(A1) + 1.4554;//Middle S1
   frontIR2_Median.add(irDistance);
   if (frontIR2_Median.getCount() >= NUM_SAMPLES_MEDIAN) {
     if (abs(frontIR2_Median.getHighest() - frontIR2_Median.getLowest()) > 40) {
@@ -140,7 +140,7 @@ void readFrontSensor_2() {
 }
 
 void readFrontSensor_3() {
-  double irDistance = 6044.1/analogRead(A0) - 2.8095;//Front right
+  double irDistance = 7092.3/analogRead(A0) - 3.7396;//Front right
   frontIR3_Median.add(irDistance);
   if (frontIR3_Median.getCount() >= NUM_SAMPLES_MEDIAN) {
     if (abs(frontIR3_Median.getHighest() - frontIR3_Median.getLowest()) > 40) {
@@ -159,7 +159,7 @@ void readFrontSensor_3() {
 }
 
 void readRightSensor_1() {
-  double irDistance = 6188.3/analogRead(A2) - 3.964;//right back
+  double irDistance = 6188.3/analogRead(A2) - 3.964;//right back s2
   rightIR1_Median.add(irDistance);
   if (rightIR1_Median.getCount() >= NUM_SAMPLES_MEDIAN) {
     if (abs(rightIR1_Median.getHighest() - rightIR1_Median.getLowest()) > 40) {
@@ -178,7 +178,7 @@ void readRightSensor_1() {
 }
 
 void readRightSensor_2() {
-  double irDistance = 6063.2/analogRead(A5)- 3.5461;//right front
+  double irDistance = 6297.7/analogRead(A5)- 2.9104;//right front s3
   rightIR2_Median.add(irDistance);
   if (rightIR2_Median.getCount() >= NUM_SAMPLES_MEDIAN) {
     if (abs(rightIR2_Median.getHighest() - rightIR2_Median.getLowest()) > 40) {
@@ -197,13 +197,7 @@ void readRightSensor_2() {
 }
 
 void readLeftSensor_1() {
-  double irDistance=0.0;
-  if (analogRead(A4)>300){
-     irDistance = 12855/analogRead(A4)- 2.1442;//Long Range
-  }
-  else {
-   irDistance = 12855/analogRead(A4)- 4.1442;//Long Range 
-  }
+  double irDistance=13411/analogRead(A4) - 4.7152; //Long range sensor left A4
   leftIR_1_Median.add(irDistance);
   if (leftIR_1_Median.getCount() >= NUM_SAMPLES_MEDIAN) {
     if (abs(leftIR_1_Median.getHighest() - leftIR_1_Median.getLowest()) > 40) {
@@ -212,9 +206,9 @@ void readLeftSensor_1() {
       leftIR1_Value = leftIR_1_Median.getMedian();
     }
   }
-  for (int m = 0; m < 6; m++) {
+  for (int m = 0; m < 5; m++) {
     if (leftIR1_Value <= leftIR1_Diffs[m]) {
-      leftIR1_Block = m + 1;
+      leftIR1_Block = m + 2;
       return;
     }
   }
