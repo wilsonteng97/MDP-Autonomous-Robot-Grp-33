@@ -11,6 +11,7 @@ import map.MapSettings;
 import network.NetworkMgr;
 import utils.SimulatorSettings;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -169,37 +170,38 @@ abstract public class ExplorationAlgo {
 
             AStarHeuristicSearch keepExploring;
             ArrayList<Cell> unExploredCells;
-            boolean exceededLimit = false;
+
             // visit surrounding cells of those unvisited cells
             Cell destCell;
             unExploredCells = findUnexplored();
+            int i = 0;
             while (!unExploredCells.isEmpty()) {
                 int targetRow, targetCol;
                 System.out.println("Unexplored cells: " + unExploredCells.size());
-                for (Cell targetCell : unExploredCells) {
-                    targetRow = targetCell.getRow();
-                    targetCol = targetCell.getCol();
-                    destCell = findSurroundingReachable(targetRow, targetCol);
-                    if (destCell != null) {
-                        System.out.println(destCell);
-                        keepExploring = new AStarHeuristicSearch(exploredMap, bot, realMap);
-                        keepExploring.runFastestPath(destCell.getRow(), destCell.getCol());
-                    }
-
-                    elapsedTime = getElapsedTime();
-                    if (areaExplored >= coverageLimit) {
-                        System.out.printf("Reached coverage limit, successfully explored %d grids\n", areaExplored);
-                        exceededLimit = true;
-                        break;
-                    }
-                    if (elapsedTime >= timeLimit) {
-                        System.out.printf("Reached time limit, exploration has taken %d millisecond(ms)\n", elapsedTime);
-                        exceededLimit = true;
-                        break;
-                    }
+                Cell targetCell = unExploredCells.get(i);
+                targetRow = targetCell.getRow();
+                targetCol = targetCell.getCol();
+                destCell = findSurroundingReachable(targetRow, targetCol);
+                if (destCell != null) {
+                    System.out.println(destCell);
+                    keepExploring = new AStarHeuristicSearch(exploredMap, bot, realMap);
+                    keepExploring.runFastestPath(destCell.getRow(), destCell.getCol());
+                    i = 0;
+                } else {
+                    i++;
                 }
-                if (exceededLimit) break;
-                unExploredCells = findUnexplored();
+
+                elapsedTime = getElapsedTime();
+                if (areaExplored >= coverageLimit) {
+                    System.out.printf("Reached coverage limit, successfully explored %d grids\n", areaExplored);
+                    break;
+                }
+                if (elapsedTime >= timeLimit) {
+                    System.out.printf("Reached time limit, exploration has taken %d millisecond(ms)\n", elapsedTime);
+                    break;
+                }
+
+                if (i == 0) unExploredCells = findUnexplored();
             }
             goHome();
         }
@@ -486,34 +488,27 @@ abstract public class ExplorationAlgo {
         System.out.println("Action executed: " + m);
         actionsTaken.add(m);
         bot.takeAction(m, 1, exploredMap, realMap);
-        senseAndRepaint();
 
-        // TODO calibration
-        if (m != Actions.ALIGN_FRONT) {
+        if (m != Actions.ALIGN_FRONT && m != Actions.ALIGN_RIGHT) {
             senseAndRepaint();
         } else {
 //            CommMgr commMgr = CommMgr.getCommMgr();
 //            commMgr.recvMsg();
         }
-        if (!bot.isSim() && !calibrationMode) {
-            calibrationMode = true;
+//        if (!bot.isSim() && m != Actions.ALIGN_FRONT && m != Actions.ALIGN_RIGHT) {
+//            if (canAlignRight(bot.getAgtDir()) && canAlignFront(bot.getAgtDir())) {
+//                calibrateBot(Direction.clockwise90(bot.getAgtDir()));
+//                moveBot(Actions.ALIGN_FRONT);
+//                lastCalibrate = 0;
+//            } else if (canAlignRight(bot.getAgtDir())) {
+//                if (lastCalibrate > 1) moveBot(Actions.ALIGN_RIGHT);
+//                else lastCalibrate++;
+//            } else {
+//                lastCalibrate++;
+//            }
+//        }
 
-            if (canCalibrateOnTheSpot(bot.getAgtDir())) {
-                lastCalibrate = 0;
-                moveBot(Actions.ALIGN_FRONT);
-            } else {
-                lastCalibrate++;
-                if (lastCalibrate >= 5) {
-                    Direction targetDir = getCalibrationDirection();
-                    if (targetDir != null) {
-                        lastCalibrate = 0;
-                        calibrateBot(targetDir);
-                    }
-                }
-            }
 
-            calibrationMode = false;
-        }
     }
 
     /**
@@ -527,9 +522,9 @@ abstract public class ExplorationAlgo {
 
 
     /**
-     * Checks if the robot can calibrate at its current position given a direction.
+     * Checks if there's wall/obstacle in front of the bot so can alignfront
      */
-    private boolean canCalibrateOnTheSpot(Direction botDir) {
+    private boolean canAlignFront(Direction botDir) {
         int row = bot.getAgtRow();
         int col = bot.getAgtCol();
 
@@ -548,6 +543,13 @@ abstract public class ExplorationAlgo {
     }
 
     /**
+     * Checks if there's wall/obstacle at RHS of the bot so can align right
+     */
+    private boolean canAlignRight(Direction botDir) {
+        return canAlignFront(Direction.clockwise90(botDir));
+    }
+
+    /**
      * Returns a possible direction for robot calibration or null, otherwise.
      */
     private Direction getCalibrationDirection() {
@@ -555,13 +557,13 @@ abstract public class ExplorationAlgo {
         Direction dirToCheck;
 
         dirToCheck = Direction.clockwise90(origDir);                    // right turn
-        if (canCalibrateOnTheSpot(dirToCheck)) return dirToCheck;
+        if (canAlignFront(dirToCheck)) return dirToCheck;
 
         dirToCheck = Direction.antiClockwise90(origDir);                // left turn
-        if (canCalibrateOnTheSpot(dirToCheck)) return dirToCheck;
+        if (canAlignFront(dirToCheck)) return dirToCheck;
 
         dirToCheck = Direction.antiClockwise90(dirToCheck);             // u turn
-        if (canCalibrateOnTheSpot(dirToCheck)) return dirToCheck;
+        if (canAlignFront(dirToCheck)) return dirToCheck;
 
         return null;
     }
@@ -574,7 +576,7 @@ abstract public class ExplorationAlgo {
         Direction origDir = bot.getAgtDir();
 
         turnBotDirection(targetDir);
-        moveBot(Actions.ALIGN_FRONT);
+        if (canAlignRight(targetDir)) moveBot(Actions.ALIGN_FRONT);
         turnBotDirection(origDir);
     }
 
