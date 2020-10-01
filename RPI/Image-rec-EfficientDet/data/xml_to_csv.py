@@ -29,11 +29,11 @@ def xml_to_csv(path):
 
 
 def main():
-    for folder in ['train', 'test']:
+    for folder in ['train', 'val']:
         image_path = os.path.join(os.getcwd(), folder)
         xml_df = xml_to_csv(image_path)
         xml_df.to_csv(('csv/'+folder+'_labels.csv'), index=None)
     print('Successfully converted xml to csv.')
 
-
-main()
+if __name__ == "__main__":
+    main()
