@@ -152,6 +152,9 @@ public class Map extends JPanel {
     public boolean isObstacleCell(int row, int col) {
         return grid[row][col].isObstacle();
     }
+    public boolean isWallOrObstacleCell(int row, int col) {
+        return !checkValidCell(row, col) || getCell(row, col).isObstacle();
+    }
     public boolean checkValidMove(int row, int col) {
         return checkValidCell(row, col) && getCell(row, col).isMovableCell();
     }
