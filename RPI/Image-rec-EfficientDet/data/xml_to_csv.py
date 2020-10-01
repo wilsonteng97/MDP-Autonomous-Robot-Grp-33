@@ -2,10 +2,7 @@ import os
 import glob
 import pandas as pd
 import xml.etree.ElementTree as ET
-
-data_dict = {
-
-}
+from config import data_dict
 
 COLUMN_NAME = ['image_id',
                 'filename',
@@ -24,25 +21,27 @@ def get_area(xmin, ymin, xmax, ymax):
 def xml_to_csv(path):
     xml_list = []
     for xml_file in glob.glob(path + '/*.xml'):
-        tree = ET.parse(xml_file)
-        root = tree.getroot()
-        for member in root.findall('object'):
-            xmin, ymin = int(member[4][0].text), int(member[4][1].text)
-            xmax, ymax = int(member[4][2].text), int(member[4][3].text)
+        try:
+            tree = ET.parse(xml_file)
+            root = tree.getroot()
+            for member in root.findall('object'):
+                xmin, ymin = int(member[4][0].text), int(member[4][1].text)
+                xmax, ymax = int(member[4][2].text), int(member[4][3].text)
 
-
-            value = (xml_file.rsplit(".")[0],
-                    root.find('filename').text,
-                    int(root.find('size')[0].text),
-                    int(root.find('size')[1].text),
-                    member[0].text,
-                    xmin,
-                    ymin,
-                    xmax,
-                    ymax,
-                    get_area(xmin, ymin, xmax, ymax)
-                    )
-            xml_list.append(value) 
+                value = (os.path.basename(xml_file).rsplit(".")[0],
+                        root.find('filename').text,
+                        int(root.find('size')[0].text),
+                        int(root.find('size')[1].text),
+                        data_dict[member[0].text],
+                        xmin,
+                        ymin,
+                        xmax,
+                        ymax,
+                        get_area(xmin, ymin, xmax, ymax)
+                        )
+                xml_list.append(value) 
+        except:
+            print("[!Error]", xml_file)
     xml_df = pd.DataFrame(xml_list, columns=COLUMN_NAME)
     return xml_df
 
