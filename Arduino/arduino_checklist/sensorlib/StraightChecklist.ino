@@ -282,20 +282,20 @@ void alignRight() {
   delay(2);
   double diff = getRightIR1() - getRightIR2();
   int rotated = 0;
-  while (abs(diff) >= 0.05 && rotated < 20 && getRightIR1_Block() == getRightIR2_Block()) {
+  while (abs(diff) >= 0.1 && rotated < 20 && getRightIR1_Block() == getRightIR2_Block() && getRightIR1_Block()< 3) {
     rotated++;
     if (diff > 0) {
       rotateRight(abs(diff * 5));
       diff = getRightIR1() - getRightIR2();
       if (getRightIR1_Block() != getRightIR2_Block()) {
-        rotateLeft(abs(diff * 1));
+        rotateLeft(abs(diff * 2));
         diff = getRightIR1() - getRightIR2();
       }
     } else {
       rotateLeft(abs(diff * 5));
       diff = getRightIR1() - getRightIR2();
       if (getRightIR1_Block() != getRightIR2_Block()) {
-        rotateRight(abs(diff * 1));
+        rotateRight(abs(diff * 4));
         diff = getRightIR1() - getRightIR2();
       }
     }
@@ -306,31 +306,55 @@ void alignRight() {
 
 void alignFront() {
   delay(2);
-  double diff_dis;
-  int moved = 0;
-  double previous_turn = 0;
-  if (getFrontIR1_Block() != 1 || getFrontIR3_Block() != 1 ) {
-    do {
-      diff_dis = getMin(getFrontIR1(), getFrontIR3(), getFrontIR2()) - DIST_WALL_CENTER_BOX;
-      if (diff_dis > 0) {
-        moveForwardCalibrate(abs(diff_dis*0.75));
-      } else {
-        moveBackwardsCalibrate(abs(diff_dis*0.75));
+  double diff = getFrontIR1() - getFrontIR3();
+  int rotated = 0;
+  while (abs(diff) >= 0.1 && rotated < 20 && getFrontIR1_Block() == getFrontIR3_Block() && getFrontIR1_Block()< 3) {
+    rotated++;
+    if (diff > 0) {
+      rotateLeft(abs(diff * 5));
+      diff = getFrontIR1() - getFrontIR3();
+      if (getFrontIR1_Block() != getFrontIR3_Block()) {
+        rotateRight(abs(diff * 2));
+        diff = getFrontIR1() - getFrontIR3();
       }
-      delay(2);
-      diff_dis = getMin(getFrontIR1(), getFrontIR3(), getFrontIR2()) - DIST_WALL_CENTER_BOX;
-      moved++;
-    } while (abs(diff_dis) > 0.2 && moved < 15);
-//    return;
+    } else {
+      rotateRight(abs(diff * 5));
+      diff = getFrontIR1() - getFrontIR3();
+      if (getFrontIR1_Block() != getFrontIR3_Block()) {
+        rotateLeft(abs(diff * 2));
+        diff = getFrontIR1() - getFrontIR3();
+      }
+    }
+    delay(1);
   }
   delay(2);
-  turnLeft();
-  delay(1000);
-  alignRight();
-  delay(1000);
-  turnRight();
-  turnRight();
-  delay(2);
+//  delay(2);
+//  double diff_dis;
+//  int moved = 0;
+//  double previous_turn = 0;
+//  diff_dis = getFrontIR1_Block() - getFrontIR3_Block();
+//  while (abs(diff_dis) > 0.2 && moved < 15){
+//      
+//      if (diff_dis > 0) {
+////        moveForwardCalibrate(abs(diff_dis*0.75));
+//          md.setSpeeds(50, -50);
+//      } else {
+////        moveBackwardsCalibrate(abs(diff_dis*0.75));
+//          md.setSpeeds(-50, 50);
+//      }
+//      delay(2);
+//      diff_dis = getFrontIR1_Block() - getFrontIR3_Block();
+//      moved++;
+//    } 
+//    return;
+//  delay(2);
+//  turnLeft();
+//  delay(1000);
+//  alignRight();
+//  delay(1000);
+//  turnRight();
+//  turnRight();
+//  delay(2);
 }
 
 
