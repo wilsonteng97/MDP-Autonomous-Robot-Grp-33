@@ -130,7 +130,7 @@ abstract public class ExplorationAlgo {
                 }
             }
             elapsedTime = getElapsedTime();
-//            scanner.nextLine();
+            scanner.nextLine();
             System.out.println("[doWhile loop elapsed time] " + getElapsedTime());
         } while (areaExplored <= coverageLimit && elapsedTime < timeLimit);
 
@@ -478,21 +478,45 @@ abstract public class ExplorationAlgo {
         return reversedActions;
     }
 
+//    /**
+//     * Moves the bot, repaints the map and calls senseAndRepaint().
+//     */
+//    protected void moveBot(Actions m) {
+////        System.out.println("[Agent Dir] " + bot.getAgtDir());
+//        System.out.println("Action executed: " + m);
+//        actionsTaken.add(m);
+//        bot.takeAction(m, 1, exploredMap, realMap);
+//
+////        if (m != Actions.ALIGN_FRONT && m != Actions.ALIGN_RIGHT) {
+//        senseAndRepaint();
+////        } else {
+////            CommMgr commMgr = CommMgr.getCommMgr();
+////            commMgr.recvMsg();
+////        }
+//        if (!bot.isSim() && m != Actions.ALIGN_FRONT && m != Actions.ALIGN_RIGHT) {
+//            if (canAlignRight(bot.getAgtDir()) && canAlignFront(bot.getAgtDir())) {
+//                System.out.print("If corner");
+//                moveBot(Actions.ALIGN_FRONT);
+//                moveBot(Actions.ALIGN_RIGHT);
+////                calibrateBot(Direction.clockwise90(bot.getAgtDir()));
+//                lastCalibrate = 0;
+//            } else if (canAlignRight(bot.getAgtDir())) {
+//                if (lastCalibrate > 1) {
+//                    System.out.print("If rightwall, after");
+//                    moveBot(Actions.ALIGN_RIGHT);
+//                    lastCalibrate = 0;
+//                }
+//                else lastCalibrate++;
+//            } else {
+//                lastCalibrate++;
+//            }
+//        }
+//    }
+
     /**
      * Moves the bot, repaints the map and calls senseAndRepaint().
      */
     protected void moveBot(Actions m) {
-//        System.out.println("[Agent Dir] " + bot.getAgtDir());
-        System.out.println("Action executed: " + m);
-        actionsTaken.add(m);
-        bot.takeAction(m, 1, exploredMap, realMap);
-
-        if (m != Actions.ALIGN_FRONT && m != Actions.ALIGN_RIGHT) {
-            senseAndRepaint();
-        } else {
-//            CommMgr commMgr = CommMgr.getCommMgr();
-//            commMgr.recvMsg();
-        }
         if (!bot.isSim() && m != Actions.ALIGN_FRONT && m != Actions.ALIGN_RIGHT) {
             if (canAlignRight(bot.getAgtDir()) && canAlignFront(bot.getAgtDir())) {
                 System.out.print("If corner");
@@ -510,6 +534,18 @@ abstract public class ExplorationAlgo {
             } else {
                 lastCalibrate++;
             }
+        }
+
+        //        System.out.println("[Agent Dir] " + bot.getAgtDir());
+        System.out.println("Action executed: " + m);
+        actionsTaken.add(m);
+        bot.takeAction(m, 1, exploredMap, realMap);
+
+        if (m != Actions.ALIGN_FRONT && m != Actions.ALIGN_RIGHT) {
+            senseAndRepaint();
+        } else {
+//            CommMgr commMgr = CommMgr.getCommMgr();
+//            commMgr.recvMsg();
         }
     }
 
