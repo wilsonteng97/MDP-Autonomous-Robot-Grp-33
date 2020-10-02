@@ -493,13 +493,19 @@ abstract public class ExplorationAlgo {
 //            CommMgr commMgr = CommMgr.getCommMgr();
 //            commMgr.recvMsg();
         }
-        if (!bot.isSim()) {
+        if (!bot.isSim() && m != Actions.ALIGN_FRONT && m != Actions.ALIGN_RIGHT) {
             if (canAlignRight(bot.getAgtDir()) && canAlignFront(bot.getAgtDir())) {
+                System.out.print("If corner");
+                moveBot(Actions.ALIGN_FRONT);
                 moveBot(Actions.ALIGN_RIGHT);
-                calibrateBot(Direction.clockwise90(bot.getAgtDir()));
+//                calibrateBot(Direction.clockwise90(bot.getAgtDir()));
                 lastCalibrate = 0;
             } else if (canAlignRight(bot.getAgtDir())) {
-                if (lastCalibrate > 1) moveBot(Actions.ALIGN_RIGHT);
+                if (lastCalibrate > 1) {
+                    System.out.print("If rightwall, after");
+                    moveBot(Actions.ALIGN_RIGHT);
+                    lastCalibrate = 0;
+                }
                 else lastCalibrate++;
             } else {
                 lastCalibrate++;
