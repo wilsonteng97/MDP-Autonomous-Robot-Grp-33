@@ -3,7 +3,7 @@ import os
 
 # define the base path to the *original* input dataset and then use
 # the base path to derive the image and annotations directories
-ORIG_BASE_PATH = "02_down"
+ORIG_BASE_PATH = "train"
 ORIG_IMAGES = os.path.sep.join([ORIG_BASE_PATH, "images"])
 ORIG_ANNOTS = os.path.sep.join([ORIG_BASE_PATH, "annotations"])
 
@@ -12,7 +12,7 @@ ORIG_ANNOTS = os.path.sep.join([ORIG_BASE_PATH, "annotations"])
 # our output class label directories
 BASE_PATH = "dataset+"
 POSITVE_PATH = os.path.sep.join([BASE_PATH, "02_down"])
-NEGATIVE_PATH = os.path.sep.join([BASE_PATH, "no_02_down"])
+NEGATIVE_PATH = os.path.sep.join([BASE_PATH, "negatives"])
 
 # define the number of max proposals used when running selective
 # search for (1) gathering training data and (2) performing inference

@@ -1,0 +1,26 @@
+<annotation>
+	<folder>test</folder>
+	<filename>20200831_163153.jpg</filename>
+	<path>D:\NTU\MDP\MDP_dataset_resize\test\20200831_163153.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>640</width>
+		<height>480</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>alphabet_x</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>209</xmin>
+			<ymin>171</ymin>
+			<xmax>359</xmax>
+			<ymax>319</ymax>
+		</bndbox>
+	</object>
+</annotation>
