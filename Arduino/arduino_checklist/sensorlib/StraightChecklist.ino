@@ -1,24 +1,27 @@
 #include <MsTimer2.h>
 #include <PID_v1.h>
-#include <PID_AutoTune_v0.h>
 #include <EnableInterrupt.h>
 #include <DualVNH5019MotorShield.h>
 
 const int LEFT_PULSE = 3; // LEFT M1 Pulse
 const int RIGHT_PULSE = 11; // RIGHT M2 Pulse
+const int MOVE_MAX_SPEED = 288;
+const int MOVE_FAST_SPEED = 345;
+const int MOVE_MIN_SPEED = 183;
 const int MOVE_FAST_SPEED_L = 345;
-const int MOVE_MAX_SPEED_L = 288;
-const int MOVE_MIN_SPEED_L = 183;
+const int MOVE_MAX_SPEED_L = 278;
+const int MOVE_MIN_SPEED_L = 170;
 const int MOVE_FAST_SPEED_R = 370;
 const int MOVE_MAX_SPEED_R = 310;
 const int MOVE_MIN_SPEED_R = 200;
-const int TURN_MAX_SPEED = 260;
+const int TURN_MAX_SPEED_L = 241;
+const int TURN_MAX_SPEED_R = 260;
 const int ROTATE_MAX_SPEED = 150;
 const int TURN_TICKS_L = 790;
 const int TURN_TICKS_R = 778;
-const int TICKS[10] = {545, 1155, 1760, 2380, 2985, 3615, 4195, 4775, 5370};
+const int TICKS[10] = {605, 1155, 1760, 2380, 2985, 3615, 4195, 4775, 5370};
 const double DIST_WALL_CENTER_BOX = 1.58;
-const double kp = 0.02668, ki = 0.0, kd = 0.00657; // Arena 1
+const double kp = 0.05, ki = 0.0, kd = 0.0; // Arena 1
 //KP 0.02 KD 0.009
 int TENCM_TICKS_OFFSET = 0;
 
@@ -65,14 +68,14 @@ void moveForward(int distance) {
     currentSpeedR = MOVE_MAX_SPEED_R;
   }
   double offset = 0;
-  int last_tick_L = 0;
-  md.setSpeeds(-(currentSpeedL), -(currentSpeedR));
-  while (tick_L <= distance || tick_R <= distance) {
-    if ((tick_L - last_tick_L) >= 10 || tick_L == 0 || tick_L == last_tick_L) {
-      last_tick_L = tick_L;
+  int last_tick_R = 0;
+  //md.setSpeeds(-(currentSpeedL), -(currentSpeedR));
+  while (tick_L <= distance && tick_R <= distance) {
+    if ((tick_R - last_tick_R) >= 10 || tick_R == 0 || tick_R == last_tick_R) {
+      last_tick_R = tick_R;
       offset += 0.1;
     }
-    if (myPID.Compute() || tick_L == last_tick_L) {
+    if (myPID.Compute() || tick_R == last_tick_R) {
       if (offset >= 1)
         md.setSpeeds(-(currentSpeedL + speed_O), -(currentSpeedR - speed_O));
       else
@@ -232,7 +235,8 @@ void moveBackwardsCalibrate(int distance) {
 void turnRight() {
   initializeTick();
   initializeMotor_Start();
-  double currentSpeed = TURN_MAX_SPEED;
+  double currentSpeedL = TURN_MAX_SPEED_L;
+  double currentSpeedR = TURN_MAX_SPEED_R;
   double offset = 0;
 
   while (tick_L < TURN_TICKS_L || tick_R < TURN_TICKS_L) {
@@ -293,13 +297,13 @@ void alignRight() {
   delay(2);
   double diff = getRightIR1() - getRightIR2();
   int rotated = 0;
-  while (abs(diff) >= 0.1 && rotated < 20) {
+  while (abs(diff) >= 0.1 && rotated < 20 && getRightIR1_Block() == getRightIR2_Block() && getRightIR1_Block()< 3) {
     rotated++;
     if (diff > 0) {
       rotateRight(abs(diff * 5));
       diff = getRightIR1() - getRightIR2();
       if (getRightIR1_Block() != getRightIR2_Block()) {
-        rotateLeft(abs(diff * 4));
+        rotateLeft(abs(diff * 2));
         diff = getRightIR1() - getRightIR2();
       }
     } else {
@@ -317,31 +321,55 @@ void alignRight() {
 
 void alignFront() {
   delay(2);
-  double diff_dis;
-  int moved = 0;
-  double previous_turn = 0;
-  if (getFrontIR1_Block() != 1 || getFrontIR3_Block() != 1 ) {
-    do {
-      diff_dis = getMin(getFrontIR1(), getFrontIR3(), getFrontIR2()) - DIST_WALL_CENTER_BOX;
-      if (diff_dis > 0) {
-        moveForwardCalibrate(abs(diff_dis*0.75));
-      } else {
-        moveBackwardsCalibrate(abs(diff_dis*0.75));
+  double diff = getFrontIR1() - getFrontIR3();
+  int rotated = 0;
+  while (abs(diff) >= 0.1 && rotated < 20 && getFrontIR1_Block() == getFrontIR3_Block() && getFrontIR1_Block()< 3) {
+    rotated++;
+    if (diff > 0) {
+      rotateLeft(abs(diff * 5));
+      diff = getFrontIR1() - getFrontIR3();
+      if (getFrontIR1_Block() != getFrontIR3_Block()) {
+        rotateRight(abs(diff * 2));
+        diff = getFrontIR1() - getFrontIR3();
       }
-      delay(2);
-      diff_dis = getMin(getFrontIR1(), getFrontIR3(), getFrontIR2()) - DIST_WALL_CENTER_BOX;
-      moved++;
-    } while (abs(diff_dis) > 0.2 && moved < 15);
-//    return;
+    } else {
+      rotateRight(abs(diff * 5));
+      diff = getFrontIR1() - getFrontIR3();
+      if (getFrontIR1_Block() != getFrontIR3_Block()) {
+        rotateLeft(abs(diff * 2));
+        diff = getFrontIR1() - getFrontIR3();
+      }
+    }
+    delay(1);
   }
   delay(2);
-  turnLeft();
-  delay(1000);
-  alignRight();
-  delay(1000);
-  turnRight();
-  turnRight();
-  delay(2);
+//  delay(2);
+//  double diff_dis;
+//  int moved = 0;
+//  double previous_turn = 0;
+//  diff_dis = getFrontIR1_Block() - getFrontIR3_Block();
+//  while (abs(diff_dis) > 0.2 && moved < 15){
+//      
+//      if (diff_dis > 0) {
+////        moveForwardCalibrate(abs(diff_dis*0.75));
+//          md.setSpeeds(50, -50);
+//      } else {
+////        moveBackwardsCalibrate(abs(diff_dis*0.75));
+//          md.setSpeeds(-50, 50);
+//      }
+//      delay(2);
+//      diff_dis = getFrontIR1_Block() - getFrontIR3_Block();
+//      moved++;
+//    } 
+//    return;
+//  delay(2);
+//  turnLeft();
+//  delay(1000);
+//  alignRight();
+//  delay(1000);
+//  turnRight();
+//  turnRight();
+//  delay(2);
 }
 
 
@@ -373,11 +401,11 @@ double getMin(double f1, double f2, double f3) {
 }
 
 void leftMotorTime() {
-  tick_R++;
+  tick_L++;
 }
 
 void rightMotorTime() {
-  tick_L++;
+  tick_R++;
 }
 
 void initializeTick() {
