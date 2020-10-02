@@ -516,10 +516,12 @@ abstract public class ExplorationAlgo {
     /**
      * Sets the bot's sensors, processes the sensor data and repaints the map.
      */
-    protected void senseAndRepaint() {
+    protected int[] senseAndRepaint() {
         bot.setSensors();
-        bot.senseEnv(exploredMap, realMap);
+        int[] sensorReadings = bot.senseEnv(exploredMap, realMap);
         exploredMap.repaint();
+
+        return sensorReadings;
     }
 
 
