@@ -28,8 +28,8 @@ MAX_NEGATIVE = 10
 INPUT_DIMS = (224, 224)
 
 # define the path to the output model and label binarizer
-MODEL_PATH = "image_detector_new.h5"
-ENCODER_PATH = "label_encoder_new.pickle"
+MODEL_PATH = "image_detector_new2.h5"
+ENCODER_PATH = "label_encoder_new2.pickle"
 
 # define the minimum probability required for a positive prediction
 # (used to filter out false-positive predictions)
