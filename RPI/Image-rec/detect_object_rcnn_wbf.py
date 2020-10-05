@@ -120,4 +120,6 @@ for i in range(len(boxes)):
 # cv2.waitKey(0)
 
 # save output image
-cv2.imwrite("output.jpg", image)
+filename = args["image"]
+filename = filename[:filename.rfind(".")] + "_output" + filename[filename.rfind("."):]
+cv2.imwrite(filename, image)

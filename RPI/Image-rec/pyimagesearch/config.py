@@ -14,6 +14,8 @@ BASE_PATH = "dataset+"
 POSITVE_PATH = os.path.sep.join([BASE_PATH, "02_down"])
 NEGATIVE_PATH = os.path.sep.join([BASE_PATH, "negatives"])
 
+OUTPUT_PATH = "images"
+
 # define the number of max proposals used when running selective
 # search for (1) gathering training data and (2) performing inference
 MAX_PROPOSALS = 2000
