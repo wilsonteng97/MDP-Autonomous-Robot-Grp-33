@@ -159,15 +159,15 @@ void moveBackwardsFast(int distance) {
   initializeMotor_End();
 }
 
-void moveForwardCalibrate(int distance) {
+void moveForwardCalibrate(int distance1) {
   initializeTick();
   initializeMotor_Start();
-  if (distance < 6)
-    return;
-  distance = cmToTicksCalibrate(distance);
+  double distance = distance1/18.85*562.25;
+  if (distance < 1)
+    return;  
   double currentSpeed = 0;
-  if (distance < 60) {
-    currentSpeed = MOVE_MIN_SPEED;
+  if (distance < 6000) {
+    currentSpeed = 100;
   } else {
     currentSpeed = MOVE_MAX_SPEED;
   }
@@ -189,15 +189,15 @@ void moveForwardCalibrate(int distance) {
 }
 
 
-void moveBackwardsCalibrate(int distance) {
+void moveBackwardsCalibrate(int distance1) {
   initializeTick();
   initializeMotor_Start();
-  distance = cmToTicksCalibrate(distance);
-  if (distance < 3)
+  double distance = distance1/18.85*562.25;
+  if (distance < 1)
     return;
   double currentSpeed = 0;
-  if (distance < 60) {
-    currentSpeed = MOVE_MIN_SPEED;
+  if (distance < 6000) {
+    currentSpeed = 100;
   } else {
     currentSpeed = MOVE_MAX_SPEED;
   }
@@ -306,6 +306,21 @@ void alignRight() {
 
 void alignFront() {
   delay(2);
+  int moved = 0;
+  double diff_dis = getMin(getFrontIR1(),getFrontIR2(),getFrontIR3());
+  while ((abs(diff_dis) < 6.2 && moved < 15) || (abs(diff_dis) > 6.4 && moved < 15)){
+      Serial.println(abs(diff_dis));
+      if (diff_dis > 6.4) {
+        moveForwardCalibrate(1);
+          md.setSpeeds(50, -50);
+      } else {
+        moveBackwardsCalibrate(1);
+          md.setSpeeds(-50, 50);
+      }
+      delay(2);
+      diff_dis = getMin(getFrontIR1(),getFrontIR2(),getFrontIR3());
+      moved++;
+    }
   double diff = getFrontIR1() - getFrontIR3();
   int rotated = 0;
   while (abs(diff) >= 0.1 && rotated < 20 && getFrontIR1_Block() == getFrontIR3_Block() && getFrontIR1_Block()< 3) {
@@ -332,20 +347,7 @@ void alignFront() {
 //  double diff_dis;
 //  int moved = 0;
 //  double previous_turn = 0;
-//  diff_dis = getFrontIR1_Block() - getFrontIR3_Block();
-//  while (abs(diff_dis) > 0.2 && moved < 15){
-//      
-//      if (diff_dis > 0) {
-////        moveForwardCalibrate(abs(diff_dis*0.75));
-//          md.setSpeeds(50, -50);
-//      } else {
-////        moveBackwardsCalibrate(abs(diff_dis*0.75));
-//          md.setSpeeds(-50, 50);
-//      }
-//      delay(2);
-//      diff_dis = getFrontIR1_Block() - getFrontIR3_Block();
-//      moved++;
-//    } 
+//  diff_dis = getFrontIR1_Block() - getFrontIR3_Block(); 
 //    return;
 //  delay(2);
 //  turnLeft();
