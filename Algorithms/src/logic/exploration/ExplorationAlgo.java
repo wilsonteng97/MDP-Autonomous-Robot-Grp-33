@@ -478,6 +478,7 @@ abstract public class ExplorationAlgo {
         return reversedActions;
     }
 
+
     /**
      * Moves the bot, repaints the map and calls senseAndRepaint().
      */
@@ -487,31 +488,93 @@ abstract public class ExplorationAlgo {
         actionsTaken.add(m);
         bot.takeAction(m, 1, exploredMap, realMap);
 
-        if (m != Actions.ALIGN_FRONT && m != Actions.ALIGN_RIGHT) {
-            senseAndRepaint();
-        } else {
+//        if (m != Actions.ALIGN_FRONT && m != Actions.ALIGN_RIGHT) {
+        senseAndRepaint();
+//        } else {
 //            CommMgr commMgr = CommMgr.getCommMgr();
 //            commMgr.recvMsg();
-        }
-        if (!bot.isSim() && m != Actions.ALIGN_FRONT && m != Actions.ALIGN_RIGHT) {
-            if (canAlignRight(bot.getAgtDir()) && canAlignFront(bot.getAgtDir())) {
-                System.out.print("If corner");
-                moveBot(Actions.ALIGN_FRONT);
-                moveBot(Actions.ALIGN_RIGHT);
-//                calibrateBot(Direction.clockwise90(bot.getAgtDir()));
-                lastCalibrate = 0;
-            } else if (canAlignRight(bot.getAgtDir())) {
-                if (lastCalibrate > 1) {
-                    System.out.print("If rightwall, after");
-                    moveBot(Actions.ALIGN_RIGHT);
-                    lastCalibrate = 0;
-                }
-                else lastCalibrate++;
-            } else {
-                lastCalibrate++;
-            }
-        }
+//        }
+//        if (!bot.isSim() && m != Actions.ALIGN_FRONT && m != Actions.ALIGN_RIGHT) {
+//            if (canAlignRight(bot.getAgtDir()) && canAlignFront(bot.getAgtDir())) {
+//                System.out.print("If corner");
+//                moveBot(Actions.ALIGN_FRONT);
+//                moveBot(Actions.ALIGN_RIGHT);
+////                calibrateBot(Direction.clockwise90(bot.getAgtDir()));
+//                lastCalibrate = 0;
+//            } else if (canAlignRight(bot.getAgtDir())) {
+//                if (lastCalibrate > 1) {
+//                    System.out.print("If rightwall, after");
+//                    moveBot(Actions.ALIGN_RIGHT);
+//                    lastCalibrate = 0;
+//                }
+//                else lastCalibrate++;
+//            } else {
+//                lastCalibrate++;
+//            }
+//        }
     }
+
+//    /**
+//     * Moves the bot, repaints the map and calls senseAndRepaint().
+//     */
+//    protected void moveBot(Actions m) {
+//        if (!bot.isSim() && m != Actions.ALIGN_FRONT && m != Actions.ALIGN_RIGHT) {
+//            if (canAlignRight(bot.getAgtDir()) && canAlignFront(bot.getAgtDir())) {
+//                System.out.print("If corner");
+//                moveBot(Actions.ALIGN_FRONT);
+//                moveBot(Actions.ALIGN_RIGHT);
+////                calibrateBot(Direction.clockwise90(bot.getAgtDir()));
+//                lastCalibrate = 0;
+//            } else if (canAlignRight(bot.getAgtDir())) {
+//                if (lastCalibrate > 1) {
+//                    System.out.print("If rightwall, after");
+//                    moveBot(Actions.ALIGN_RIGHT);
+//                    lastCalibrate = 0;
+//                }
+//                else lastCalibrate++;
+//            } else {
+//                lastCalibrate++;
+//            }
+//        }
+//
+//        //        System.out.println("[Agent Dir] " + bot.getAgtDir());
+//        System.out.println("Action executed: " + m);
+//        actionsTaken.add(m);
+//        bot.takeAction(m, 1, exploredMap, realMap);
+//
+//        if (m != Actions.ALIGN_FRONT && m != Actions.ALIGN_RIGHT) {
+//            senseAndRepaint();
+//        } else {
+////            CommMgr commMgr = CommMgr.getCommMgr();
+////            commMgr.recvMsg();
+//        }
+//    }
+
+//    /**
+//     * Moves the bot, repaints the map and calls senseAndRepaint().
+//     */
+//    protected void moveBot(Actions m) {
+//        if (!bot.isSim() && m != Actions.ALIGN_FRONT && m != Actions.ALIGN_RIGHT) {
+//            if (canAlignRight(bot.getAgtDir()) && canAlignFront(bot.getAgtDir())) {
+//                System.out.print("If corner");
+//                calibrateBot(Direction.clockwise90(bot.getAgtDir()));
+//                moveBot(Actions.ALIGN_FRONT);
+////                moveBot(Actions.ALIGN_RIGHT);
+//            }
+//        }
+//
+//        //        System.out.println("[Agent Dir] " + bot.getAgtDir());
+//        System.out.println("Action executed: " + m);
+//        actionsTaken.add(m);
+//        bot.takeAction(m, 1, exploredMap, realMap);
+//
+//        if (m != Actions.ALIGN_FRONT && m != Actions.ALIGN_RIGHT) {
+//            senseAndRepaint();
+//        } else {
+////            CommMgr commMgr = CommMgr.getCommMgr();
+////            commMgr.recvMsg();
+//        }
+//    }
 
     /**
      * Sets the bot's sensors, processes the sensor data and repaints the map.
@@ -556,21 +619,21 @@ abstract public class ExplorationAlgo {
     /**
      * Returns a possible direction for robot calibration or null, otherwise.
      */
-    private Direction getCalibrationDirection() {
-        Direction origDir = bot.getAgtDir();
-        Direction dirToCheck;
-
-        dirToCheck = Direction.clockwise90(origDir);                    // right turn
-        if (canAlignFront(dirToCheck)) return dirToCheck;
-
-        dirToCheck = Direction.antiClockwise90(origDir);                // left turn
-        if (canAlignFront(dirToCheck)) return dirToCheck;
-
-        dirToCheck = Direction.antiClockwise90(dirToCheck);             // u turn
-        if (canAlignFront(dirToCheck)) return dirToCheck;
-
-        return null;
-    }
+//    private Direction getCalibrationDirection() {
+//        Direction origDir = bot.getAgtDir();
+//        Direction dirToCheck;
+//
+//        dirToCheck = Direction.clockwise90(origDir);                    // right turn
+//        if (canAlignFront(dirToCheck)) return dirToCheck;
+//
+//        dirToCheck = Direction.antiClockwise90(origDir);                // left turn
+//        if (canAlignFront(dirToCheck)) return dirToCheck;
+//
+//        dirToCheck = Direction.antiClockwise90(dirToCheck);             // u turn
+//        if (canAlignFront(dirToCheck)) return dirToCheck;
+//
+//        return null;
+//    }
 
     /**
      * Turns the bot in the needed direction and sends the ALIGN_FRONT movement. Once calibrated, the bot is turned back

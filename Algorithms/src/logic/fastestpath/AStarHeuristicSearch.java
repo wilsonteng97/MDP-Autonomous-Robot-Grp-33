@@ -65,7 +65,6 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
 
     /**
      * Returns the Cell inside toVisit with the minimum g(n) + h(n).
-     * TODO a heap implementation for better performance, not sure it's necessary since toVisit should be small
      */
     private Cell minimumCostCell(int goalRow, int getCol) {
         int size = toVisit.size();
