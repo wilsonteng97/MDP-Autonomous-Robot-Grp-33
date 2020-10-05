@@ -144,6 +144,7 @@ public class Sensor {
                 detectObstacle(explorationMap, sensorVal, 0, -1); break;
         }
     }
+
     public void detectObstacle(Map explorationMap, int sensorVal, int rowDispl, int colDispl) {
         if (sensorVal == 0) return;  // return value for LR sensor if obstacle before lowerRange
 
@@ -174,13 +175,13 @@ public class Sensor {
                 return;
             }
 //             Override previous obstacle value if front sensors detect no obstacle.
-//            if (explorationMap.getCell(row, col).isObstacle()) {
-//                if (id.equals("SR1") || id.equals("SR2") || id.equals("SR3")) {
-//                    explorationMap.resetVirtualWalls(row, col);
-//                } else {
-//                    break;
-//                }
-//            }
+            if (explorationMap.getCell(row, col).isObstacle()) {
+                if (id.equals("SR1") || id.equals("SR2") || id.equals("SR3")) {
+                    explorationMap.resetVirtualWalls(row, col);
+                } else {
+                    break;
+                }
+            }
         }
     }
 }

@@ -478,43 +478,6 @@ abstract public class ExplorationAlgo {
         return reversedActions;
     }
 
-
-//    /**
-//     * Moves the bot, repaints the map and calls senseAndRepaint().
-//     */
-//    protected void moveBot(Actions m) {
-////        System.out.println("[Agent Dir] " + bot.getAgtDir());
-//        System.out.println("Action executed: " + m);
-//        actionsTaken.add(m);
-//        bot.takeAction(m, 1, exploredMap, realMap);
-//
-////        if (m != Actions.ALIGN_FRONT && m != Actions.ALIGN_RIGHT) {
-//        senseAndRepaint();
-////        } else {
-////            CommMgr commMgr = CommMgr.getCommMgr();
-////            commMgr.recvMsg();
-////        }
-////        if (!bot.isSim() && m != Actions.ALIGN_FRONT && m != Actions.ALIGN_RIGHT) {
-////            if (canAlignRight(bot.getAgtDir()) && canAlignFront(bot.getAgtDir())) {
-////                System.out.print("If corner");
-////                moveBot(Actions.ALIGN_FRONT);
-////                moveBot(Actions.ALIGN_RIGHT);
-//////                calibrateBot(Direction.clockwise90(bot.getAgtDir()));
-////                lastCalibrate = 0;
-////            } else if (canAlignRight(bot.getAgtDir())) {
-////                if (lastCalibrate > 1) {
-////                    System.out.print("If rightwall, after");
-////                    moveBot(Actions.ALIGN_RIGHT);
-////                    lastCalibrate = 0;
-////                }
-////                else lastCalibrate++;
-////            } else {
-////                lastCalibrate++;
-////            }
-////        }
-//    }
-    
-
     /**
      * Moves the bot, repaints the map and calls senseAndRepaint().
      */
@@ -533,12 +496,8 @@ abstract public class ExplorationAlgo {
         actionsTaken.add(m);
         bot.takeAction(m, 1, exploredMap, realMap);
 
-        if (m != Actions.ALIGN_FRONT && m != Actions.ALIGN_RIGHT) {
-            senseAndRepaint();
-        } else {
-//            CommMgr commMgr = CommMgr.getCommMgr();
-//            commMgr.recvMsg();
-        }
+        senseAndRepaint();
+
     }
 
     /**
@@ -623,13 +582,18 @@ abstract public class ExplorationAlgo {
         if (numOfTurn == 1) {
             if (Direction.clockwise90(bot.getAgtDir()) == targetDir) {
                 bot.takeAction(Actions.FACE_RIGHT, 0, exploredMap, realMap);
+                senseAndRepaint();
             } else {
                 bot.takeAction(Actions.FACE_LEFT, 0, exploredMap, realMap);
+                senseAndRepaint();
             }
         } else if (numOfTurn == 2) {
             bot.takeAction(Actions.FACE_RIGHT, 0, exploredMap, realMap);
+            senseAndRepaint();
             bot.takeAction(Actions.FACE_RIGHT, 0, exploredMap, realMap);
+            senseAndRepaint();
         }
+
     }
 
     protected long getElapsedTime() {
