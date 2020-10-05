@@ -130,7 +130,7 @@ abstract public class ExplorationAlgo {
                 }
             }
             elapsedTime = getElapsedTime();
-//            scanner.nextLine();
+            scanner.nextLine();
             System.out.println("[doWhile loop elapsed time] " + getElapsedTime());
         } while (areaExplored <= coverageLimit && elapsedTime < timeLimit);
 
