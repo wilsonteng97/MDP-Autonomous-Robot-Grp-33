@@ -309,7 +309,6 @@ void alignFront() {
   int moved = 0;
   double diff_dis = getMin(getFrontIR1(),getFrontIR2(),getFrontIR3());
   while ((abs(diff_dis) < 6.2 && moved < 15) || (abs(diff_dis) > 6.4 && moved < 15)){
-      Serial.println(abs(diff_dis));
       if (diff_dis > 6.4) {
         moveForwardCalibrate(1);
           md.setSpeeds(50, -50);
