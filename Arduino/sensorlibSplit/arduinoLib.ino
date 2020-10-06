@@ -68,7 +68,7 @@ void loop() {
     */
 while (Serial.available()>0){
  char command=Serial.read();
-  int value=1;    
+  int value=8;    
     switch (command) {
       case 'W':
         moveForward(value * 10);

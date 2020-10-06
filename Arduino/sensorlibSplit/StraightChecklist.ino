@@ -6,11 +6,11 @@
 const int LEFT_PULSE = 3; // LEFT M1 Pulse
 const int RIGHT_PULSE = 11; // RIGHT M2 Pulse
 const int MOVE_FAST_SPEED_L = 345;
-const int MOVE_MAX_SPEED_L = 259;
+const int MOVE_MAX_SPEED_L = 311;
 const int MOVE_MIN_SPEED_L = 183;
 const int TURN_MAX_SPEED_L = 259;
 const int MOVE_FAST_SPEED_R = 370;
-const int MOVE_MAX_SPEED_R = 280;
+const int MOVE_MAX_SPEED_R = 333;
 const int MOVE_MIN_SPEED_R = 200;
 const int TURN_MAX_SPEED_R = 280;
 const int MOVE_FAST_SPEED = 370;
@@ -70,18 +70,38 @@ void moveForward(int distance) {
     currentSpeedL = MOVE_MAX_SPEED_L;
     currentSpeedR = MOVE_MAX_SPEED_R;
   }
+
+  for (int i = 0; i <= 300; i++) {
+    md.setSpeeds(-i,-i);
+  }
+  
   double offset = 0;
+  double gain_L = 1;
+  double gain_R = 1;
   int last_tick_L = 0;
-  while (tick_L <= distance || tick_R <= distance) {
-    if ((tick_L - last_tick_L) >= 10 || tick_L == 0 || tick_L == last_tick_L) {
+  while (tick_L <= distance && tick_R <= distance) {
+    /*if ((tick_L - last_tick_L) >= 10 || tick_L == 0 || tick_L == last_tick_L) {
       last_tick_L = tick_L;
       offset += 0.1;
+    }*/
+    if(tick_L < tick_R) {
+      gain_L = 1.1;
+      gain_R = 1.0;
+    }
+    else if(tick_R < tick_L) {
+      gain_R = 1.5;
+      gain_L = 1.0;
+    }
+    else {
+      gain_R = 1.0;
+      gain_L = 1.0;
     }
     if (myPID.Compute() || tick_L == last_tick_L) {
-      if (offset >= 1)
+      md.setSpeeds(-1 * gain_L*(currentSpeedL - speed_O), -1 * gain_R * (currentSpeedR + speed_O)); 
+      /*if (offset >= 1)
         md.setSpeeds(-(currentSpeedL - speed_O), -(currentSpeedR + speed_O));
       else
-        md.setSpeeds(-1*offset * (currentSpeedL - speed_O), -1*offset * (currentSpeedR + speed_O));
+        md.setSpeeds(-1*offset * (currentSpeedL - speed_O), -1*offset * (currentSpeedR + speed_O));*/
     }
   }
   initializeMotor_End();
