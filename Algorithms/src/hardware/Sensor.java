@@ -176,14 +176,15 @@ public class Sensor {
 //                System.out.println("Cell is virtualwall @[" + (row+1) + ", " + col + "]=" + explorationMap.getCell(row+1, col).isVirtualWall());
                 return;
             }
-//             Override previous obstacle value if front sensors detect no obstacle.
+            // Override previous obstacle value if front and right sensors detect no obstacle.
+            // Override previous obstacle value if long-range sensor detects no obstacle in distance 5 and 6
             if (explorationMap.getCell(row, col).isObstacle()) {
                 if (id.equals("SR1") || id.equals("SR2") || id.equals("SR3") || id.equals("SR4") || id.equals("SR5")) {
                     explorationMap.resetVirtualWalls(row, col);
-                    explorationMap.setVirtualWallIfBorder(row, col);    // make sure never reset border
-                } else {
-                    break;
+                } else if (id.equals("LR1") && (i == 5 || i == 6)) {
+                    explorationMap.resetVirtualWalls(row, col);
                 }
+                explorationMap.setVirtualWallIfBorder(row, col);    // make sure never reset border
             }
         }
     }
