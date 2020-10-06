@@ -71,8 +71,10 @@ void moveForward(int distance) {
     currentSpeedR = MOVE_MAX_SPEED_R;
   }
 
-  for (int i = 0; i <= 300; i++) {
-    md.setSpeeds(-i,-i);
+  for (int i = 0; i <= 100; i+=2) {
+    for (int j = 0; j <= 300; j+=6) {
+      md.setSpeeds(-i,-j);
+    }
   }
   
   double offset = 0;
@@ -84,11 +86,11 @@ void moveForward(int distance) {
       last_tick_L = tick_L;
       offset += 0.1;
     }*/
-    if(tick_L < tick_R) {
-      gain_L = 1.1;
+    if((tick_R - tick_L) >= 20) {
+      gain_L = 1.5;
       gain_R = 1.0;
     }
-    else if(tick_R < tick_L) {
+    else if((tick_L - tick_R) >= 20) {
       gain_R = 1.5;
       gain_L = 1.0;
     }
@@ -98,6 +100,8 @@ void moveForward(int distance) {
     }
     if (myPID.Compute() || tick_L == last_tick_L) {
       md.setSpeeds(-1 * gain_L*(currentSpeedL - speed_O), -1 * gain_R * (currentSpeedR + speed_O)); 
+      currentSpeedL = currentSpeedL - speed_O;
+      currentSpeedR = currentSpeedR + speed_O;
       /*if (offset >= 1)
         md.setSpeeds(-(currentSpeedL - speed_O), -(currentSpeedR + speed_O));
       else
@@ -144,6 +148,11 @@ void moveBackwards(int distance) {
     currentSpeedL = MOVE_MAX_SPEED_L;
     currentSpeedR = MOVE_MAX_SPEED_R;
   }
+
+  for (int i = 0; i <= 300; i++) {
+    md.setSpeeds(i, i);
+  }
+  
   double offset = 0;
   int last_tick_L = 0;
   while (tick_L <= distance || tick_R <= distance) {
