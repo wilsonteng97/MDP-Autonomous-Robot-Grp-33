@@ -8,11 +8,11 @@ const int RIGHT_PULSE = 11; // RIGHT M2 Pulse
 const int MOVE_FAST_SPEED_L = 345;
 const int MOVE_MAX_SPEED_L = 259;
 const int MOVE_MIN_SPEED_L = 183;
-const int TURN_MAX_SPEED_L = 185;
+const int TURN_MAX_SPEED_L = 259;
 const int MOVE_FAST_SPEED_R = 370;
 const int MOVE_MAX_SPEED_R = 280;
 const int MOVE_MIN_SPEED_R = 200;
-const int TURN_MAX_SPEED_R = 200;
+const int TURN_MAX_SPEED_R = 280;
 const int MOVE_FAST_SPEED = 370;
 const int MOVE_MAX_SPEED = 310;
 const int MOVE_MIN_SPEED = 200;
@@ -423,20 +423,8 @@ void alignFront() {
     delay(1);
   }
   delay(2);
-//  delay(2);
-//  double diff_dis;
-//  int moved = 0;
-//  double previous_turn = 0;
-//  diff_dis = getFrontIR1_Block() - getFrontIR3_Block(); 
-//    return;
-//  delay(2);
-//  turnLeft();
-//  delay(1000);
-//  alignRight();
-//  delay(1000);
-//  turnRight();
-//  turnRight();
-//  delay(2);
+  initializeMotor_End();
+
 }
 
 
