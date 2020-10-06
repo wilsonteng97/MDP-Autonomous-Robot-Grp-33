@@ -11,7 +11,7 @@ const int MOVE_MIN_SPEED = 200;
 const int TURN_MAX_SPEED = 260;
 const int ROTATE_MAX_SPEED = 150;
 const int TURN_TICKS_L = 790;
-const int TURN_TICKS_R = 778;
+const int TURN_TICKS_R = 790;
 const int TICKS[10] = {545, 1155, 1760, 2380, 2985, 3615, 4195, 4775, 5370};
 const double DIST_WALL_CENTER_BOX = 1.58;
 const double kp = 0.02668, ki = 0.0, kd = 0.00657; // Arena 1
@@ -342,20 +342,7 @@ void alignFront() {
     delay(1);
   }
   delay(2);
-//  delay(2);
-//  double diff_dis;
-//  int moved = 0;
-//  double previous_turn = 0;
-//  diff_dis = getFrontIR1_Block() - getFrontIR3_Block(); 
-//    return;
-//  delay(2);
-//  turnLeft();
-//  delay(1000);
-//  alignRight();
-//  delay(1000);
-//  turnRight();
-//  turnRight();
-//  delay(2);
+  initializeMotor_End();
 }
 
 
