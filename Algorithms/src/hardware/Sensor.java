@@ -165,7 +165,9 @@ public class Sensor {
 //                System.out.println("[DEBUG] Cell[" + col + ", " + row + "]" + "is not valid");
                 return;
             }
+
 //            System.out.println("[!SETEXPLORED@" + i + "] Cell[" + col + ", " + row + "]");
+            explorationMap.setVirtualWallIfBorder(row, col);
             explorationMap.getCell(row, col).setExplored(true);
             if (sensorVal == i) {
 //                System.out.println("[!SETOBSTACLE@" + i + "] Cell[" + col + ", " + row + "]");
@@ -178,10 +180,10 @@ public class Sensor {
             if (explorationMap.getCell(row, col).isObstacle()) {
                 if (id.equals("SR1") || id.equals("SR2") || id.equals("SR3")) {
                     explorationMap.resetVirtualWalls(row, col);
+                    explorationMap.setVirtualWallIfBorder(row, col);    // make sure never reset border
                 } else {
                     break;
                 }
-                explorationMap.setBorder(row, col);
             }
         }
     }

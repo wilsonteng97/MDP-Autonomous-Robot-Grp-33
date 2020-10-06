@@ -49,7 +49,7 @@ public class Map extends JPanel {
      * @param row
      * @param col
      */
-    public void setBorder(int row, int col) {
+    public void setVirtualWallIfBorder(int row, int col) {
         if ((row == 0) || (row == MapSettings.MAP_ROWS - 1) || (col == 0) || (col == MapSettings.MAP_COLS - 1)) {
             this.grid[row][col].setVirtualWall(true);
         }
@@ -58,7 +58,7 @@ public class Map extends JPanel {
     public void createVirtualWalls(int row, int col) {
 //        System.out.println("[Function executed] createVirtualWalls() " + row + ", " + col);
         // Set true walls
-        setBorder(row, col);
+        setVirtualWallIfBorder(row, col);
         // Set obstacle virtual walls
         if (this.grid[row][col].isObstacle()) {
 //            System.out.printf(" ->grid[%d][%d] is obstacle\n", row, col);
