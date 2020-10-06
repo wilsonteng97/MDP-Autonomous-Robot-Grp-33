@@ -44,13 +44,21 @@ public class Map extends JPanel {
         }
     }
 
+    /**
+     * Set virtual wall if the given coordinate is a true border
+     * @param row
+     * @param col
+     */
+    public void setBorder(int row, int col) {
+        if ((row == 0) || (row == MapSettings.MAP_ROWS - 1) || (col == 0) || (col == MapSettings.MAP_COLS - 1)) {
+            this.grid[row][col].setVirtualWall(true);
+        }
+    }
 
     public void createVirtualWalls(int row, int col) {
 //        System.out.println("[Function executed] createVirtualWalls() " + row + ", " + col);
         // Set true walls
-        if ((row == 0) || (row == MapSettings.MAP_ROWS - 1) || (col == 0) || (col == MapSettings.MAP_COLS - 1)) {
-            this.grid[row][col].setVirtualWall(true);
-        }
+        setBorder(row, col);
         // Set obstacle virtual walls
         if (this.grid[row][col].isObstacle()) {
 //            System.out.printf(" ->grid[%d][%d] is obstacle\n", row, col);
