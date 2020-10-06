@@ -117,10 +117,6 @@ for i in range(len(boxes)):
 	cv2.putText(image, text, (startX, y),
 		cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 2)
 
-# show the output image
-# cv2.imshow("Image Rec", image)
-# cv2.waitKey(0)
-
 # save output image
 raw_image_name = args["image"]
 processed_image_path = 'processed_images' + raw_image_name[raw_image_name.rfind("/"):raw_image_name.rfind(".")] + "_processed" + IMAGE_ENCODING
