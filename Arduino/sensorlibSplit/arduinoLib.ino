@@ -68,9 +68,10 @@ void loop() {
     */
 while (Serial.available()>0){
  char command=Serial.read();
-  int value=8;    
+  int value=1;    
     switch (command) {
       case 'W':
+        value=Serial.parseInt();
         moveForward(value * 10);
         delay(10);
         returnSensorReading_Raw();
@@ -78,6 +79,7 @@ while (Serial.available()>0){
         delay(10);
         break;
       case 'A':
+        value=Serial.parseInt();
         for (int k = 0; k < value; k++) {
           turnLeft();
         }
@@ -85,6 +87,7 @@ while (Serial.available()>0){
         returnSensorReading_Raw();
         break;
       case 'D':
+        value=Serial.parseInt();
         for (int k = 0; k < value; k++) {
           turnRight();
         }
@@ -92,6 +95,7 @@ while (Serial.available()>0){
         returnSensorReading_Raw();
         break;
       case 'S':
+        value=Serial.parseInt();
         moveBackwards(value * 10);
         delay(10);
         returnSensorReading_Raw();
@@ -107,7 +111,7 @@ while (Serial.available()>0){
       case 'Z':
         returnSensorReading_Raw();
         break;
-        case 'U':
+      case 'U':
         md.setSpeeds(0,0);
         md.setBrakes(400,400);
         break;

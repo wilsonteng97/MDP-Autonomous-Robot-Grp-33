@@ -6,11 +6,11 @@
 const int LEFT_PULSE = 3; // LEFT M1 Pulse
 const int RIGHT_PULSE = 11; // RIGHT M2 Pulse
 const int MOVE_FAST_SPEED_L = 345;
-const int MOVE_MAX_SPEED_L = 311;
+const int MOVE_MAX_SPEED_L = 336;
 const int MOVE_MIN_SPEED_L = 183;
 const int TURN_MAX_SPEED_L = 259;
 const int MOVE_FAST_SPEED_R = 370;
-const int MOVE_MAX_SPEED_R = 333;
+const int MOVE_MAX_SPEED_R = 360;
 const int MOVE_MIN_SPEED_R = 200;
 const int TURN_MAX_SPEED_R = 280;
 const int MOVE_FAST_SPEED = 370;
@@ -20,11 +20,11 @@ const int TURN_MAX_SPEED = 260;
 const int ROTATE_MAX_SPEED_L = 136;
 const int ROTATE_MAX_SPEED_R = 150;
 const int ROTATE_MAX_SPEED = 150;
-const int TURN_TICKS_L = 805 * 0.98;
-const int TURN_TICKS_R = 805 * 0.99;
-const int TICKS[10] = {565, 1155, 1760, 2380, 2985, 3615, 4195, 4775, 5370};
+const int TURN_TICKS_L = 805 * 0.97;
+const int TURN_TICKS_R = 805 * 0.97;
+const int TICKS[10] = {540, 1155, 1760, 2380, 2985, 3615, 4195, 4775, 5370};
 const double DIST_WALL_CENTER_BOX = 1.58;
-const double kp = 2.6, ki = 0.0, kd = 0.0; // Arena 1
+const double kp = 5, ki = 0.0, kd = 0.0; // Arena 1
 //KP 0.02 KD 0.009
 int TENCM_TICKS_OFFSET = 0;
 
@@ -71,22 +71,22 @@ void moveForward(int distance) {
     currentSpeedR = MOVE_MAX_SPEED_R;
   }
 
-  for (int i = 0; i <= 100; i+=2) {
-    for (int j = 0; j <= 300; j+=6) {
+  for (int i = 0; i <= 100; i+=20) {
+    for (int j = 0; j <= 150; j+=30) {
       md.setSpeeds(-i,-j);
     }
   }
   
-  double offset = 0;
-  double gain_L = 1;
-  double gain_R = 1;
+  //double offset = 0;
+  //double gain_L = 1;
+  //double gain_R = 1;
   int last_tick_L = 0;
   while (tick_L <= distance && tick_R <= distance) {
     /*if ((tick_L - last_tick_L) >= 10 || tick_L == 0 || tick_L == last_tick_L) {
       last_tick_L = tick_L;
       offset += 0.1;
     }*/
-    if((tick_R - tick_L) >= 20) {
+    /*if((tick_R - tick_L) >= 20) {
       gain_L = 1.5;
       gain_R = 1.0;
     }
@@ -97,11 +97,9 @@ void moveForward(int distance) {
     else {
       gain_R = 1.0;
       gain_L = 1.0;
-    }
+    }*/
     if (myPID.Compute() || tick_L == last_tick_L) {
-      md.setSpeeds(-1 * gain_L*(currentSpeedL - speed_O), -1 * gain_R * (currentSpeedR + speed_O)); 
-      currentSpeedL = currentSpeedL - speed_O;
-      currentSpeedR = currentSpeedR + speed_O;
+      md.setSpeeds(-(currentSpeedL - speed_O), -(currentSpeedR + speed_O)); 
       /*if (offset >= 1)
         md.setSpeeds(-(currentSpeedL - speed_O), -(currentSpeedR + speed_O));
       else
