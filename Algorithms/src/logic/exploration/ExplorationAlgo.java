@@ -487,7 +487,7 @@ abstract public class ExplorationAlgo {
                 System.out.println("If corner");
                 calibrateBot(Direction.clockwise90(bot.getAgtDir()));
                 moveBot(Actions.ALIGN_FRONT);
-//                moveBot(Actions.ALIGN_RIGHT);
+                moveBot(Actions.ALIGN_RIGHT);
             }
         }
 
