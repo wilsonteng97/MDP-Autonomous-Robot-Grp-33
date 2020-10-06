@@ -108,13 +108,13 @@ public class AgentSettings {
                 case BACKWARD:
                     return "S|";
                 case FACE_RIGHT:
-                    return "D|";
+                    return "D1|";
                 case MOVE_RIGHT:
-                    return "D|";
+                    return "D1|";
                 case FACE_LEFT:
-                    return "A|";
+                    return "A1|";
                 case MOVE_LEFT:
-                    return "A|";
+                    return "A1|";
                 case START_EXP:
                     return "ES";
                 case ALIGN_FRONT:
