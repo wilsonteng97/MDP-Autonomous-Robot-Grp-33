@@ -208,7 +208,7 @@ public class Simulator {
                 }
 
                 FastestPathAlgo toGoal, toWaypoint;
-                readWaypointFromStdin();
+                if (sim) readWaypointFromStdin();
                 toWaypoint = new AStarHeuristicSearch(explorationMap, agt);
                 toWaypoint.runFastestPath(waypointY, waypointX);
 
