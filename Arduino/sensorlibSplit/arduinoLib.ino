@@ -71,7 +71,7 @@ while (Serial.available()>0){
   int value=1;    
     switch (command) {
       case 'W':
-        value=Serial.parseInt();
+        value=takeInt();
         moveForward(value * 10);
         delay(10);
         returnSensorReading_Raw();
@@ -79,7 +79,7 @@ while (Serial.available()>0){
         delay(10);
         break;
       case 'A':
-        value=Serial.parseInt();
+        value=takeInt();
         for (int k = 0; k < value; k++) {
           turnLeft();
         }
@@ -87,7 +87,7 @@ while (Serial.available()>0){
         returnSensorReading_Raw();
         break;
       case 'D':
-        value=Serial.parseInt();
+        value=takeInt();
         for (int k = 0; k < value; k++) {
           turnRight();
         }
@@ -95,7 +95,7 @@ while (Serial.available()>0){
         returnSensorReading_Raw();
         break;
       case 'S':
-        value=Serial.parseInt();
+        value=takeInt();
         moveBackwards(value * 10);
         delay(10);
         returnSensorReading_Raw();
@@ -125,6 +125,17 @@ while (Serial.available()>0){
 void setupSerialConnection() {
   Serial.begin(9600);
   while (!Serial);
+}
+
+int takeInt(){
+  char hold[2];
+  int value=0;
+  delay(10);
+  char i=Serial.read();
+  hold[0]=i;
+  hold[1]='\0';
+  value = atoi(hold);
+  return value;
 }
 
 void returnSensorReading_Raw() {
