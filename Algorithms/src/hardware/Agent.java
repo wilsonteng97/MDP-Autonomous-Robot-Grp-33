@@ -462,11 +462,11 @@ public class Agent {
     public void takePicture(int row, int col) {
         String msg = AgentSettings.Actions.parsePictureMsg(row, col);
 
-        if (!sim) {
-            NetworkMgr comm = NetworkMgr.getInstance();
-            comm.sendMsg(msg + "", NetworkMgr.INSTRUCTIONS);
-        }
-            System.out.println("Taking image: " + msg);
+//        if (!sim) {
+//            NetworkMgr comm = NetworkMgr.getInstance();
+//            comm.sendMsg(msg + "", NetworkMgr.INSTRUCTIONS);
+//        }
+        System.out.println("Taking image: " + msg);
     }
 
 

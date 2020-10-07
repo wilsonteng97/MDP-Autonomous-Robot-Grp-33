@@ -38,12 +38,12 @@ abstract public class FastestPathAlgo {
     /**
      * Returns true if the cell can be visited.
      */
-//    protected boolean canBeVisited(Cell c) {
-//        return c.isExplored() && !c.isObstacle() && !c.isVirtualWall();
-//    }
     protected boolean canBeVisited(Cell c) {
-        return !c.isObstacle() && !c.isVirtualWall();
+        return c.isExplored() && !c.isObstacle() && !c.isVirtualWall();
     }
+//    protected boolean canBeVisited(Cell c) {
+//        return !c.isObstacle() && !c.isVirtualWall();
+//    }
 
     /**
      * Returns the target direction of the bot from [botR, botC] to target Cell.
