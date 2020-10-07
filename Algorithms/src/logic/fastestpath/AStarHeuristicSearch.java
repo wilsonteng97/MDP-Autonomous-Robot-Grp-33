@@ -7,6 +7,7 @@ import hardware.AgentSettings.Direction;
 import map.Cell;
 import map.Map;
 import map.MapSettings;
+import network.NetworkMgr;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -280,31 +281,32 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
         }
         else {
             // TODO real bot
-            int fCount = 0;
-            for (Actions x : movements) {
-                if (x == Actions.FORWARD) {
-                    fCount++;
-                    if (fCount == 10) {
-                        bot.takeAction(Actions.FORWARD, fCount, exploredMap, realMap);
-                        fCount = 0;
-                        exploredMap.repaint();
-                    }
-                } else if (x == Actions.FACE_RIGHT || x == Actions.FACE_LEFT) {
-                    if (fCount > 0) {
-                        bot.takeAction(Actions.FORWARD, fCount, exploredMap, realMap);
-                        fCount = 0;
-                        exploredMap.repaint();
-                    }
-
-                    bot.takeAction(x, 1, exploredMap, realMap);
-                    exploredMap.repaint();
-                }
-            }
-
-            if (fCount > 0) {
-                bot.takeAction(Actions.FORWARD, fCount, exploredMap, realMap);
-                exploredMap.repaint();
-            }
+//            int fCount = 0;
+//            for (Actions x : movements) {
+//                if (x == Actions.FORWARD) {
+//                    fCount++;
+//                    if (fCount == 10) {
+//                        bot.takeAction(Actions.FORWARD, fCount, exploredMap, realMap);
+//                        fCount = 0;
+//                        exploredMap.repaint();
+//                    }
+//                } else if (x == Actions.FACE_RIGHT || x == Actions.FACE_LEFT) {
+//                    if (fCount > 0) {
+//                        bot.takeAction(Actions.FORWARD, fCount, exploredMap, realMap);
+//                        fCount = 0;
+//                        exploredMap.repaint();
+//                    }
+//
+//                    bot.takeAction(x, 1, exploredMap, realMap);
+//                    exploredMap.repaint();
+//                }
+//            }
+//
+//            if (fCount > 0) {
+//                bot.takeAction(Actions.FORWARD, fCount, exploredMap, realMap);
+//                exploredMap.repaint();
+//            }
+            NetworkMgr.getInstance().sendMsg(outputString + "", NetworkMgr.INSTRUCTIONS);
         }
 
         System.out.println("\nMovements: " + outputString.toString());
