@@ -3,6 +3,8 @@ package logic.exploration;
 import hardware.Agent;
 import hardware.AgentSettings.Actions;
 import map.Map;
+import network.NetworkMgr;
+import utils.MapDescriptorFormat;
 
 public class RightWallHugging extends ExplorationAlgo {
     public RightWallHugging(Map exploredMap, Map realMap, Agent bot, int coverageLimit, int timeLimit) {
@@ -37,6 +39,9 @@ public class RightWallHugging extends ExplorationAlgo {
             moveBot(Actions.FACE_RIGHT);
             moveBot(Actions.FACE_RIGHT);
         }
+        String[] MDFString = MapDescriptorFormat.generateMapDescriptorFormat(exploredMap);
+        String msg = MDFString[0] + "|" + MDFString[1];
+        NetworkMgr.getInstance().sendMsg(msg, NetworkMgr.MAP_STRINGS);
     }
 
 
