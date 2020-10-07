@@ -259,7 +259,7 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
         }
 
         if (bot.isSim() || explorationMode) {
-            System.out.println("[ASTAR] in exploration mode");
+            if (explorationMode) System.out.println("[ASTAR] in exploration mode");
             for (Actions x : movements) {
                 if (x == Actions.FORWARD) {
                     if (!canMoveForward()) {

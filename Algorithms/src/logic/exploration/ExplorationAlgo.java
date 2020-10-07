@@ -322,12 +322,11 @@ abstract public class ExplorationAlgo {
 
         // realbot
         if (!bot.isSim()) {
-//            turnBotDirection(Direction.WEST);
-//            moveBot(Actions.CALIBRATE);
-//            turnBotDirection(Direction.SOUTH);
-//            moveBot(Actions.CALIBRATE);
-//            turnBotDirection(Direction.WEST);
-//            moveBot(Actions.CALIBRATE);
+            turnBotDirection(Direction.SOUTH);
+            moveBot(Actions.ALIGN_RIGHT);
+            moveBot(Actions.ALIGN_FRONT);
+            turnBotDirection(Direction.WEST);
+            moveBot(Actions.ALIGN_FRONT);
         }
         turnBotDirection(Direction.NORTH);
         System.out.println("Went home");

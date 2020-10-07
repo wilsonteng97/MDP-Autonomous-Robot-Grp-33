@@ -200,6 +200,8 @@ public class Simulator {
             protected Integer doInBackground() throws Exception {
                 System.out.println("Executing Fastest path");
                 agt.setAgtCtrCoord(agt.getAgtRow(), agt.getAgtCol());
+//                if (!sim) agt.setSim(true);
+                Agent fakeBot = new Agent(agt.getAgtRow(), agt.getAgtCol(), true);
                 explorationMap.repaint();
 
                 if (!sim) {
@@ -213,13 +215,16 @@ public class Simulator {
 
                 FastestPathAlgo toGoal, toWaypoint;
                 if (sim) readWaypointFromStdin();
-                toWaypoint = new AStarHeuristicSearch(explorationMap, agt);
+                toWaypoint = new AStarHeuristicSearch(explorationMap, fakeBot);
                 startToWaypoint = toWaypoint.runFastestPath(waypointY, waypointX);
 
-                toGoal = new AStarHeuristicSearch(explorationMap, agt);
+                toGoal = new AStarHeuristicSearch(explorationMap, fakeBot);
                 waypointToGoal = toGoal.runFastestPath(MapSettings.GOAL_ROW, MapSettings.GOAL_COL);
 
-                NetworkMgr.getInstance().sendMsg(startToWaypoint + waypointToGoal, NetworkMgr.INSTRUCTIONS);
+                if (!sim) NetworkMgr.getInstance().sendMsg("K" + startToWaypoint + waypointToGoal, NetworkMgr.INSTRUCTIONS);
+                else System.out.println("K" + startToWaypoint + waypointToGoal);
+
+//                if (!sim) agt.setSim(false);
 
                 return 222;
             }
