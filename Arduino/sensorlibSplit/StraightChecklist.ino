@@ -6,15 +6,15 @@
 const int LEFT_PULSE = 3; // LEFT M1 Pulse
 const int RIGHT_PULSE = 11; // RIGHT M2 Pulse
 const int MOVE_FAST_SPEED_L = 345;
-const int MOVE_MAX_SPEED_L = 336;
-const int MOVE_MIN_SPEED_L = 183;
+const int MOVE_MAX_SPEED_L = 338;
+const int MOVE_MIN_SPEED_L = 281;
 const int TURN_MAX_SPEED_L = 259;
 const int MOVE_FAST_SPEED_R = 370;
 const int MOVE_MAX_SPEED_R = 360;
-const int MOVE_MIN_SPEED_R = 200;
+const int MOVE_MIN_SPEED_R = 293;
 const int TURN_MAX_SPEED_R = 280;
 const int MOVE_FAST_SPEED = 370;
-const int MOVE_MAX_SPEED = 310;
+const int MOVE_MAX_SPEED = 352;
 const int MOVE_MIN_SPEED = 200;
 const int TURN_MAX_SPEED = 260;
 const int ROTATE_MAX_SPEED_L = 136;
@@ -22,9 +22,9 @@ const int ROTATE_MAX_SPEED_R = 150;
 const int ROTATE_MAX_SPEED = 150;
 const int TURN_TICKS_L = 805 * 0.97;
 const int TURN_TICKS_R = 805 * 0.97;
-const int TICKS[10] = {540, 1155, 1760, 2380, 2985, 3615, 4195, 4775, 5370};
+const int TICKS[10] = {565, 1155, 1760, 2380, 2985, 3615, 4195, 4775, 5370};
 const double DIST_WALL_CENTER_BOX = 1.58;
-const double kp = 5, ki = 0.0, kd = 0.0; // Arena 1
+const double kp = 1, ki = 0.0, kd = 0.0; // Arena 1
 //KP 0.02 KD 0.009
 int TENCM_TICKS_OFFSET = 0;
 
@@ -63,7 +63,7 @@ void moveForward(int distance) {
   distance = cmToTicks(distance);
   double currentSpeedL = 0;
   double currentSpeedR = 0;
-  if (distance < 60) {
+  if (distance < 1155 ) {
     currentSpeedL = MOVE_MIN_SPEED_L;
     currentSpeedR = MOVE_MIN_SPEED_R;
   } else {
@@ -79,13 +79,15 @@ void moveForward(int distance) {
   
   //double offset = 0;
   int last_tick_L = 0;
-  while (tick_L <= distance && tick_R <= distance) {
+  while (tick_L <= distance || tick_R <= distance) {
     /*if ((tick_L - last_tick_L) >= 10 || tick_L == 0 || tick_L == last_tick_L) {
       last_tick_L = tick_L;
       offset += 0.1;
     }*/
     if (myPID.Compute() || tick_L == last_tick_L) {
       md.setSpeeds(-(currentSpeedL - speed_O), -(currentSpeedR + speed_O)); 
+      Serial.println(speed_O);
+      delay(500);
       /*if (offset >= 1)
         md.setSpeeds(-(currentSpeedL - speed_O), -(currentSpeedR + speed_O));
       else
@@ -491,6 +493,7 @@ void initializeMotor_Start() {
 
 void initializeMotor_End() {
   md.setSpeeds(0, 0);
+  md.setBrakes(0, 400);
   md.setBrakes(400, 400);
   
   delay(5);
