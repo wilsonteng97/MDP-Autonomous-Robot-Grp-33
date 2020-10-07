@@ -78,25 +78,11 @@ void moveForward(int distance) {
   }
   
   //double offset = 0;
-  //double gain_L = 1;
-  //double gain_R = 1;
   int last_tick_L = 0;
   while (tick_L <= distance && tick_R <= distance) {
     /*if ((tick_L - last_tick_L) >= 10 || tick_L == 0 || tick_L == last_tick_L) {
       last_tick_L = tick_L;
       offset += 0.1;
-    }*/
-    /*if((tick_R - tick_L) >= 20) {
-      gain_L = 1.5;
-      gain_R = 1.0;
-    }
-    else if((tick_L - tick_R) >= 20) {
-      gain_R = 1.5;
-      gain_L = 1.0;
-    }
-    else {
-      gain_R = 1.0;
-      gain_L = 1.0;
     }*/
     if (myPID.Compute() || tick_L == last_tick_L) {
       md.setSpeeds(-(currentSpeedL - speed_O), -(currentSpeedR + speed_O)); 
@@ -498,13 +484,15 @@ void initializeTick() {
 }
 
 void initializeMotor_Start() {
-  md.setSpeeds(0, 0);
   md.setBrakes(400, 400);
+  md.setSpeeds(0, 0);
+  md.setBrakes(0, 0);
 }
 
 void initializeMotor_End() {
   md.setSpeeds(0, 0);
   md.setBrakes(400, 400);
+  
   delay(5);
 }
 
