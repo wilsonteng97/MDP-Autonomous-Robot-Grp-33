@@ -146,8 +146,9 @@ class ImageProcessingServer:
         print('\nStarted image processing server.\n')
         while True:
             print('Waiting for image from RPi...')
-            _,frame = self.image_hub.recv_image()
+            cdt,frame = self.image_hub.recv_image()
             print('Connected and received frame at time: ' + str(datetime.now()))
+            print("image coordinates: ", cdt)
             frame = imutils.resize(frame, width=IMAGE_WIDTH)
             frame_expanded = np.expand_dims(frame, axis=0)
 
