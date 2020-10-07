@@ -17,12 +17,12 @@ public class NetworkMgr {
     // Android Integration (Android --> PC)
     public static final String EXP_START = "ES|";                   // Start exploration (RPi send E| to Arduino)
     public static final String FP_START = "FS|";                    // Fastest path (RPi send F| to Arduino)
-    public static final String SEND_MDF_STR = "SendArena";          // Give MDF string
+//    public static final String SEND_MDF_STR = "SendArena";          // Give MDF string
     public static final String START_POS = "starting (x,y,s)";      // Determine starting point (x and y coordinates, s is a integer of direction: 0-up, 1-right, 2-down, 3-left)
     public static final String SET_WAYPOINT = "waypoint (x,y)";     // Set waypoint (x,y)
 
     // PC --> other components
-    public static final String MAP_STRINGS = "MAP";         // PC --> Android
+    public static final String MAP_STRINGS = "M";         // PC --> Android
     public static final String BOT_POS = "BOT_POS";         // PC --> Android
     public static final String BOT_START = "BOT_START";     // PC --> Arduino
     public static final String INSTRUCTIONS = "INSTR";      // PC --> Arduino
@@ -111,8 +111,10 @@ public class NetworkMgr {
             // FIXME finalize message format here
             if (msgType == INSTRUCTIONS) {
                 outputMsg = msg;
+            } else if (msgType == MAP_STRINGS) {
+                outputMsg = MAP_STRINGS + msg;
             } else {
-                outputMsg = msg;
+                    outputMsg = msg;
             }
 
 //            if (msg == null) {
