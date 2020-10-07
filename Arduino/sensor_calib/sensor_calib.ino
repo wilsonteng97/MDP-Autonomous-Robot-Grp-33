@@ -11,9 +11,8 @@ RunningMedian rightIR1_Median = RunningMedian(NUM_SAMPLES_MEDIAN);
 RunningMedian rightIR2_Median = RunningMedian(NUM_SAMPLES_MEDIAN);
 RunningMedian leftIR_1_Median = RunningMedian(NUM_SAMPLES_MEDIAN);
 
-
 double frontIR1_Diffs[] = {16.00, 26.00, 35.00};//copied array blocks from senior code for block detection
-double frontIR2_Diffs[] = {12.00, 23.00, 30.00};//how it works is that for a certain range like 5-15 cm obstacle is considered as one block away
+double frontIR2_Diffs[] = {12.00, 19.00, 28.00};//how it works is that for a certain range like 5-15 cm obstacle is considered as one block away
 double frontIR3_Diffs[] = {17.00, 26.00, 35.00};//15-25cm is 2 blocks away etc
 
 double rightIR1_Diffs[] = {16.00, 27.00 ,35.00};
@@ -27,21 +26,36 @@ int  frontIR1_Block = 0, frontIR2_Block = 0, frontIR3_Block = 0;
 int rightIR1_Block = 0, rightIR2_Block = 0, leftIR1_Block = 0;
 
 
-void setupSensorInterrupt() {
-  //  ADCSRA &= ~(bit (ADPS0) | bit (ADPS1) | bit (ADPS2)); // clear prescaler bits
-  //  //  ADCSRA |= bit (ADPS0) | bit (ADPS2);// 32  prescaler
-  //  ADCSRA |= bit (ADPS2); // 16  prescaler
-  //    MsTimer2::set(35, readSensors);
-  //    MsTimer2::start();
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+  Serial.setTimeout(0);
+  pinMode(A3, INPUT);
+  pinMode(A0, INPUT);
+  pinMode(A1, INPUT);
+  pinMode(A2, INPUT);
+  pinMode(A4, INPUT);
+  pinMode(A5, INPUT);
 }
 
-void readSensors() {
-  readFrontSensor_1();
-  readFrontSensor_2();
-  readFrontSensor_3();
-  readRightSensor_1();
-  readRightSensor_2();
-  readLeftSensor_1();
+void loop() {
+  // put your main code here, to run repeatedly:
+  // FrontIR1 for 30-50cm if LeftIR1 not accurate enough
+  // LeftIR1 for 30-70cm
+    Serial.print("Left cm: ");
+    Serial.println(getLeftIR1());
+    Serial.print("Left block: ");
+    Serial.println(getLeftIR1_Block());
+    getRightIR2();
+    getRightIR1();
+    getFrontIR1();
+    getFrontIR2();
+    getFrontIR3();
+    getFrontIR3_Block();
+    getFrontIR2_Block();
+    getRightIR2();
+    delay(1000);
+   
 }
 
 double getFrontIR1() {
@@ -80,6 +94,8 @@ double getLeftIR1() {
   }
   return leftIR1_Value;
 }
+
+
 
 int getFrontIR1_Block() {
   return frontIR1_Block;
@@ -125,7 +141,7 @@ void readFrontSensor_2() {
   if (analogRead(A1)>210)
    irDistance=6149.8/analogRead(A1)-3.7914;
   else
-    irDistance=4252.5/analogRead(A1) + 4.5429; 
+   irDistance=4252.5/analogRead(A1) + 4.5429; 
   frontIR2_Median.add(irDistance);
   if (frontIR2_Median.getCount() >= NUM_SAMPLES_MEDIAN) {
     if (abs(frontIR2_Median.getHighest() - frontIR2_Median.getLowest()) > 40) {

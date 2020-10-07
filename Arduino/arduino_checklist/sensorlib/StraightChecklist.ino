@@ -1,6 +1,5 @@
 #include <MsTimer2.h>
 #include <PID_v1.h>
-#include <PID_AutoTune_v0.h>
 #include <EnableInterrupt.h>
 #include <DualVNH5019MotorShield.h>
 
@@ -11,11 +10,11 @@ const int MOVE_MAX_SPEED = 310;
 const int MOVE_MIN_SPEED = 200;
 const int TURN_MAX_SPEED = 260;
 const int ROTATE_MAX_SPEED = 150;
-const int TURN_TICKS_L = 395;
-const int TURN_TICKS_R = 389;
+const int TURN_TICKS_L = 790;
+const int TURN_TICKS_R = 790;
 const int TICKS[10] = {545, 1155, 1760, 2380, 2985, 3615, 4195, 4775, 5370};
 const double DIST_WALL_CENTER_BOX = 1.58;
-const double kp = 0.02, ki = 0, kd = 0.0124; // Arena 1
+const double kp = 0.02668, ki = 0.0, kd = 0.00657; // Arena 1
 //KP 0.02 KD 0.009
 int TENCM_TICKS_OFFSET = 0;
 
@@ -67,9 +66,9 @@ void moveForward(int distance) {
     }
     if (myPID.Compute() || tick_L == last_tick_L) {
       if (offset >= 1)
-        md.setSpeeds(currentSpeed + speed_O, currentSpeed - speed_O);
+        md.setSpeeds(-(currentSpeed + speed_O), -(currentSpeed - speed_O));
       else
-        md.setSpeeds(offset * (currentSpeed + speed_O), offset * (currentSpeed - speed_O));
+        md.setSpeeds(-1*offset * (currentSpeed + speed_O), -1*offset * (currentSpeed - speed_O));
     }
   }
   initializeMotor_End();
@@ -94,9 +93,9 @@ void moveBackwards(int distance) {
     }
     if (myPID.Compute() || tick_L == last_tick_L) {
       if (offset >= 1)
-        md.setSpeeds(-(currentSpeed + speed_O), -(currentSpeed - speed_O));
+        md.setSpeeds((currentSpeed + speed_O), (currentSpeed - speed_O));
       else
-        md.setSpeeds(-(offset * (currentSpeed + speed_O)), -(offset * (currentSpeed - speed_O)));
+        md.setSpeeds((offset * (currentSpeed + speed_O)), (offset * (currentSpeed - speed_O)));
     }
   }
   initializeMotor_End();
@@ -160,18 +159,15 @@ void moveBackwardsFast(int distance) {
   initializeMotor_End();
 }
 
-void moveForwardCalibrate(int distance) {
+void moveForwardCalibrate(int distance1) {
   initializeTick();
   initializeMotor_Start();
-  Serial.println(distance);
-  if (distance < 6)
-    return;
-  distance = cmToTicksCalibrate(distance);
+  double distance = distance1/18.85*562.25;
+  if (distance < 1)
+    return;  
   double currentSpeed = 0;
-  //  Serial.print("HELLO: ");
-  //  Serial.println(distance);
-  if (distance < 60) {
-    currentSpeed = MOVE_MIN_SPEED;
+  if (distance < 6000) {
+    currentSpeed = 100;
   } else {
     currentSpeed = MOVE_MAX_SPEED;
   }
@@ -193,17 +189,15 @@ void moveForwardCalibrate(int distance) {
 }
 
 
-void moveBackwardsCalibrate(int distance) {
+void moveBackwardsCalibrate(int distance1) {
   initializeTick();
   initializeMotor_Start();
-  distance = cmToTicksCalibrate(distance);
-  if (distance < 3)
+  double distance = distance1/18.85*562.25;
+  if (distance < 1)
     return;
   double currentSpeed = 0;
-  //  Serial.print("HELLO: ");
-  //  Serial.println(distance);
-  if (distance < 60) {
-    currentSpeed = MOVE_MIN_SPEED;
+  if (distance < 6000) {
+    currentSpeed = 100;
   } else {
     currentSpeed = MOVE_MAX_SPEED;
   }
@@ -285,150 +279,70 @@ void rotateRight(int distance) {
 }
 
 void alignRight() {
-  Serial.println(getRightIR1());
-  Serial.println(getRightIR2());
   delay(2);
   double diff = getRightIR1() - getRightIR2();
   int rotated = 0;
-  while (abs(diff) >= 0.10 && rotated < 20) {
+  while (abs(diff) >= 0.1 && rotated < 20 && getRightIR1_Block() == getRightIR2_Block() && getRightIR1_Block()< 3) {
     rotated++;
     if (diff > 0) {
-      rotateRight(abs(diff * 10));
+      rotateRight(abs(diff * 5));
       diff = getRightIR1() - getRightIR2();
       if (getRightIR1_Block() != getRightIR2_Block()) {
-//        rotateLeft(abs(diff * 1));
+        rotateLeft(abs(diff * 2));
         diff = getRightIR1() - getRightIR2();
       }
     } else {
-      rotateLeft(abs(diff * 10));
+      rotateLeft(abs(diff * 5));
       diff = getRightIR1() - getRightIR2();
       if (getRightIR1_Block() != getRightIR2_Block()) {
-//        rotateRight(abs(diff * 1));
+        rotateRight(abs(diff * 4));
         diff = getRightIR1() - getRightIR2();
       }
     }
     delay(1);
-  Serial.println(rotated);
-  Serial.println(getRightIR1());
-  Serial.println(getRightIR2());
   }
   delay(2);
 }
 
 void alignFront() {
   delay(2);
-  double diff_dis;
   int moved = 0;
-  double previous_turn = 0;
-  if (getFrontIR1_Block() != 1 || getFrontIR3_Block() != 1 ) {
-    do {
-      diff_dis = getMin(getFrontIR1(), getFrontIR3(), getFrontIR2()) - DIST_WALL_CENTER_BOX;
-      if (diff_dis > 0) {
-        moveForwardCalibrate(abs(diff_dis*0.75));
+  double diff_dis = getMin(getFrontIR1(),getFrontIR2(),getFrontIR3());
+  while ((abs(diff_dis) < 6.2 && moved < 15) || (abs(diff_dis) > 6.4 && moved < 15)){
+      if (diff_dis > 6.4) {
+        moveForwardCalibrate(1);
+          md.setSpeeds(50, -50);
       } else {
-        moveBackwardsCalibrate(abs(diff_dis*0.75));
+        moveBackwardsCalibrate(1);
+          md.setSpeeds(-50, 50);
       }
       delay(2);
-      diff_dis = getMin(getFrontIR1(), getFrontIR3(), getFrontIR2()) - DIST_WALL_CENTER_BOX;
+      diff_dis = getMin(getFrontIR1(),getFrontIR2(),getFrontIR3());
       moved++;
-    } while (abs(diff_dis) > 0.2 && moved < 15);
-//    return;
+    }
+  double diff = getFrontIR1() - getFrontIR3();
+  int rotated = 0;
+  while (abs(diff) >= 0.1 && rotated < 20 && getFrontIR1_Block() == getFrontIR3_Block() && getFrontIR1_Block()< 3) {
+    rotated++;
+    if (diff > 0) {
+      rotateLeft(abs(diff * 5));
+      diff = getFrontIR1() - getFrontIR3();
+      if (getFrontIR1_Block() != getFrontIR3_Block()) {
+        rotateRight(abs(diff * 2));
+        diff = getFrontIR1() - getFrontIR3();
+      }
+    } else {
+      rotateRight(abs(diff * 5));
+      diff = getFrontIR1() - getFrontIR3();
+      if (getFrontIR1_Block() != getFrontIR3_Block()) {
+        rotateLeft(abs(diff * 2));
+        diff = getFrontIR1() - getFrontIR3();
+      }
+    }
+    delay(1);
   }
   delay(2);
-  turnLeft();
-  delay(1000);
-  alignRight();
-  delay(1000);
-  turnRight();
-  turnRight();
-//  moved = 0;
-//  double diff = getFrontIR3()/2 - getFrontIR1();
-//  Serial.print("difference between IR1 and 3: ");
-//  Serial.println(diff);
-//  Serial.println(getFrontIR1());
-//  Serial.println(getFrontIR3());
-//  delay(1000);
-//  int rotated = 0;
-//  while (abs(diff) >= 0.10 && rotated < 20) {
-//    rotated++;
-//    if (diff > 0) {
-//      rotateRight(abs(diff * 5));
-//      diff = getFrontIR3()/2 - getFrontIR1();
-//      if (getFrontIR3_Block() != getFrontIR1_Block()) {
-////        rotateLeft(abs(diff * 1));
-//        diff = getFrontIR3() - getFrontIR1();
-//      }
-//    } else {
-//      rotateLeft(abs(diff * 5));
-//      diff = getFrontIR3()/2 - getFrontIR1();
-//      if (getFrontIR3_Block() != getFrontIR1_Block()) {
-////        rotateRight(abs(diff * 1));
-//        diff = getFrontIR3()/2 - getFrontIR1();
-//      }
-//    }
-//    delay(1);
-//  Serial.println(rotated);
-//  Serial.println(getFrontIR1());
-//  Serial.println(getFrontIR3());
-//  }
-  delay(2);
-//  while (abs(diff) >= 0.2 && moved < 15) {
-//    moved++;
-//    previous_turn = abs(diff * 5);
-//    if (diff > 0) {
-//      Serial.print("rotateRight0 "); Serial.print(previous_turn);
-//      rotateRight(previous_turn);
-//      diff = getFrontIR1() - getFrontIR3();
-////      if (getFrontIR1_Block() != getFrontIR3_Block()) {
-////        rotateLeft(previous_turn);
-////        break;
-////      }
-//    } else {
-//      Serial.print("rotateLeft0 "); Serial.print(previous_turn);
-//      rotateLeft(previous_turn);
-//      diff = getFrontIR1() - getFrontIR3();
-////      if (getFrontIR1_Block() != getFrontIR3_Block()) {
-////        rotateLeft(previous_turn);
-////        break;
-////      }
-//    }
-//    delay(2);
-//  }
-//  delay(2);
-//  moved = 0;
-//  do {
-//    diff_dis = getMin(getFrontIR1(), getFrontIR3(), getFrontIR2()) - DIST_WALL_CENTER_BOX;
-//    if (diff_dis > 0) {
-//      moveForwardCalibrate(abs(diff_dis));
-//    } else {
-//      moveBackwardsCalibrate(abs(diff_dis));
-//    }
-//    delay(2);
-//    diff_dis = getMin(getFrontIR1(), getFrontIR3(), getFrontIR2()) - DIST_WALL_CENTER_BOX;
-//    moved++;
-//  } while (abs(diff_dis) > 0.2 && moved < 20);
-//  moved = 0;
-//  delay(2);
-//  diff = getFrontIR1() - getFrontIR2();
-//  Serial.print(diff);
-//  while (abs(diff) >= 0.2 && moved < 15) {
-//    moved++;
-//    previous_turn = abs(diff * 5);
-//    if (diff > 0) {
-//      Serial.print("rotateRight "); Serial.print(previous_turn);
-//      rotateRight(previous_turn);
-//      diff = getFrontIR1() - getFrontIR2();
-////      if (getFrontIR1_Block() != getFrontIR2_Block())
-////        rotateLeft(previous_turn);
-//    } else {
-//      Serial.print("rotateLeft "); Serial.print(previous_turn);
-//      rotateLeft(previous_turn);
-//      diff = getFrontIR1() - getFrontIR2();
-////      if (getFrontIR1_Block() != getFrontIR2_Block())
-////        rotateLeft(previous_turn);
-//    }
-//    delay(2);
-//  }
+  initializeMotor_End();
 }
 
 
