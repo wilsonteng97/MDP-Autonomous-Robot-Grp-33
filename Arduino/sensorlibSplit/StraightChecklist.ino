@@ -493,7 +493,6 @@ void initializeMotor_Start() {
 
 void initializeMotor_End() {
   md.setSpeeds(0, 0);
-  md.setBrakes(0, 400);
   md.setBrakes(400, 400);
   
   delay(5);
