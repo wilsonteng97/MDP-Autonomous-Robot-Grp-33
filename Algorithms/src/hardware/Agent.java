@@ -223,22 +223,26 @@ public class Agent {
             case BACKWARD:
             case MOVE_LEFT:
             case MOVE_RIGHT:
-                agtDir = move(action, steps, explorationMap, map); break;
+                agtDir = move(action, steps, explorationMap, map);
+                break;
 
             case FACE_LEFT:
             case FACE_RIGHT:
             case FACE_REVERSE:
-                agtDir = changeDir(action, explorationMap, map); break;
+                agtDir = changeDir(action, explorationMap, map);
+                break;
 
             case ALIGN_FRONT:
             case ALIGN_RIGHT:
             case CALIBRATE:
-                agtDir = calibrate(action, explorationMap, map); break;
+                agtDir = calibrate(action, explorationMap, map);
+                break;
 
             case ERROR:
             default:
                 break;
         }
+        if (!sim) sendMovement(action);
         return agtDir;
     }
 
@@ -276,8 +280,8 @@ public class Agent {
             case CALIBRATE:
                 break;
         }
-        this.setSensors();
-        this.senseEnv(explorationMap, map);
+//        this.setSensors();
+//        this.senseEnv(explorationMap, map);
         return agtDir;
     }
 
@@ -352,9 +356,6 @@ public class Agent {
                 break;
         }
 
-        // TODO real bot: send AgentSettings.Direction
-        if (!sim) {sendMovement(action);}
-
         updateEnteredGoal();
         return agtDir;
     }
@@ -374,6 +375,17 @@ public class Agent {
             }
         } else {
             // Get Sensor readings from Network Manager.
+            NetworkMgr comm = NetworkMgr.getInstance();
+            String msg = comm.receiveMsg();
+            System.out.println(msg);
+            String[] msgArr = msg.split("\\|");
+
+            result[0] = Integer.parseInt(msgArr[0]);
+            result[1] = Integer.parseInt(msgArr[1]);
+            result[2] = Integer.parseInt(msgArr[2]);
+            result[3] = Integer.parseInt(msgArr[3]);
+            result[4] = Integer.parseInt(msgArr[4]);
+            result[5] = Integer.parseInt(msgArr[5]);
         }
         sensorCount = 0;
         for (Sensor s : sensorLst) {
@@ -435,8 +447,8 @@ public class Agent {
     private void sendMovement(AgentSettings.Actions m) {
         NetworkMgr comm = NetworkMgr.getInstance();
         comm.sendMsg(AgentSettings.Actions.print(m) + "", NetworkMgr.INSTRUCTIONS);
-        if (m != AgentSettings.Actions.CALIBRATE) {
-            comm.sendMsg(this.getAgtRow() + "," + this.getAgtCol() + "," + AgentSettings.Direction.print(this.getAgtDir()), NetworkMgr.BOT_POS);
-        }
+//        if (m != AgentSettings.Actions.CALIBRATE) {
+//            comm.sendMsg(this.getAgtRow() + "," + this.getAgtCol() + "," + AgentSettings.Direction.print(this.getAgtDir()), NetworkMgr.BOT_POS);
+//        }
     }
 }

@@ -43,12 +43,22 @@ public class Map extends JPanel {
             }
         }
     }
-    public void createVirtualWalls(int row, int col) {
-//        System.out.println("[Function executed] createVirtualWalls() " + row + ", " + col);
-        // Set true walls
+
+    /**
+     * Set virtual wall if the given coordinate is a true border
+     * @param row
+     * @param col
+     */
+    public void setVirtualWallIfBorder(int row, int col) {
         if ((row == 0) || (row == MapSettings.MAP_ROWS - 1) || (col == 0) || (col == MapSettings.MAP_COLS - 1)) {
             this.grid[row][col].setVirtualWall(true);
         }
+    }
+
+    public void createVirtualWalls(int row, int col) {
+//        System.out.println("[Function executed] createVirtualWalls() " + row + ", " + col);
+        // Set true walls
+        setVirtualWallIfBorder(row, col);
         // Set obstacle virtual walls
         if (this.grid[row][col].isObstacle()) {
 //            System.out.printf(" ->grid[%d][%d] is obstacle\n", row, col);
@@ -65,31 +75,33 @@ public class Map extends JPanel {
     public void resetVirtualWalls(int row, int col) {
         grid[row][col].setObstacle(false);
 
-        if (row >= 1) {
+        if (row > 1) {
+            // never set row 0
             grid[row - 1][col].setVirtualWall(false);            // bottom cell
-            if (col < MapSettings.MAP_COLS - 1) {
+            if (col < MapSettings.MAP_COLS - 2) {
                 grid[row - 1][col + 1].setVirtualWall(false);    // bottom-right cell
             }
-            if (col >= 1) {
+            if (col > 1) {
                 grid[row - 1][col - 1].setVirtualWall(false);    // bottom-left cell
             }
         }
 
-        if (row < MapSettings.MAP_ROWS - 1) {
+        if (row < MapSettings.MAP_ROWS - 2) {
+            // never set row 19
             grid[row + 1][col].setVirtualWall(false);            // top cell
-            if (col < MapSettings.MAP_COLS - 1) {
+            if (col < MapSettings.MAP_COLS - 2) {
                 grid[row + 1][col + 1].setVirtualWall(false);    // top-right cell
             }
-            if (col >= 1) {
+            if (col > 1) {
                 grid[row + 1][col - 1].setVirtualWall(false);    // top-left cell
             }
         }
 
-        if (col >= 1) {
+        if (col > 1) {
             grid[row][col - 1].setVirtualWall(false);            // left cell
         }
 
-        if (col < MapSettings.MAP_COLS - 1) {
+        if (col < MapSettings.MAP_COLS - 2) {
             grid[row][col + 1].setVirtualWall(false);            // right cell
         }
     }
@@ -151,6 +163,9 @@ public class Map extends JPanel {
     }
     public boolean isObstacleCell(int row, int col) {
         return grid[row][col].isObstacle();
+    }
+    public boolean isWallOrObstacleCell(int row, int col) {
+        return !checkValidCell(row, col) || getCell(row, col).isObstacle();
     }
     public boolean checkValidMove(int row, int col) {
         return checkValidCell(row, col) && getCell(row, col).isMovableCell();

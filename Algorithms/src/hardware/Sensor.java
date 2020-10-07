@@ -144,6 +144,7 @@ public class Sensor {
                 detectObstacle(explorationMap, sensorVal, 0, -1); break;
         }
     }
+
     public void detectObstacle(Map explorationMap, int sensorVal, int rowDispl, int colDispl) {
         if (sensorVal == 0) return;  // return value for LR sensor if obstacle before lowerRange
 
@@ -164,7 +165,9 @@ public class Sensor {
 //                System.out.println("[DEBUG] Cell[" + col + ", " + row + "]" + "is not valid");
                 return;
             }
+
 //            System.out.println("[!SETEXPLORED@" + i + "] Cell[" + col + ", " + row + "]");
+            explorationMap.setVirtualWallIfBorder(row, col);
             explorationMap.getCell(row, col).setExplored(true);
             if (sensorVal == i) {
 //                System.out.println("[!SETOBSTACLE@" + i + "] Cell[" + col + ", " + row + "]");
@@ -173,14 +176,16 @@ public class Sensor {
 //                System.out.println("Cell is virtualwall @[" + (row+1) + ", " + col + "]=" + explorationMap.getCell(row+1, col).isVirtualWall());
                 return;
             }
-//             Override previous obstacle value if front sensors detect no obstacle.
-//            if (explorationMap.getCell(row, col).isObstacle()) {
-//                if (id.equals("SR1") || id.equals("SR2") || id.equals("SR3")) {
-//                    explorationMap.resetVirtualWalls(row, col);
-//                } else {
-//                    break;
-//                }
-//            }
+            // Override previous obstacle value if front and right sensors detect no obstacle.
+            // Override previous obstacle value if long-range sensor detects no obstacle in distance 5 and 6
+            if (explorationMap.getCell(row, col).isObstacle()) {
+                if (id.equals("SR1") || id.equals("SR2") || id.equals("SR3") || id.equals("SR4") || id.equals("SR5")) {
+                    explorationMap.resetVirtualWalls(row, col);
+                } else if (id.equals("LR1") && (i == 5 || i == 6)) {
+                    explorationMap.resetVirtualWalls(row, col);
+                }
+                explorationMap.setVirtualWallIfBorder(row, col);    // make sure never reset border
+            }
         }
     }
 }
