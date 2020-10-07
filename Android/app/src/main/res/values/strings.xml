@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">MDP</string>
+    <string name="searchBTdevices">Searching devices..</string>
+    <string name="searchBTdevicesDone">Searching done</string>
+    <string name="enterMessage">Enter a message</string>
+    <string name="borderradius">10dp</string>
+</resources>

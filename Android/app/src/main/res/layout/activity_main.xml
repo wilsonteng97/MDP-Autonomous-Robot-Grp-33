@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/russianViolet"
+    android:padding="10dp"
+    android:textAlignment="center"
+    tools:context=".MainActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/Container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.example.mdp.GameView
+            android:id="@+id/map"
+            android:layout_width="399dp"
+            android:layout_height="532dp"
+            android:layout_marginTop="4dp"
+            app:column_count="15"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:row_count="20" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/map"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.example.mdp.JoyStick
+                android:id="@+id/joystick"
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <Switch
+                android:id="@+id/updateSwitch"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:checked="true"
+                android:text="Auto Update Map"
+                android:textAlignment="textStart"
+                android:textColor="#FFFFFF"
+                android:theme="@style/SwitchTheme"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/statusView" />
+
+            <Switch
+                android:id="@+id/touchSwitch"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Enable Touch"
+                android:textAlignment="textStart"
+                android:textColor="#FFFFFF"
+                android:theme="@style/SwitchTheme"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/updateSwitch" />
+
+            <Switch
+                android:id="@+id/tiltSensorSwitch"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Tilt Sensor"
+                android:textAlignment="textStart"
+                android:textColor="#FFFFFF"
+                android:theme="@style/SwitchTheme"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/touchSwitch" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/bluetoothContainer"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tiltSensorSwitch">
+
+                <ImageView
+                    android:id="@+id/bluetooth"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:onClick="toggleBluetooth"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@mipmap/bluetoothoff" />
+
+                <Button
+                    android:id="@+id/searchDevicesBtn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:background="@drawable/roundercornerbutton"
+                    android:backgroundTint="@color/hanPurple"
+                    android:onClick="searchDevices"
+                    android:text="search"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toStartOf="@+id/bluetooth"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/statusView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/indicator"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                android:text="Stationary"
+                android:textAlignment="center"
+                android:textColor="@color/xiketic"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:layout_editor_absoluteX="66dp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        app:layout_constraintTop_toBottomOf="@+id/Container"
+        tools:layout_editor_absoluteX="20dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraintLayout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/chatboxinput"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <EditText
+                    android:id="@+id/chatboxinput"
+                    android:layout_width="230dp"
+                    android:layout_height="fill_parent"
+                    android:backgroundTint="#00FFFFFF"
+                    android:cursorVisible="false"
+                    android:ems="10"
+                    android:hint="Send message ..."
+                    android:inputType="textPersonName"
+                    android:onClick="enableCursor"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:selectAllOnFocus="false"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/chatboxsend"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="1dp"
+                    android:padding="10dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/chatboxinput">
+
+                    <ImageView
+                        android:id="@+id/imageView"
+                        android:layout_width="40dp"
+                        android:layout_height="match_parent"
+                        android:onClick="sendText"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@mipmap/send" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/chatbox"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:background="@drawable/chatbox"
+                android:padding="10dp"
+                app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/chatboxlv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    tools:layout_editor_absoluteX="1dp"
+                    tools:layout_editor_absoluteY="1dp" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stretchColumns="0, 1"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginBottom="10dp">
+
+                    <Button
+                        android:id="@+id/sendValue"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="10dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/roundercornerbutton"
+                        android:onClick="loadData"
+                        android:text="send value 1"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        tools:layout_editor_absoluteX="273dp"
+                        tools:layout_editor_absoluteY="13dp" />
+
+                    <Switch
+                        android:id="@+id/updateValue"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:text="Update Value 1"
+                        android:textAlignment="center"
+                        android:textColor="@color/magnolia"
+                        android:textSize="11sp"
+                        android:theme="@style/SwitchTheme" />
+
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginBottom="10dp">
+
+                    <Button
+                        android:id="@+id/sendValue2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="10dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/roundercornerbutton"
+                        android:onClick="loadData2"
+                        android:text="send value 2"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        tools:layout_editor_absoluteX="273dp"
+                        tools:layout_editor_absoluteY="13dp" />
+
+                    <Switch
+                        android:id="@+id/updateValue2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:text="Update Value 2"
+                        android:textAlignment="center"
+                        android:textColor="@color/magnolia"
+                        android:textSize="11sp"
+                        android:theme="@style/SwitchTheme" />
+
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginBottom="10dp">
+
+                    <Button
+                        android:id="@+id/updateMap"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="10dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/roundercornerbutton"
+                        android:onClick="updateMapManual"
+                        android:text="Update Map"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        app:layout_columnWeight="1" />
+
+                    <Button
+                        android:id="@+id/discover"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/roundercornerbutton"
+                        android:onClick="startDiscovery"
+                        android:text="Start Discovery"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        app:layout_columnWeight="1" />
+
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginBottom="10dp">
+
+                    <Button
+                        android:id="@+id/fastestPath"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="10dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/roundercornerbutton"
+                        android:onClick="sendFastestPath"
+                        android:text="Fastest Path"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        app:layout_columnWeight="1" />
+
+                    <Button
+                        android:id="@+id/sendWaypoint"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/roundercornerbutton"
+                        android:onClick="sendWaypoint"
+                        android:text="Send Waypoint"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        app:layout_columnWeight="1" />
+
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginBottom="10dp">
+
+                    <Button
+                        android:id="@+id/resetMap"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="10dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/roundercornerbutton"
+                        android:onClick="resetMap"
+                        android:text="Reset Map"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        app:layout_columnWeight="1" />
+
+                    <Button
+                        android:id="@+id/sendMapDescriptor"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/roundercornerbutton"
+                        android:text="Map Descriptor"
+                        android:onClick="getMapDescriptor"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        app:layout_columnWeight="1" />
+
+                </TableRow>
+            </TableLayout>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

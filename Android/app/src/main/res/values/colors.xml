@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#6200EE</color>
+    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorAccent">#03DAC5</color>
+    <color name="magnolia">#f3edfc</color>
+    <color name="hanPurple">#6321d4</color>
+    <color name="xiketic">#100623</color>
+    <color name="russianViolet">#180934</color>
+    <color name="darkOrchid">#9A3ED4</color>
+    <color name="white">#fff</color>
+</resources>
