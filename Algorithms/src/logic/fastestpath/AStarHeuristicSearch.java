@@ -306,7 +306,8 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
 //                bot.takeAction(Actions.FORWARD, fCount, exploredMap, realMap);
 //                exploredMap.repaint();
 //            }
-            NetworkMgr.getInstance().sendMsg(outputString + "", NetworkMgr.INSTRUCTIONS);
+//            NetworkMgr.getInstance().sendMsg(outputString + "", NetworkMgr.INSTRUCTIONS);
+
         }
 
         System.out.println("\nMovements: " + outputString.toString());

@@ -46,6 +46,9 @@ public class Simulator {
 
     private static final Scanner sc = new Scanner(System.in);
 
+    private static String startToWaypoint;
+    private static String waypointToGoal;
+
     public static void main(String[] args) {
         if (!sim) comm.startConn();
 
@@ -195,7 +198,8 @@ public class Simulator {
         // FastestPath Class for Multithreading
         class FastestPath extends SwingWorker<Integer, String> {
             protected Integer doInBackground() throws Exception {
-                agt.setAgtCtrCoord(MapSettings.START_ROW, MapSettings.START_COL);
+                System.out.println("Executing Fastest path");
+                agt.setAgtCtrCoord(agt.getAgtRow(), agt.getAgtCol());
                 explorationMap.repaint();
 
                 if (!sim) {
@@ -210,10 +214,12 @@ public class Simulator {
                 FastestPathAlgo toGoal, toWaypoint;
                 if (sim) readWaypointFromStdin();
                 toWaypoint = new AStarHeuristicSearch(explorationMap, agt);
-                toWaypoint.runFastestPath(waypointY, waypointX);
+                startToWaypoint = toWaypoint.runFastestPath(waypointY, waypointX);
 
                 toGoal = new AStarHeuristicSearch(explorationMap, agt);
-                toGoal.runFastestPath(MapSettings.GOAL_ROW, MapSettings.GOAL_COL);
+                waypointToGoal = toGoal.runFastestPath(MapSettings.GOAL_ROW, MapSettings.GOAL_COL);
+
+                NetworkMgr.getInstance().sendMsg(startToWaypoint + waypointToGoal, NetworkMgr.INSTRUCTIONS);
 
                 return 222;
             }
@@ -244,6 +250,7 @@ public class Simulator {
                 exploration.runExploration();
 
                 if (!sim) {
+                    System.out.println("Automatically fastest path");
                     new FastestPath().execute();
                 }
 

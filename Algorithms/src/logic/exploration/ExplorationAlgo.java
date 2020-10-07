@@ -92,10 +92,11 @@ abstract public class ExplorationAlgo {
 
         explorationLoop(bot.getAgtY(), bot.getAgtX());
 
-        if (!bot.isSim()) {
-            NetworkMgr.getInstance().sendMsg(null, NetworkMgr.BOT_START);
-        }
-        senseAndRepaint();
+//        if (!bot.isSim()) {
+//            NetworkMgr.getInstance().sendMsg(null, NetworkMgr.BOT_START);
+//        }
+//        senseAndRepaint();
+        exploredMap.repaint();
     }
 
 
@@ -321,11 +322,11 @@ abstract public class ExplorationAlgo {
 
         // realbot
         if (!bot.isSim()) {
-            turnBotDirection(Direction.WEST);
+//            turnBotDirection(Direction.WEST);
 //            moveBot(Actions.CALIBRATE);
-            turnBotDirection(Direction.SOUTH);
+//            turnBotDirection(Direction.SOUTH);
 //            moveBot(Actions.CALIBRATE);
-            turnBotDirection(Direction.WEST);
+//            turnBotDirection(Direction.WEST);
 //            moveBot(Actions.CALIBRATE);
         }
         turnBotDirection(Direction.NORTH);
