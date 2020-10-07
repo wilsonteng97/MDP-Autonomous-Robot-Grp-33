@@ -119,6 +119,15 @@ abstract public class ExplorationAlgo {
             nextMove();
             System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
 
+            // take picture on RHS if can
+            Direction botDir = bot.getAgtDir();
+            if (canTakePicture(botDir)) {
+                if (botDir == Direction.NORTH) bot.takePicture(bot.getAgtRow(), bot.getAgtCol() + 2);
+                else if (botDir == Direction.EAST) bot.takePicture(bot.getAgtRow() - 2, bot.getAgtCol());
+                else if (botDir == Direction.WEST) bot.takePicture(bot.getAgtRow() + 2, bot.getAgtCol());
+                else bot.takePicture(bot.getAgtRow(), bot.getAgtCol() - 2);
+            }
+
             areaExplored = calculateAreaExplored();
             System.out.println("Area explored: " + areaExplored);
             System.out.println();
@@ -512,6 +521,30 @@ abstract public class ExplorationAlgo {
     }
 
 
+
+    /**
+     * Check if the if the center cell on the RHS of the bot is wall/obstacle so can take picture
+     */
+    private boolean canTakePicture(Direction botDir) {
+        int row = bot.getAgtRow();
+        int col = bot.getAgtCol();
+
+        switch (botDir) {
+            case NORTH:
+                return exploredMap.isWallOrObstacleCell(row, col + 2);
+            case EAST:
+                return exploredMap.isWallOrObstacleCell(row - 2, col);
+            case SOUTH:
+                return exploredMap.isWallOrObstacleCell(row, col - 2);
+            case WEST:
+                return exploredMap.isWallOrObstacleCell(row + 2, col);
+        }
+
+        return false;
+    }
+
+
+
     /**
      * Checks if there's wall/obstacle in front of the bot so can alignfront
      */
@@ -541,24 +574,6 @@ abstract public class ExplorationAlgo {
         return canAlignFront(Direction.clockwise90(botDir));
     }
 
-    /**
-     * Returns a possible direction for robot calibration or null, otherwise.
-     */
-//    private Direction getCalibrationDirection() {
-//        Direction origDir = bot.getAgtDir();
-//        Direction dirToCheck;
-//
-//        dirToCheck = Direction.clockwise90(origDir);                    // right turn
-//        if (canAlignFront(dirToCheck)) return dirToCheck;
-//
-//        dirToCheck = Direction.antiClockwise90(origDir);                // left turn
-//        if (canAlignFront(dirToCheck)) return dirToCheck;
-//
-//        dirToCheck = Direction.antiClockwise90(dirToCheck);             // u turn
-//        if (canAlignFront(dirToCheck)) return dirToCheck;
-//
-//        return null;
-//    }
 
     /**
      * Turns the bot in the needed direction and sends the ALIGN_FRONT movement. Once calibrated, the bot is turned back
