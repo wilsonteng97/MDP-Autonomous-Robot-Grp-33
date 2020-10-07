@@ -133,6 +133,14 @@ public class AgentSettings {
             }
         }
 
-
+        /**
+         * parse and returns a taking picture command
+         * @param row row of the sticker
+         * @param col column of the sticker
+         * @return taking picture command
+         */
+        public static String parsePictureMsg(int row, int col) {
+            return "P|" + Integer.toString(col) + "|" + Integer.toString(row) + "|";
+        }
     }
 }

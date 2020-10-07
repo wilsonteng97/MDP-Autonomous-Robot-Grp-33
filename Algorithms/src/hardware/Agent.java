@@ -460,26 +460,14 @@ public class Agent {
      * @param col column of the sticker
      */
     public void takePicture(int row, int col) {
-        String msg = parsePictureMsg(row, col);
+        String msg = AgentSettings.Actions.parsePictureMsg(row, col);
 
         if (!sim) {
             NetworkMgr comm = NetworkMgr.getInstance();
             comm.sendMsg(msg + "", NetworkMgr.INSTRUCTIONS);
         }
-        else {
-            System.out.println("Command sent out: " + msg);
-        }
-
-        System.out.printf("Picture taken at Cell [%d, %d]\n", col, row);
+            System.out.println("Taking image: " + msg);
     }
 
-    /**
-     * parse and returns a taking picture command
-     * @param row row of the sticker
-     * @param col column of the sticker
-     * @return taking picture command
-     */
-    public String parsePictureMsg(int row, int col) {
-        return "P|" + Integer.toString(col) + "|" + Integer.toString(row) + "|";
-    }
+
 }
