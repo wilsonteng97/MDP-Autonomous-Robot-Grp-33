@@ -21,10 +21,10 @@ const int ROTATE_MAX_SPEED_L = 136;
 const int ROTATE_MAX_SPEED_R = 150;
 const int ROTATE_MAX_SPEED = 150;
 const int TURN_TICKS_L = 805 * 0.97;
-const int TURN_TICKS_R = 805 * 0.97;
+const int TURN_TICKS_R = 805 * 0.99;
 const int TICKS[10] = {565, 1155, 1760, 2380, 2985, 3615, 4195, 4775, 5370};
 const double DIST_WALL_CENTER_BOX = 1.58;
-const double kp = 1, ki = 0.0, kd = 0.0; // Arena 1
+const double kp = 0.5, ki = 0.0, kd = 0.0; // Arena 1
 //KP 0.02 KD 0.009
 int TENCM_TICKS_OFFSET = 0;
 
@@ -84,10 +84,10 @@ void moveForward(int distance) {
       last_tick_L = tick_L;
       offset += 0.1;
     }*/
+    //Serial.println(speed_O);
+    //delay(500);
     if (myPID.Compute() || tick_L == last_tick_L) {
       md.setSpeeds(-(currentSpeedL - speed_O), -(currentSpeedR + speed_O)); 
-      Serial.println(speed_O);
-      delay(500);
       /*if (offset >= 1)
         md.setSpeeds(-(currentSpeedL - speed_O), -(currentSpeedR + speed_O));
       else
