@@ -1,15 +1,26 @@
 package hardware;
 
 public class AgentSettings {
+    // Agent Start Direction
+    public static final Direction START_DIR = Direction.NORTH;
+    public static final int SPEED = 1000;                           // delay between movements (ms)
+    public static final int TURN_SPEED = 2000;                      // delay between movements (ms)
+    public static final int CALIBERATE_SPEED = 3000;                      // delay between movements (ms)
+
+    public static final int GOAL_ROW = 18;                          // row no. of goal cell
+    public static final int GOAL_COL = 13;                          // col no. of goal cell
+    public static final int START_ROW = 1;                          // row no. of start cell
+    public static final int START_COL = 1;                          // col no. of start cell
+
     // G values used for A* algorithm
     public static final int MOVE_COST = 1;
     public static final int TURN_COST = 5;
-    public static final double INFINITE_COST = 10000000;
-    //	public static final int CALIBRATE_AFTER = 3; //Calibrate After number of moves
+    public static final int INFINITE_COST = 10000000;
+//    public static final int CALIBRATE_AFTER = 3;        //Calibrate After number of moves
 
     public static final int MOVE_STEPS = 1;
-    public static final int MOVE_SPEED = 5000;	//Delays before movement (Lower = faster) in milliseconds
-    public static final long WAIT_TIME = 5000;	//Time waiting before retransmitting in milliseconds
+    public static final int MOVE_SPEED = 2000;	        // Delays before movement (Lower = faster) in milliseconds
+    public static final long WAIT_TIME = 5000;	        // Time waiting before retransmitting in milliseconds
     public static final short CAMERA_RANGE = 4;
 
     // Sensors default range (In grids)
@@ -17,9 +28,9 @@ public class AgentSettings {
     public static final int SHORT_MAX = 3;
 
     public static final int LONG_MIN = 1;
-    public static final int LONG_MAX = 5;
+    public static final int LONG_MAX = 6;
 
-    public static final double RIGHT_THRES = 0.5; //Threshold value or right sensor will calibrate once exceeded
+    public static final double RIGHT_THRES = 0.5;       // Threshold value or right sensor will calibrate once exceeded
     public static final double RIGHT_DIS_THRES_CLOSE = 1.0;
     public static final double RIGHT_DIS_THRES_FAR = 3.8;
 
@@ -78,6 +89,44 @@ public class AgentSettings {
     }
 
     public static enum Actions {
-        FORWARD, FACE_LEFT, FACE_RIGHT, MOVE_LEFT, MOVE_RIGHT, BACKWARD, ALIGN_FRONT, ALIGN_RIGHT, SEND_SENSORS, ERROR, ENDEXP, ENDFAST, ROBOT_POS, START_EXP, START_FAST;
+
+        START_EXP, START_FAST, END_EXP, END_FAST,   // Start/End "Exploration"/"Fastest Path" tasks
+
+        FORWARD, BACKWARD, MOVE_LEFT, MOVE_RIGHT,   // Move with reference to the direction Agent is facing.
+        FACE_LEFT, FACE_RIGHT, FACE_REVERSE,        // Change Direction of Agent
+        ALIGN_FRONT, ALIGN_RIGHT, CALIBRATE,                  // Calibrate Robot, only used for real runs
+
+        RESET_ROBOT,                                // Reset Agent, sensors to initial position/direction.
+                                                    // If applicable, reset Waypoint too.
+
+        ERROR;                                      // Error
+          
+          public static String print(Actions m) {
+            switch (m) {
+                case FORWARD:
+                    return "W1|";
+                case BACKWARD:
+                    return "S|";
+                case FACE_RIGHT:
+                    return "D1|";
+                case MOVE_RIGHT:
+                    return "D1|";
+                case FACE_LEFT:
+                    return "A1|";
+                case MOVE_LEFT:
+                    return "A1|";
+                case START_EXP:
+                    return "ES";
+                case ALIGN_FRONT:
+                    return "V|";
+                case ALIGN_RIGHT:
+                    return "B|";
+                case START_FAST:
+                    return "FS";
+                case ERROR:
+                default:
+                    return "E";
+            }
+        }
     }
 }
