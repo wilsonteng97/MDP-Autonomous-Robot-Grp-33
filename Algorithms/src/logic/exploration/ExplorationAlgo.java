@@ -75,10 +75,8 @@ abstract public class ExplorationAlgo {
             while (true) {
                 System.out.println("Waiting for ES|...");
                 String msg = NetworkMgr.getInstance().receiveMsg();
-//                String msg = scanner.nextLine();
 //                String[] msgArr = msg.split("\\|");
                 if (msg.equals(NetworkMgr.EXP_START)) break;
-//                if (msg.equals(NetworkMgr.EXP_START)) break;
             }
         }
 
@@ -87,7 +85,6 @@ abstract public class ExplorationAlgo {
 
         // prepare for timing
         startTime = System.currentTimeMillis();
-//        endTime = getEndTime(startTime, timeLimit);         // startTime + (timeLimit * 1000);
 
         areaExplored = calculateAreaExplored();
         System.out.println("Starting state - area explored: " + areaExplored);
@@ -134,7 +131,7 @@ abstract public class ExplorationAlgo {
                 }
             }
             elapsedTime = getElapsedTime();
-            scanner.nextLine();
+//            scanner.nextLine();
             System.out.println("[doWhile loop elapsed time] " + getElapsedTime());
         } while (areaExplored <= coverageLimit && elapsedTime < timeLimit);
 
