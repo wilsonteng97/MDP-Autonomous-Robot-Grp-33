@@ -15,6 +15,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Scanner;
 
 import static utils.FileIO.loadMap;
 import static utils.MapDescriptorFormat.generateMapDescriptorFormat;
@@ -40,6 +41,14 @@ public class Simulator {
 
     private static String[] stringMDF;
 
+    private static int waypointX;
+    private static int waypointY;
+
+    private static final Scanner sc = new Scanner(System.in);
+
+    private static String startToWaypoint;
+    private static String waypointToGoal;
+
     public static void main(String[] args) {
         if (!sim) comm.startConn();
 
@@ -50,6 +59,10 @@ public class Simulator {
         explorationMap = new Map(agt); explorationMap.setAllUnexplored();
 
         displayAll();
+
+        if (!sim) {
+            readWaypointFromRpi();
+        }
     }
 
     private static void displayAll() {
@@ -136,11 +149,14 @@ public class Simulator {
 
                         @Override
                         public void keyReleased(KeyEvent e) {}
+
+
                     });
 
                     JButton loadMapButton = new JButton("Load");
 
                     loadMapButton.addMouseListener(new MouseAdapter() {
+                        @Override
                         public void mousePressed(MouseEvent e) {
                             explorationMap.resetMap();
                             loadMapDialog.setVisible(false);
@@ -149,6 +165,8 @@ public class Simulator {
                             cl.show(_mapCards, "DUMMY_MAP");
                             dummyMap.repaint();
                         }
+
+
                     });
 
                     loadMapDialog.add(new JLabel("File Name: "));
@@ -180,22 +198,33 @@ public class Simulator {
         // FastestPath Class for Multithreading
         class FastestPath extends SwingWorker<Integer, String> {
             protected Integer doInBackground() throws Exception {
-                agt.setAgtCtrCoord(MapSettings.START_ROW, MapSettings.START_COL);
+                System.out.println("Executing Fastest path");
+                agt.setAgtCtrCoord(agt.getAgtRow(), agt.getAgtCol());
+//                if (!sim) agt.setSim(true);
+                Agent fakeBot = new Agent(agt.getAgtRow(), agt.getAgtCol(), true);
                 explorationMap.repaint();
 
                 if (!sim) {
                     // Transmit signal to get Agent to start. Initiate handshake signals.
                     while (true) {
-                        System.out.println("Waiting for FP_START...");
+                        System.out.println("Waiting for FS|...");
                         String msg = comm.receiveMsg();
                         if (msg.equals(NetworkMgr.FP_START)) break;
                     }
                 }
 
-                FastestPathAlgo fastestPath;
-                fastestPath = new AStarHeuristicSearch(explorationMap, agt);
+                FastestPathAlgo toGoal, toWaypoint;
+                if (sim) readWaypointFromStdin();
+                toWaypoint = new AStarHeuristicSearch(explorationMap, fakeBot);
+                startToWaypoint = toWaypoint.runFastestPath(waypointY, waypointX);
 
-                fastestPath.runFastestPath(MapSettings.GOAL_ROW, MapSettings.GOAL_COL);
+                toGoal = new AStarHeuristicSearch(explorationMap, fakeBot);
+                waypointToGoal = toGoal.runFastestPath(MapSettings.GOAL_ROW, MapSettings.GOAL_COL);
+
+                if (!sim) NetworkMgr.getInstance().sendMsg("K" + startToWaypoint + waypointToGoal, NetworkMgr.INSTRUCTIONS);
+                else System.out.println("K" + startToWaypoint + waypointToGoal);
+
+//                if (!sim) agt.setSim(false);
 
                 return 222;
             }
@@ -218,14 +247,15 @@ public class Simulator {
                 ExplorationAlgo exploration;
                 exploration = new RightWallHugging(explorationMap, dummyMap, agt, coverageLimit, timeLimit);
 
-                if (!sim) {
+//                if (!sim) {
                     // Transmit signal to start Agent
 //                    NetworkMgr.getInstance().sendMsg(null, NetworkMgr.BOT_START);
-                }
+//                }
 
                 exploration.runExploration();
 
                 if (!sim) {
+                    System.out.println("Automatically fastest path");
                     new FastestPath().execute();
                 }
 
@@ -389,5 +419,26 @@ public class Simulator {
             }
         });
         _buttons.add(btn_CoverageExploration);
+    }
+
+    private static void readWaypointFromStdin() {
+        System.out.println("Waiting for waypoint input...");
+        String[] waypointCoords = sc.nextLine().split("\\|");
+        waypointX = Integer.parseInt(waypointCoords[1]);
+        waypointY = Integer.parseInt(waypointCoords[2]);
+        System.out.printf("Successfully reading waypoint [%d, %d]\n", waypointX, waypointY);
+    }
+
+    private static void readWaypointFromRpi() {
+        String[] waypointCoords;
+        while (true) {
+            System.out.println("Waiting for waypoint input...");
+            waypointCoords = comm.receiveMsg().split("\\|");
+            if (waypointCoords[0].equals("WP")) break;
+        }
+        waypointX = Integer.parseInt(waypointCoords[1]);
+        waypointY = Integer.parseInt(waypointCoords[2]);
+
+        System.out.printf("Successfully reading waypoint [%d, %d]\n", waypointX, waypointY);
     }
 }

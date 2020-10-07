@@ -246,6 +246,7 @@ public class Agent {
         return agtDir;
     }
 
+
     /**
      * Agent action component Methods
      * @returns original changed direction or original direction if it is unchanged.
@@ -451,4 +452,22 @@ public class Agent {
 //            comm.sendMsg(this.getAgtRow() + "," + this.getAgtCol() + "," + AgentSettings.Direction.print(this.getAgtDir()), NetworkMgr.BOT_POS);
 //        }
     }
+
+
+    /**
+     * take picture and send out command
+     * @param row row of the sticker
+     * @param col column of the sticker
+     */
+    public void takePicture(int row, int col) {
+        String msg = AgentSettings.Actions.parsePictureMsg(row, col);
+
+//        if (!sim) {
+//            NetworkMgr comm = NetworkMgr.getInstance();
+//            comm.sendMsg(msg + "", NetworkMgr.INSTRUCTIONS);
+//        }
+        System.out.println("Taking image: " + msg);
+    }
+
+
 }

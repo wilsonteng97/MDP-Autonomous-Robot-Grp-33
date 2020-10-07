@@ -36,12 +36,16 @@ public class RightWallHugging extends ExplorationAlgo {
             }
         } else {
 //            System.out.println("[DEBUG]Reverse Direction");
-            moveBot(Actions.FACE_RIGHT);
-            moveBot(Actions.FACE_RIGHT);
+            moveBot(Actions.FACE_LEFT);
+            tryTakePicture();
+            moveBot(Actions.FACE_LEFT);
         }
-        String[] MDFString = MapDescriptorFormat.generateMapDescriptorFormat(exploredMap);
-        String msg = MDFString[0] + "|" + MDFString[1];
-        NetworkMgr.getInstance().sendMsg(msg, NetworkMgr.MAP_STRINGS);
+
+        if (!bot.isSim()) {
+            String[] MDFString = MapDescriptorFormat.generateMapDescriptorFormat(exploredMap);
+            String msg = MDFString[0] + "|" + MDFString[1];
+            NetworkMgr.getInstance().sendMsg(msg, NetworkMgr.MAP_STRINGS);
+        }
     }
 
 

@@ -14,18 +14,23 @@ abstract public class FastestPathAlgo {
     protected AgentSettings.Direction curDir; // current direction of robot
     protected Cell current;                   // current Cell
     protected boolean explorationMode;
+//    private int waypointX;
+//    private int waypointY;
 
 
     public FastestPathAlgo(Map exploredMap, Agent bot) {
         this.realMap = null;
         initObject(exploredMap, bot);
+//        this.waypointX = waypointX;
+//        this.waypointY = waypointY;
     }
 
     public FastestPathAlgo(Map exploredMap, Agent bot, Map realMap) {
         this.realMap = realMap;
         this.explorationMode = true;
         initObject(exploredMap, bot);
-
+//        this.waypointX = waypointX;
+//        this.waypointY = waypointY;
     }
 
     protected void initObject(Map map, Agent bot) {
@@ -38,12 +43,12 @@ abstract public class FastestPathAlgo {
     /**
      * Returns true if the cell can be visited.
      */
-//    protected boolean canBeVisited(Cell c) {
-//        return c.isExplored() && !c.isObstacle() && !c.isVirtualWall();
-//    }
     protected boolean canBeVisited(Cell c) {
-        return !c.isObstacle() && !c.isVirtualWall();
+        return c.isExplored() && !c.isObstacle() && !c.isVirtualWall();
     }
+//    protected boolean canBeVisited(Cell c) {
+//        return !c.isObstacle() && !c.isVirtualWall();
+//    }
 
     /**
      * Returns the target direction of the bot from [botR, botC] to target Cell.

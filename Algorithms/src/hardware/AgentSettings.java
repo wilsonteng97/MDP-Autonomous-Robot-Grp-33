@@ -99,6 +99,8 @@ public class AgentSettings {
         RESET_ROBOT,                                // Reset Agent, sensors to initial position/direction.
                                                     // If applicable, reset Waypoint too.
 
+        TAKE_PICTURE,
+
         ERROR;                                      // Error
           
           public static String print(Actions m) {
@@ -123,10 +125,22 @@ public class AgentSettings {
                     return "B|";
                 case START_FAST:
                     return "FS";
+                case TAKE_PICTURE:
+                    return "P|";
                 case ERROR:
                 default:
                     return "E";
             }
+        }
+
+        /**
+         * parse and returns a taking picture command
+         * @param row row of the sticker
+         * @param col column of the sticker
+         * @return taking picture command
+         */
+        public static String parsePictureMsg(int row, int col) {
+            return "P|" + Integer.toString(col) + "|" + Integer.toString(row) + "|";
         }
     }
 }
