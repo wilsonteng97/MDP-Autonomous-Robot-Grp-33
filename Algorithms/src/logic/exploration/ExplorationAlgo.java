@@ -320,13 +320,15 @@ abstract public class ExplorationAlgo {
         System.out.println(", " + areaExplored + " Cells");
         System.out.println((getElapsedTime()) / 1000 + " Seconds");
 
-        // realbot
+        // Align before fastest path
         if (!bot.isSim()) {
             turnBotDirection(Direction.SOUTH);
             moveBot(Actions.ALIGN_RIGHT);
             moveBot(Actions.ALIGN_FRONT);
             turnBotDirection(Direction.WEST);
             moveBot(Actions.ALIGN_FRONT);
+            turnBotDirection(Direction.EAST);
+            moveBot(Actions.ALIGN_RIGHT);
         }
         turnBotDirection(Direction.NORTH);
         System.out.println("Went home");
