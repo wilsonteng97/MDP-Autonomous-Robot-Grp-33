@@ -28,7 +28,7 @@ public class AgentSettings {
     public static final int SHORT_MAX = 3;
 
     public static final int LONG_MIN = 1;
-    public static final int LONG_MAX = 6;
+    public static final int LONG_MAX = 5;
 
     public static final double RIGHT_THRES = 0.5;       // Threshold value or right sensor will calibrate once exceeded
     public static final double RIGHT_DIS_THRES_CLOSE = 1.0;
@@ -102,7 +102,7 @@ public class AgentSettings {
         TAKE_PICTURE,
 
         ERROR;                                      // Error
-          
+
           public static String print(Actions m) {
             switch (m) {
                 case FORWARD:
