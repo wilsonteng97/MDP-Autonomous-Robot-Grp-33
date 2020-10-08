@@ -181,7 +181,7 @@ public class Sensor {
             if (explorationMap.getCell(row, col).isObstacle()) {
                 if (id.equals("SR1") || id.equals("SR2") || id.equals("SR3") || id.equals("SR4") || id.equals("SR5")) {
                     explorationMap.resetVirtualWalls(row, col);
-                } else if (id.equals("LR1") && (i == 5 || i == 6)) {
+                } else if (id.equals("LR1") && (i == 5)) {
                     explorationMap.resetVirtualWalls(row, col);
                 }
                 explorationMap.setVirtualWallIfBorder(row, col);    // make sure never reset border
