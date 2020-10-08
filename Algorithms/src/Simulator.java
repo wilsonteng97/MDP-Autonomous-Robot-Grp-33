@@ -204,15 +204,7 @@ public class Simulator {
                 Agent fakeBot = new Agent(agt.getAgtRow(), agt.getAgtCol(), true);
                 explorationMap.repaint();
 
-                if (!sim) {
-                    // Transmit signal to get Agent to start. Initiate handshake signals.
-                    while (true) {
-                        System.out.println("Waiting for FS|...");
-                        String msg = comm.receiveMsg();
-                        if (msg.equals(NetworkMgr.FP_START)) break;
-                    }
-                }
-
+                // Compute fastest path beforehand
                 FastestPathAlgo toGoal, toWaypoint;
                 if (sim) readWaypointFromStdin();
                 toWaypoint = new AStarHeuristicSearch(explorationMap, fakeBot);
@@ -221,6 +213,15 @@ public class Simulator {
                 toGoal = new AStarHeuristicSearch(explorationMap, fakeBot);
                 waypointToGoal = toGoal.runFastestPath(MapSettings.GOAL_ROW, MapSettings.GOAL_COL);
 
+                if (!sim) {
+                    // Transmit signal to get Agent to start. Initiate handshake signals.
+                    while (true) {
+                        System.out.println("Waiting for FS|...");
+                        String msg = comm.receiveMsg();
+                        if (msg.equals(NetworkMgr.FP_START)) break;
+                    }
+                }
+                
                 if (!sim) NetworkMgr.getInstance().sendMsg("K" + startToWaypoint + waypointToGoal, NetworkMgr.INSTRUCTIONS);
                 else System.out.println("K" + startToWaypoint + waypointToGoal);
 
