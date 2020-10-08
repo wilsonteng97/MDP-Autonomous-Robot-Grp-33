@@ -20,11 +20,12 @@ const int TURN_MAX_SPEED = 260;
 const int ROTATE_MAX_SPEED_L = 136;
 const int ROTATE_MAX_SPEED_R = 150;
 const int ROTATE_MAX_SPEED = 150;
-const int TURN_TICKS_L = 805 * 0.99;
-const int TURN_TICKS_R = 805 * 0.98;
-const int TICKS[10] = {565, 1155, 1760, 2380, 2985, 3615, 4195, 4775, 5370};
+const int TURN_TICKS_L = 811*0.95;
+const int TURN_TICKS_R = 811*0.95;
+const int TICKS[10] = {550, 1155, 1760, 2380, 2985, 3615, 4195, 4775, 5370};
 const double DIST_WALL_CENTER_BOX = 1.58;
-const double kp = 1, ki = 0.001, kd = 0.003; // Arena 1
+const double kp = 3, ki = 0.00, kd = 0.001; // Arena 1 STRAIGHT
+const double rtKp = 3, rtKi = 0.00, rtKd = 0.005; // Arena 1 turn right
 //KP 0.02 KD 0.009
 int TENCM_TICKS_OFFSET = 0;
 
@@ -60,6 +61,9 @@ void setupPID() {
 void moveForward(int distance) {
   initializeTick();
   initializeMotor_Start();
+  
+  myPID.SetTunings(kp, ki, kd);
+  
   distance = cmToTicks(distance);
   double currentSpeedL = 0;
   double currentSpeedR = 0;
@@ -157,6 +161,9 @@ void moveBackwards(int distance) {
   initializeMotor_End();*/
   initializeTick();
   initializeMotor_Start();
+  
+  myPID.SetTunings(kp, ki, kd);
+  
   distance = cmToTicks(distance);
   double currentSpeedL = 0;
   double currentSpeedR = 0;
@@ -255,7 +262,10 @@ void moveBackwardsFast(int distance) {
 void moveForwardCalibrate(int distance1) {
   initializeTick();
   initializeMotor_Start();
-  double distance = distance1/18.85*562.25;
+  
+  myPID.SetTunings(kp, ki, kd);
+  
+  double distance = distance1/19.48*562.25;
   if (distance < 1)
     return;  
   double currentSpeedL = 0;
@@ -288,7 +298,10 @@ void moveForwardCalibrate(int distance1) {
 void moveBackwardsCalibrate(int distance1) {
   initializeTick();
   initializeMotor_Start();
-  double distance = distance1/18.85*562.25;
+
+   myPID.SetTunings(kp, ki, kd);
+  
+  double distance = distance1/19.48*562.25;
   if (distance < 1)
     return;  
   double currentSpeedL = 0;
@@ -321,13 +334,15 @@ void turnRight() {
   initializeTick();
   initializeMotor_Start();
 
+  myPID.SetTunings(rtKp, rtKi, rtKd);
+  
   double currentSpeedL = TURN_MAX_SPEED_L;
   double currentSpeedR = TURN_MAX_SPEED_R;
   double offset = 0;
 
   while (tick_L < TURN_TICKS_R || tick_R < TURN_TICKS_R) {
     //    offset = computePID();
-        //Serial.println(tick_L - tick_R);
+    //Serial.println(tick_L - tick_R);
     //delay(5);
     if (myPID.Compute())
       md.setSpeeds(-(currentSpeedL - speed_O), currentSpeedR);
@@ -339,12 +354,17 @@ void turnRight() {
 void turnLeft() {
   initializeTick();
   initializeMotor_Start();
+
+  myPID.SetTunings(kp, ki, kd);
+  
   double currentSpeedL = TURN_MAX_SPEED_L;
   double currentSpeedR = TURN_MAX_SPEED_R;
   double offset = 0;
   
   while (tick_L < (TURN_TICKS_L) || tick_R < (TURN_TICKS_L)) {
     //    offset = computePID();
+   // Serial.println(tick_L - tick_R);
+    //delay(5);
     if (myPID.Compute())
       md.setSpeeds((currentSpeedL - speed_O), -(currentSpeedR));
   }
@@ -387,6 +407,9 @@ void rotateRight(int distance) {
 void rotateLeft(int distance) {
   initializeTick();
   initializeMotor_Start();
+
+  myPID.SetTunings(kp, ki, kd);
+  
   double currentSpeed = ROTATE_MAX_SPEED;
   double offset = 0;
   if (distance < 3)
@@ -402,6 +425,9 @@ void rotateLeft(int distance) {
 void rotateRight(int distance) {
   initializeTick();
   initializeMotor_Start();
+
+   myPID.SetTunings(kp, ki, kd);
+  
   double currentSpeed = ROTATE_MAX_SPEED;
   double offset = 0;
   if (distance < 3)
