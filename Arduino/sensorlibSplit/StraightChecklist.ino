@@ -20,8 +20,8 @@ const int TURN_MAX_SPEED = 260;
 const int ROTATE_MAX_SPEED_L = 136;
 const int ROTATE_MAX_SPEED_R = 150;
 const int ROTATE_MAX_SPEED = 150;
-const int TURN_TICKS_L = 811*0.95;
-const int TURN_TICKS_R = 811*0.95;
+const int TURN_TICKS_L = 811*0.99;
+const int TURN_TICKS_R = 811*0.98;
 const int TICKS[10] = {550, 1155, 1760, 2380, 2985, 3615, 4195, 4775, 5370};
 const double DIST_WALL_CENTER_BOX = 1.58;
 const double kp = 3, ki = 0.00, kd = 0.001; // Arena 1 STRAIGHT
@@ -457,7 +457,7 @@ void alignRight() {
       rotateLeft(abs(diff * 5));
       diff = getRightIR1() - getRightIR2();
       if (getRightIR1_Block() != getRightIR2_Block()) {
-        rotateRight(abs(diff * 4));
+        rotateRight(abs(diff * 2));
         diff = getRightIR1() - getRightIR2();
       }
     }
@@ -469,9 +469,9 @@ void alignRight() {
 void alignFront() {
   delay(2);
   int moved = 0;
-  double diff_dis = getMin(getFrontIR1(),getFrontIR2(),getFrontIR3());
-  while ((abs(diff_dis) < 6.2 && moved < 30) || (abs(diff_dis) > 6.4 && moved < 20)){
-      if (diff_dis > 6.4) {
+  double diff_dis = getMin(getFrontIR1(),20.0,getFrontIR3());
+  while ((abs(diff_dis) < 10.0 && moved < 30) || (abs(diff_dis) > 10.2 && moved < 20)){
+      if (diff_dis > 10.2) {
         moveForwardCalibrate(1);
           md.setSpeeds(50, -50);
       } else {
@@ -479,7 +479,7 @@ void alignFront() {
           md.setSpeeds(-50, 50);
       }
       delay(2);
-      diff_dis = getMin(getFrontIR1(),getFrontIR2(),getFrontIR3());
+      diff_dis = getMin(getFrontIR1(),20.0,getFrontIR3());
       moved++;
     }
   double diff = getFrontIR1() - getFrontIR3();

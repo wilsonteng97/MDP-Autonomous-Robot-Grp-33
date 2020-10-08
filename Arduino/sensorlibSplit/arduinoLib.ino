@@ -15,46 +15,7 @@ void loop() {
     Serial.println("Waiting for connection");
     Serial.flush();
   }
-  //  getFrontIR1();
-  //  getFrontIR3();
-//  returnSensorReading_Raw();
-/*  if (Serial.available() > 0) {
-    char command = '0';
-    int value = -1;
-    char arr[15];
-    int c = 0;
-    char hold = Serial.read();
-    if (hold == '[') {
-      Serial.println('R');
-      Serial.flush();
-      delay(1);
-      hold = Serial.read();
-      while (hold != ']') {
-        arr[c] = hold;
-        c ++;
-        hold = Serial.read();
-        delay(2);
-      }
-    } else {
-      while (Serial.available() > 0) {
-        if ((char)Serial.peek() == '[' )
-          return;
-        Serial.println("DISCARDING");
-        Serial.read();
-        delay(1);
-        return;
-      }
-    }
-    command = arr[8];
-    char value_ca[c - 10 + 1];
-    for (int g = 10; g < c; g++) {
-      value_ca[g - 10] = arr[g];
-    }
-    value_ca[c - 10] = '\0';
-    value = atoi(value_ca);
-        Serial.println(command);
-        Serial.println(value);
-
+/*  
     // Alg|Ard|0|{1-10} (Steps) [Alg|Ard|0|3]
     //2nd Character of the Array is the Command
 
