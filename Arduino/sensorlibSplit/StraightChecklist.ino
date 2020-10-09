@@ -24,8 +24,8 @@ const int TURN_TICKS_L = 811*0.99;
 const int TURN_TICKS_R = 811*0.98;
 const int TICKS[10] = {550, 1155, 1760, 2380, 2985, 3615, 4195, 4775, 5370};
 const double DIST_WALL_CENTER_BOX = 1.58;
-const double kp = 3, ki = 0.00, kd = 0.001; // Arena 1 STRAIGHT
-const double rtKp = 3, rtKi = 0.00, rtKd = 0.005; // Arena 1 turn right
+const double kp = 3, ki = 0.00, kd = 0.002; // Arena 1 STRAIGHT
+const double rtKp = 3, rtKi = 0.00, rtKd = 0.002; // Arena 1 turn right
 //KP 0.02 KD 0.009
 int TENCM_TICKS_OFFSET = 0;
 
@@ -363,7 +363,7 @@ void turnLeft() {
   
   while (tick_L < (TURN_TICKS_L) || tick_R < (TURN_TICKS_L)) {
     //    offset = computePID();
-   // Serial.println(tick_L - tick_R);
+    //Serial.println(tick_L - tick_R);
     //delay(5);
     if (myPID.Compute())
       md.setSpeeds((currentSpeedL - speed_O), -(currentSpeedR));
