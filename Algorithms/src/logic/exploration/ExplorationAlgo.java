@@ -49,7 +49,7 @@ abstract public class ExplorationAlgo {
         System.out.println("[coverageLimit && timeLimit(s)] " + coverageLimit + " | " + timeLimit);
     }
 
-    public void runExploration() {
+    public void runExploration() throws InterruptedException {
         // FIXME check for real bot connection
 //        System.out.println("[DEBUG: runExploration] executed");
         if (!bot.isSim()) {
