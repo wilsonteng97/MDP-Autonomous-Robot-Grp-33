@@ -85,9 +85,9 @@ public class ImageRegExp extends ExplorationAlgo {
     }
 
     private HashMap<String, BlkSurface> getUntakenSurfaces() {
-        HashMap<String, BlkSurface> untakenSurfaces = new HashMap<String, BlkSurface>();
-        untakenSurfaces.put("Test String", new BlkSurface(new Point(1,1), AgentSettings.Direction.NORTH));
-        return untakenSurfaces;
+        HashMap<String, BlkSurface> unTakenSurfaces = new HashMap<String, BlkSurface>();
+        unTakenSurfaces.put("Test String", new BlkSurface(new Point(1,1), AgentSettings.Direction.NORTH));
+        return unTakenSurfaces;
     }
 
     private void imageLoop() {
