@@ -35,4 +35,4 @@ ENCODER_PATH = "label_encoder_new2.pickle"
 
 # define the minimum probability required for a positive prediction
 # (used to filter out false-positive predictions)
-MIN_PROBA = 0.95
+MIN_PROBA = 0.8

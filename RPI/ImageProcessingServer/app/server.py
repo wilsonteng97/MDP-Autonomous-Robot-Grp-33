@@ -86,7 +86,7 @@ class ImageProcessingServer:
         self.inference_graph_path = os.path.join(cwd_path, MODEL_NAME, INFERENCE_GRAPH)
         self.labels_path = os.path.join(cwd_path, MODEL_NAME, LABEL_MAP)
 
-              # Load the label map.
+        # Load the label map.
         #
         # Label maps map indices to category names, so that when our convolution
         # network predicts `0`, we know that this corresponds to `white up arrow`.
@@ -148,18 +148,34 @@ class ImageProcessingServer:
             print('Waiting for image from RPi...')
             cdt,frame = self.image_hub.recv_image()
             print('Connected and received frame at time: ' + str(datetime.now()))
-            print("image coordinates: ", cdt)
+            # print("image coordinates: ", cdt)
             frame = imutils.resize(frame, width=IMAGE_WIDTH)
             frame_expanded = np.expand_dims(frame, axis=0)
 
             #form image file path for saving
-            raw_image_name = RAW_IMAGE_PREFIX + str(len(self.frame_list)) + IMAGE_ENCODING
+            # raw_image_name = RAW_IMAGE_PREFIX + str(len(self.frame_list)) + IMAGE_ENCODING
+            raw_image_name = cdt + IMAGE_ENCODING
             raw_image_path = os.path.join('captured_images', raw_image_name)
-            # raw_image_path = os.path.join('C:\\\\Users\\xiaoqing\\Documents\\school stuff\\Year 3 Sem 1\\CZ3004 MDP\\MDP-Autonomous-Robot-Grp-33\\RPI\\Image-rec\\images',raw_image_name)
             # save raw image
             save_success = cv2.imwrite(raw_image_path, frame)
 
-            print('Raw image name = {}'.format(raw_image_name))
+            # split images
+            # need to find out how to get crop width and crop height numbers
+            cdt_list = list(cdt.split("|"))
+            split_no = len(cdt_list)/2
+            self.split_image(frame,cdt_list,crop_width=1,crop_height=1)
+            for i in range(split_no):
+                split_image_name = cdt_list[0] + "_" + cdt_list[1] + IMAGE_ENCODING
+                split_image = cv2.imread('captured_image/'+split_image_name)
+                image_id = self.detect_image(split_image,split_image_name)	
+                if image_id == 0:
+                    self.image_hub.send_reply("None")
+                else:
+                    reply = str(image_id) + "|" + cdt_list[0] + "|" + cdt_list[1]
+                    self.image_hub.send_reply(reply)
+                cdt_list = cdt_list[2:0]                
+
+            # print('Raw image name = {}'.format(raw_image_name))
             # import subprocess
             # cur_dif = os.getcwd()
             # detect_image_dir = os.path.join(cur_dif,'image_receiver')
@@ -168,8 +184,11 @@ class ImageProcessingServer:
             # cmd = ['python', 'detect_object_rcnn_wbf.py', '--image', 'captured_images/{}'.format(raw_image_name)]
             # subprocess.run(cmd)
 
-            image_id = detect_image(frame,raw_image_name)
-            self.image_hub.send_reply(image_id)
+            # image_id = self.detect_image(frame,raw_image_name)	
+            # if image_id == 0:
+            #     self.image_hub.send_reply("None")
+            # else:
+            #     self.image_hub.send_reply(image_id)
 
     def _get_true_positives(self, bbox_list, class_list, score_list):
             """
@@ -267,108 +286,134 @@ class ImageProcessingServer:
 
             return obstacle_symbol_map, bounding_boxes, classes, scores
     def detect_image(self,image,raw_image_name):
-		# load the our fine-tuned model and label binarizer from disk
-		print("[INFO] loading model and label binarizer...")
-		model = load_model(config.MODEL_PATH)
-		lb = pickle.loads(open(config.ENCODER_PATH, "rb").read())
+        # load the our fine-tuned model and label binarizer from disk
+        print("[INFO] loading model and label binarizer...")
+        model = load_model(config.MODEL_PATH)
+        lb = pickle.loads(open(config.ENCODER_PATH, "rb").read())
 
-		# resize and rotate image
-		image = imutils.resize(image, width=500)
-		image = imutils.rotate(image, 180)
+        # resize and rotate image
+        image = imutils.resize(image, width=500)
+        image = imutils.rotate(image, 180)
+        brightness = np.average(np.linalg.norm(image, axis=2)) / np.sqrt(3)
+        while brightness > 125:
+            hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+            hsv[...,2] = hsv[...,2]*0.9
+            image = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
+            brightness = np.average(np.linalg.norm(image, axis=2)) / np.sqrt(3)
 
-		# run selective search on the image to generate bounding box proposal regions
-		print("[INFO] running selective search...")
-		ss = cv2.ximgproc.segmentation.createSelectiveSearchSegmentation()
-		ss.setBaseImage(image)
-		ss.switchToSelectiveSearchFast()
-		rects = ss.process()
+        # run selective search on the image to generate bounding box proposal regions
+        print("[INFO] running selective search...")
+        ss = cv2.ximgproc.segmentation.createSelectiveSearchSegmentation()
+        ss.setBaseImage(image)
+        ss.switchToSelectiveSearchFast()
+        rects = ss.process()
 
-		# initialize the list of region proposals that we'll be classifying
-		# along with their associated bounding boxes
-		proposals = []
-		boxes = []
+        # initialize the list of region proposals that we'll be classifying
+        # along with their associated bounding boxes
+        proposals = []
+        boxes = []
 
-		# loop over the region proposal bounding box coordinates generated by
-		# running selective search
-		for (x, y, w, h) in rects[:config.MAX_PROPOSALS_INFER]:
-			# extract the region from the input image, convert it from BGR to
-			# RGB channel ordering, and then resize it to the required input
-			# dimensions of our trained CNN
-			roi = image[y:y + h, x:x + w]
-			roi = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
-			roi = cv2.resize(roi, config.INPUT_DIMS,
-				interpolation=cv2.INTER_CUBIC)
-			# further preprocess by the ROI
-			roi = img_to_array(roi)
-			roi = preprocess_input(roi)
+        # loop over the region proposal bounding box coordinates generated by
+        # running selective search
+        for (x, y, w, h) in rects[:config.MAX_PROPOSALS_INFER]:
+            # extract the region from the input image, convert it from BGR to
+            # RGB channel ordering, and then resize it to the required input
+            # dimensions of our trained CNN
+            roi = image[y:y + h, x:x + w]
+            roi = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
+            roi = cv2.resize(roi, config.INPUT_DIMS,
+                interpolation=cv2.INTER_CUBIC)
+            # further preprocess by the ROI
+            roi = img_to_array(roi)
+            roi = preprocess_input(roi)
 
-			# update our proposals and bounding boxes lists
-			proposals.append(roi)
-			boxes.append((x, y, x + w, y + h))
-			
-			
-		# convert the proposals and bounding boxes into NumPy arrays
-		proposals = np.array(proposals, dtype="float32")
-		boxes = np.array(boxes, dtype="float32")
-		print("[INFO] proposal shape: {}".format(proposals.shape))
+            # update our proposals and bounding boxes lists
+            proposals.append(roi)
+            boxes.append((x, y, x + w, y + h))
+            
+            
+        # convert the proposals and bounding boxes into NumPy arrays
+        proposals = np.array(proposals, dtype="float32")
+        boxes = np.array(boxes, dtype="float32")
+        print("[INFO] proposal shape: {}".format(proposals.shape))
 
-		# classify each of the proposal ROIs using fine-tuned model
-		print("[INFO] classifying proposals...")
-		proba = model.predict(proposals)
+        # classify each of the proposal ROIs using fine-tuned model
+        print("[INFO] classifying proposals...")
+        proba = model.predict(proposals)
 
-		# find the index of all predictions that are positive for the classes
-		print("[INFO] applying NMS...")
-		idxs = np.where(proba[:,:15]>config.MIN_PROBA)[0]
+        # find the index of all predictions that are positive for the classes
+        print("[INFO] applying NMS...")
+        idxs = np.where(proba[:,:15]>config.MIN_PROBA)[0]
 
-		# use the indexes to extract all bounding boxes and associated class
-		# label probabilities associated with the class
-		boxes = boxes[idxs]
-		proba = proba[idxs][:, :15]
+        # use the indexes to extract all bounding boxes and associated class
+        # label probabilities associated with the class
+        boxes = boxes[idxs]
+        proba = proba[idxs][:, :15]
 
-		for i in range(len(boxes)):
-			boxes[i][0]=boxes[i][0]/image.shape[1]
-			boxes[i][1]=boxes[i][1]/image.shape[0]
-			boxes[i][2]=boxes[i][2]/image.shape[1]
-			boxes[i][3]=boxes[i][3]/image.shape[0]
-		labels = [0]*len(boxes)
-		for i in range(len(boxes)):
-			for j in range(15):
-				if proba[i][j]>config.MIN_PROBA:
-					labels[i]=j+1
-		scores = [0]*len(boxes)
-		for i in range(len(boxes)):
-			for j in range(15):
-				if proba[i][j]>config.MIN_PROBA:
-					if proba[i][j] > scores[i]:
-						scores[i] = proba[i][j]
-		boxes_list = [boxes]
-		scores_list = [scores]
-		labels_list = [labels]
+        for i in range(len(boxes)):
+            boxes[i][0]=boxes[i][0]/image.shape[1]
+            boxes[i][1]=boxes[i][1]/image.shape[0]
+            boxes[i][2]=boxes[i][2]/image.shape[1]
+            boxes[i][3]=boxes[i][3]/image.shape[0]
+        labels = [0]*len(boxes)
+        for i in range(len(boxes)):
+            for j in range(15):
+                if proba[i][j]>config.MIN_PROBA:
+                    labels[i]=j+1
+        scores = [0]*len(boxes)
+        for i in range(len(boxes)):
+            for j in range(15):
+                if proba[i][j]>config.MIN_PROBA:
+                    if proba[i][j] > scores[i]:
+                        scores[i] = proba[i][j]
+        boxes_list = [boxes]
+        scores_list = [scores]
+        labels_list = [labels]
 
-		boxes, scores, labels = wbf.weighted_boxes_fusion(boxes_list, scores_list, labels_list)
-		for i in range(len(boxes)):
-			boxes[i][0]=boxes[i][0]*image.shape[1]
-			boxes[i][1]=boxes[i][1]*image.shape[0]
-			boxes[i][2]=boxes[i][2]*image.shape[1]
-			boxes[i][3]=boxes[i][3]*image.shape[0]
-		boxes = np.array(boxes, dtype="int32")
-		for i in range(len(boxes)):
-			# draw the bounding box, label, and probability on the image
-			(startX, startY, endX, endY) = boxes[i]
-			cv2.rectangle(image, (startX, startY), (endX, endY),
-				(0, 255, 0), 2)
-			y = startY - 10 if startY - 10 > 10 else startY + 10
-			text = str(labels[i])
-			cv2.putText(image, text, (startX, y),
-				cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 2)
-		# save output image
-		# processed_image_path = 'processed_images' + raw_image_name[raw_image_name.rfind("/"):raw_image_name.rfind(".")] + "_processed" + IMAGE_ENCODING
-		# print(processed_image_path)
-		processed_image_path = 'processed_images/' + raw_image_name[:raw_image_name.rfind(".")] + "_processed" + IMAGE_ENCODING
-		# save processed image
-		save_success = cv2.imwrite(processed_image_path, image)
-		print('save image successful?', save_success)
+        boxes, scores, labels = wbf.weighted_boxes_fusion(boxes_list, scores_list, labels_list)
+        for i in range(len(boxes)):
+            boxes[i][0]=boxes[i][0]*image.shape[1]
+            boxes[i][1]=boxes[i][1]*image.shape[0]
+            boxes[i][2]=boxes[i][2]*image.shape[1]
+            boxes[i][3]=boxes[i][3]*image.shape[0]
+        boxes = np.array(boxes, dtype="int32")
+        for i in range(len(boxes)):
+            # draw the bounding box, label, and probability on the image
+            (startX, startY, endX, endY) = boxes[i]
+            cv2.rectangle(image, (startX, startY), (endX, endY),
+                (0, 255, 0), 2)
+            y = startY - 10 if startY - 10 > 10 else startY + 10
+            text = str(labels[i])
+            cv2.putText(image, text, (startX, y),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 2)
+        try:
+            image_id = str(labels[0])
+            # save output image
+            processed_image_path = 'processed_images/' + raw_image_name[:raw_image_name.rfind(".")] + "_processed" + IMAGE_ENCODING
+            # save processed image
+            save_success = cv2.imwrite(processed_image_path, image)
+            print('save image successful?', save_success)
+        except:
+            image_id = 0
+        return image_id
 
-		#get label_id
-		image_id = str(labels[0])
-		return image_id
+    def split_image(self,image,cdt,crop_w,crop_h):
+        image2 = image
+        height, width, channels = image.shape
+        # Number of pieces Horizontally 
+        CROP_W_SIZE  = crop_w 
+        # Number of pieces Vertically to each Horizontal  
+        CROP_H_SIZE = crop_h
+        for ih in range(CROP_H_SIZE ):
+            for iw in range(CROP_W_SIZE ):
+                x = int(width/CROP_W_SIZE * iw )
+                y = int(height/CROP_H_SIZE * ih)
+                h = int((height / CROP_H_SIZE))
+                w = int((width / CROP_W_SIZE ))
+                image = image[y:y+h, x:x+w]
+                new_image_name = cdt[0] + "_" + cdt[1] + IMAGE_ENCODING
+                new_image_path = 'captured_images/' + new_image_name
+                save_success = cv2.imwrite(new_image_path,image)
+                print('save image successful?', save_success)
+                image = image2
+                cdt = cdt[2:]

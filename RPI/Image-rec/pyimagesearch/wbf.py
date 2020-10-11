@@ -140,7 +140,7 @@ def find_matching_box(boxes_list, new_box, match_iou):
     return best_index, best_iou
 
 
-def weighted_boxes_fusion(boxes_list, scores_list, labels_list, weights=None, iou_thr=0.1, skip_box_thr=0.9, conf_type='avg', allows_overflow=False):
+def weighted_boxes_fusion(boxes_list, scores_list, labels_list, weights=None, iou_thr=0.1, skip_box_thr=0.6, conf_type='avg', allows_overflow=False):
     '''
     :param boxes_list: list of boxes predictions from each model, each box is 4 numbers.
     It has 3 dimensions (models_number, model_preds, 4)

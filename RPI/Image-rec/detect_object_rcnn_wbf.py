@@ -28,6 +28,11 @@ lb = pickle.loads(open(config.ENCODER_PATH, "rb").read())
 # load the input image from disk
 image = cv2.imread(args["image"])
 image = imutils.resize(image, width=500)
+brightness = np.average(np.linalg.norm(image, axis=2)) / np.sqrt(3)
+if brightness > 125:
+	hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+	hsv[...,2] = hsv[...,2]*0.9
+	image = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
 
 # run selective search on the image to generate bounding box proposal regions
 print("[INFO] running selective search...")
@@ -123,3 +128,9 @@ for i in range(len(boxes)):
 filename = args["image"]
 filename = filename[:filename.rfind(".")] + "_output" + filename[filename.rfind("."):]
 cv2.imwrite(filename, image)
+
+# def brightness(self,img):
+#     if len(img.shape) == 3:
+#         # Colored RGB or BGR (*Do Not* use HSV images with this function)
+#         # create brightness with euclidean norm
+#         return np.average(np.linalg.norm(img, axis=2)) / np.sqrt(3)
