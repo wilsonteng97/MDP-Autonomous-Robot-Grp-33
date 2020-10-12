@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 public class ImageRegExp extends ExplorationAlgo {
-    private static final Logger LOGGER = Logger.getLogger(ImageRegExpOld.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ImageRegExp.class.getName());
 
     // for image reg
     private static HashMap<String, ObsSurface> notYetTaken;
