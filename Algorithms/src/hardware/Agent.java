@@ -519,6 +519,7 @@ public class Agent {
 
     public ArrayList<ObsSurface> imageRecognitionRight(Map exploredMap) {
         ArrayList<ObsSurface> surfaceTakenList = new ArrayList<ObsSurface>();
+        ObsSurface tempObsSurface;
         int rowInc = 0, colInc = 0;
         int camera_row, camera_col, temp_row, temp_col;
         AgentSettings.Direction obsDir = null;
@@ -542,40 +543,62 @@ public class Agent {
         camera_row = getAgtY() + rowInc;
         camera_col = getAgtX() + colInc;
 
-        System.out.println("camera_row|camera_col" + camera_row + "|" + camera_col);
+        boolean left = false; boolean mid = false; boolean right = false;
+
+        System.out.println("camera_row|camera_col " + camera_row + "|" + camera_col);
         for (int offset = AgentSettings.CAMERA_MIN; offset <= AgentSettings.CAMERA_MAX; offset++) {
+            System.out.println("offset| " + offset);
             temp_row = camera_row + rowInc * offset;
             temp_col = camera_col + colInc * offset;
-            tempCell = exploredMap.getCell(temp_row, temp_col);
+
+            System.out.println("temp_row|temp_col " + temp_row + "|"  + temp_col);
+            if (exploredMap.checkValidCell(temp_row, temp_col)) {
+                tempCell = exploredMap.getCell(temp_row, temp_col);
+            } else {
+                System.out.println("Not Valid|temp_row|temp_col " + temp_row + "|"  + temp_col);
+                break;
+            }
+
+//            System.out.println("tempCell " + tempCell);
 //            System.out.println("camera_row|camera_col " + camera_row + "|" + camera_col);
+
             // leftObs
             if (rowInc==0) temp_row++; if (colInc==0) temp_col++;
-            if (tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
+            if (!left && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
                 if (tempCell.isObstacle()) {
-                    ObsSurface os = new ObsSurface(new Point(temp_row, temp_col), obsDir);
-                    surfaceTakenList.add(os);
+                    tempObsSurface = new ObsSurface(new Point(temp_col, temp_row), obsDir);
+                    System.out.println("left tempObsSurface " + tempObsSurface);
+                    surfaceTaken.put(tempObsSurface.toString(), tempObsSurface);
+                    surfaceTakenList.add(tempObsSurface);
+                    left = true;
                 }
             }
 
             // middleObs
             if (rowInc==0) temp_row--; if (colInc==0) temp_col--;
-            if (tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
+            if (!mid && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
                 if (tempCell.isObstacle()) {
-                    ObsSurface os = new ObsSurface(new Point(temp_row, temp_col), obsDir);
-                    surfaceTakenList.add(os);
+                    tempObsSurface = new ObsSurface(new Point(temp_col, temp_row), obsDir);
+                    System.out.println("mid tempObsSurface " + tempObsSurface);
+                    surfaceTaken.put(tempObsSurface.toString(), tempObsSurface);
+                    surfaceTakenList.add(tempObsSurface);
+                    mid = true;
                 }
             }
 
             // rightObs
             if (rowInc==0) temp_row--; if (colInc==0) temp_col--;
-            if (tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
+            if (!right && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
                 if (tempCell.isObstacle()) {
-                    ObsSurface os = new ObsSurface(new Point(temp_row, temp_col), obsDir);
-                    surfaceTakenList.add(os);
+                    tempObsSurface = new ObsSurface(new Point(temp_col, temp_row), obsDir);
+                    System.out.println("right tempObsSurface " + tempObsSurface);
+                    surfaceTaken.put(tempObsSurface.toString(), tempObsSurface);
+                    surfaceTakenList.add(tempObsSurface);
+                    right = true;
                 }
             }
         }
-        System.out.println("surfaceTakenList" + surfaceTakenList);
+        System.out.println("surfaceTakenList" + surfaceTakenList + "\n");
         return surfaceTakenList;
     }
 }

@@ -13,13 +13,14 @@ import utils.MapDescriptorFormat;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 public class ImageRegExp extends ExplorationAlgo {
     private static final Logger LOGGER = Logger.getLogger(ImageRegExpOld.class.getName());
 
     // for image reg
-    HashMap<String, ObsSurface> notYetTaken;
+    private static HashMap<String, ObsSurface> notYetTaken;
 
     public ImageRegExp(Map exploredMap, Map realMap, Agent bot, int coverageLimit, int timeLimit) {
         super(exploredMap, realMap, bot, coverageLimit, timeLimit);
@@ -61,8 +62,6 @@ public class ImageRegExp extends ExplorationAlgo {
     }
 
     public void imageExploration() {
-        HashMap<String, ObsSurface> allPossibleSurfaces;
-
         notYetTaken = getUnTakenSurfaces();
         System.out.println(notYetTaken);
         if (notYetTaken.size() == 0) {
@@ -71,8 +70,9 @@ public class ImageRegExp extends ExplorationAlgo {
 
         // get all untaken surfaces
         while (notYetTaken.size() > 0) {
-            System.out.println("notYetTaken: " + notYetTaken.size());
+            System.out.println("imageLoop start " + notYetTaken.size() + ":\n" + notYetTaken);
             imageLoop();
+            System.out.println("imageLoop end " + notYetTaken.size() + ":\n" + notYetTaken);
         }
 
         goToPoint(new Point (MapSettings.START_COL, MapSettings.START_ROW));
@@ -100,33 +100,42 @@ public class ImageRegExp extends ExplorationAlgo {
         if (before == after) return false;
         ArrayList<ObsSurface> surfTaken;
 
-//        System.out.print("imageRecognitionRight before");
-//        surfTaken = bot.imageRecognitionRight(exploredMap);
-//        System.out.print("imageRecognitionRight after");
-//        updateNotYetTaken(surfTaken);
+        System.out.println("imageRecognitionRight before");
+        surfTaken = bot.imageRecognitionRight(exploredMap);
+        System.out.println("imageRecognitionRight after");
+        updateNotYetTaken(surfTaken);
 
-        AgentSettings.Direction desiredDir = AgentSettings.Direction.clockwise90(obsSurface.getSurface());
+        AgentSettings.Direction desiredDir = AgentSettings.Direction.antiClockwise90(obsSurface.getSurface());
         if (desiredDir == bot.getAgtDir()) {
+            LOGGER.info("desiredDir" + bot.getAgtDir());
             return true;
         }
         else if (desiredDir == AgentSettings.Direction.clockwise90(bot.getAgtDir())) {
+            LOGGER.info("desiredDir clockwise " + bot.getAgtDir());
             moveBot(AgentSettings.Actions.FACE_RIGHT);
             surfTaken = bot.imageRecognitionRight(exploredMap);
             updateNotYetTaken(surfTaken);
+            senseAndRepaint();
         }
         else if (desiredDir == AgentSettings.Direction.antiClockwise90(bot.getAgtDir())) {
+            LOGGER.info("desiredDir anticlockwise" + bot.getAgtDir());
             moveBot(AgentSettings.Actions.FACE_LEFT);
             surfTaken = bot.imageRecognitionRight(exploredMap);
             updateNotYetTaken(surfTaken);
+            senseAndRepaint();
         }
         // opposite
         else {
+            System.out.println("desiredDir opposite" + bot.getAgtDir());
             moveBot(AgentSettings.Actions.FACE_LEFT);
             surfTaken = bot.imageRecognitionRight(exploredMap);
             updateNotYetTaken(surfTaken);
+            senseAndRepaint();
+
             moveBot(AgentSettings.Actions.FACE_LEFT);
             surfTaken = bot.imageRecognitionRight(exploredMap);
             updateNotYetTaken(surfTaken);
+            senseAndRepaint();
         }
         return true;
     }
@@ -144,21 +153,24 @@ public class ImageRegExp extends ExplorationAlgo {
                 notYetTaken.remove(tempObsSurfaceStr);
             }
         }
+        System.out.println("notYetTaken | " + notYetTaken.size() + "\n" + notYetTaken);
         return notYetTaken;
     }
 
     private void updateNotYetTaken(ArrayList<ObsSurface> surfTaken) {
+//        LOGGER.info("[update] method called " + surfTaken);
         for (ObsSurface obsSurface : surfTaken) {
+//            LOGGER.info("[update] obsSurface " + obsSurface);
             if (notYetTaken.containsKey(obsSurface.toString())) {
                 notYetTaken.remove(obsSurface.toString());
-                LOGGER.info("Remove from not yet taken: " + obsSurface.toString());
+                LOGGER.info("[update] Remove from not yet taken: " + obsSurface.toString());
             }
         }
     }
 
     private void removeFromNotYetTaken(ObsSurface obsSurface) {
         notYetTaken.remove(obsSurface.toString());
-        LOGGER.info("Remove from not yet taken: " + obsSurface.toString());
+        LOGGER.info("[remove] Remove from not yet taken: " + obsSurface.toString());
     }
 
     private HashMap<String, ObsSurface> getAllPossibleObsSurfaces() {
@@ -171,15 +183,15 @@ public class ImageRegExp extends ExplorationAlgo {
             for (int c = 0; c < MapSettings.MAP_COLS; c++) {
                 tempCell = exploredMap.getCell(r, c);
                 if (tempCell.isObstacle()) {
-//                    System.out.println("isObstacle");
+                    System.out.println("tempCell" + tempCell);
                     tempNeighbours = exploredMap.getNeighboursHashMap(tempCell);
-//                    System.out.println("tempNeighbours" + tempNeighbours);
+                    System.out.println("tempNeighbours" + tempNeighbours);
                     for (AgentSettings.Direction nDir : tempNeighbours.keySet()) {
                         neighTempCell = tempNeighbours.get(nDir);
 //                        System.out.println("neighTempCell" + neighTempCell);
 
                         if (!neighTempCell.isObstacle()) {
-                            tempObsSurface = new ObsSurface(tempCell.getCoord(), nDir);
+                            tempObsSurface = new ObsSurface(neighTempCell.getCoord(), nDir);
 //                            System.out.println("tempObsSusrface" + tempObsSurface);
                             allPossibleObsSurfaces.put(tempObsSurface.toString(), tempObsSurface);
                         }

@@ -50,6 +50,6 @@ public class ObsSurface {
 
     @Override
     public String toString() {
-        return String.format("%d|%d|%s", this.getRow(), this.getCol(), AgentSettings.Direction.print(this.surface)); // row|col|surface
+        return String.format("%d|%d|%s", this.getCol(), this.getRow(), AgentSettings.Direction.print(this.surface)); // col|row|surface
     }
 }

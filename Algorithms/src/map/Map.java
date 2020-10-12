@@ -221,22 +221,22 @@ public class Map extends JPanel {
         // UP
         if (checkValidCellAndNotObs(c.getY() + 1, c.getX())) {
 //            System.out.println("neighbours up");
-            neighbours.put(AgentSettings.Direction.NORTH, getCell(c.getY() + 1, c.getX()));
+            neighbours.put(AgentSettings.Direction.SOUTH, getCell(c.getY() + 1, c.getX()));
         }
         // DOWN
         if (checkValidCellAndNotObs(c.getY() - 1, c.getX())) {
 //            System.out.println("neighbours down");
-            neighbours.put(AgentSettings.Direction.SOUTH, getCell(c.getY() - 1, c.getX()));
+            neighbours.put(AgentSettings.Direction.NORTH, getCell(c.getY() - 1, c.getX()));
         }
         // RIGHT
         if (checkValidCellAndNotObs(c.getY(), c.getX() + 1)) {
 //            System.out.println("neighbours right");
-            neighbours.put(AgentSettings.Direction.EAST, getCell(c.getY(), c.getX() + 1));
+            neighbours.put(AgentSettings.Direction.WEST, getCell(c.getY(), c.getX() + 1));
         }
         // LEFT
         if (checkValidCellAndNotObs(c.getY(), c.getX() - 1)) {
 //            System.out.println("neighbours left");
-            neighbours.put(AgentSettings.Direction.WEST, getCell(c.getY(), c.getX() - 1));
+            neighbours.put(AgentSettings.Direction.EAST, getCell(c.getY(), c.getX() - 1));
         }
 
 //        System.out.println(neighbours.size());
