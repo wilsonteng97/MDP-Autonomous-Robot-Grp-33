@@ -17,7 +17,7 @@ import os
 IMAGE_ENCODING = '.png'
 
 class ImageDetector:
-	def start(self,image,raw_image_name):
+	def start(self,image,raw_image_name,cut_width,cut_height):
 		# load the our fine-tuned model and label binarizer from disk
 		print("[INFO] loading model and label binarizer...")
 		model = load_model(config.MODEL_PATH)
@@ -25,7 +25,7 @@ class ImageDetector:
 
 		# resize and rotate image
 		image = imutils.resize(image, width=500)
-		image = imutils.rotate(image, 180)
+		# image = imutils.rotate(image, 180)
 
 		# run selective search on the image to generate bounding box proposal regions
 		print("[INFO] running selective search...")
@@ -95,6 +95,7 @@ class ImageDetector:
 		boxes_list = [boxes]
 		scores_list = [scores]
 		labels_list = [labels]
+		reply_list = []
 
 		boxes, scores, labels = wbf.weighted_boxes_fusion(boxes_list, scores_list, labels_list)
 		for i in range(len(boxes)):
@@ -110,8 +111,27 @@ class ImageDetector:
 				(0, 255, 0), 2)
 			y = startY - 10 if startY - 10 > 10 else startY + 10
 			text = str(labels[i])
+			box_width = abs(startX-endX)
+			box_height = abs(startY-endY)
+			for w in range(cut_width):
+				w = w+1
+				section_width = float(image.shape[1])/cut_width*w
+				# print(section_width)
+				if startX<section_width:
+					if (box_width/2)<(section_width - startX):
+						text = text + ", (" + str(w) + ", "
+						break
+			for h in range(cut_height):
+				h = h+1
+				section_height = float(image.shape[0])/cut_height*h
+				# print(section_height)
+				if startY<section_height:
+					if (box_height/2)<(section_height - startY):
+						text = text + str(h) + ")"
+						break
 			cv2.putText(image, text, (startX, y),
 				cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 2)
+			reply_list.append(text)
 		# save output image
 		# processed_image_path = 'processed_images' + raw_image_name[raw_image_name.rfind("/"):raw_image_name.rfind(".")] + "_processed" + IMAGE_ENCODING
 		# print(processed_image_path)
@@ -121,6 +141,6 @@ class ImageDetector:
 		print('save image successful?', save_success)
 
 		#get label_id
-		image_id = str(labels[0])
-		return image_id
+		# image_id = str(labels[0])
+		return reply_list
 

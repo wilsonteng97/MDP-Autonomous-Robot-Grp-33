@@ -8,6 +8,10 @@ import imutils
 import numpy as np
 import tensorflow as tf
 import pickle
+import PIL
+import glob
+from PIL import Image
+from math import ceil, floor
 
 from config import *
 from image_receiver import imagezmq_custom as imagezmq
@@ -161,34 +165,29 @@ class ImageProcessingServer:
 
             # split images
             # need to find out how to get crop width and crop height numbers
-            cdt_list = list(cdt.split("|"))
-            split_no = len(cdt_list)/2
-            self.split_image(frame,cdt_list,crop_width=1,crop_height=1)
-            for i in range(split_no):
-                split_image_name = cdt_list[0] + "_" + cdt_list[1] + IMAGE_ENCODING
-                split_image = cv2.imread('captured_image/'+split_image_name)
-                image_id = self.detect_image(split_image,split_image_name)	
-                if image_id == 0:
-                    self.image_hub.send_reply("None")
-                else:
-                    reply = str(image_id) + "|" + cdt_list[0] + "|" + cdt_list[1]
-                    self.image_hub.send_reply(reply)
-                cdt_list = cdt_list[2:0]                
+            # cdt_list = list(cdt.split("|"))
+            # split_no = len(cdt_list)/2
+            # self.split_image(frame,cdt_list,crop_width=1,crop_height=1)
+            # for i in range(split_no):
+            #     split_image_name = cdt_list[0] + "_" + cdt_list[1] + IMAGE_ENCODING
+            #     split_image = cv2.imread('captured_image/'+split_image_name)
+            #     image_id = self.detect_image(split_image,split_image_name)	
+            #     if image_id == 0:
+            #         self.image_hub.send_reply("None")
+            #     else:
+            #         reply = str(image_id) + "|" + cdt_list[0] + "|" + cdt_list[1]
+            #         self.image_hub.send_reply(reply)
+            #     cdt_list = cdt_list[2:0]                
 
-            # print('Raw image name = {}'.format(raw_image_name))
-            # import subprocess
-            # cur_dif = os.getcwd()
-            # detect_image_dir = os.path.join(cur_dif,'image_receiver')
-            # # os.chdir('C:\\\\Users\\xiaoqing\\Documents\\school stuff\\Year 3 Sem 1\\CZ3004 MDP\\MDP-Autonomous-Robot-Grp-33\\RPI\\Image-rec')
-            # os.chdir(detect_image_dir)
-            # cmd = ['python', 'detect_object_rcnn_wbf.py', '--image', 'captured_images/{}'.format(raw_image_name)]
-            # subprocess.run(cmd)
-
-            # image_id = self.detect_image(frame,raw_image_name)	
-            # if image_id == 0:
-            #     self.image_hub.send_reply("None")
-            # else:
-            #     self.image_hub.send_reply(image_id)
+            # split using bounding boxes
+            reply = self.detect_image(frame,raw_image_name,cut_width=3,cut_height=3)	
+            if reply == 0:
+                self.image_hub.send_reply("None")
+            else:
+                self.image_hub.send_reply(reply)
+            
+            # to add in when image sending ends
+            # self.stitch_images()
 
     def _get_true_positives(self, bbox_list, class_list, score_list):
             """
@@ -285,7 +284,7 @@ class ImageProcessingServer:
                 num_symbols += 1
 
             return obstacle_symbol_map, bounding_boxes, classes, scores
-    def detect_image(self,image,raw_image_name):
+    def detect_image(self, image, raw_image_name, cut_width, cut_height):
         # load the our fine-tuned model and label binarizer from disk
         print("[INFO] loading model and label binarizer...")
         model = load_model(config.MODEL_PATH)
@@ -369,6 +368,7 @@ class ImageProcessingServer:
         boxes_list = [boxes]
         scores_list = [scores]
         labels_list = [labels]
+        reply_list = []
 
         boxes, scores, labels = wbf.weighted_boxes_fusion(boxes_list, scores_list, labels_list)
         for i in range(len(boxes)):
@@ -384,18 +384,36 @@ class ImageProcessingServer:
                 (0, 255, 0), 2)
             y = startY - 10 if startY - 10 > 10 else startY + 10
             text = str(labels[i])
+            box_width = abs(startX-endX)
+            box_height = abs(startY-endY)
+            for w in range(cut_width):
+                w = w+1
+                section_width = float(image.shape[1])/cut_width*w
+                # print(section_width)
+                if startX<section_width:
+                    if (box_width/2)<(section_width - startX):
+                        text = text + ", (" + str(w) + ", "
+                        break
+            for h in range(cut_height):
+                h = h+1
+                section_height = float(image.shape[0])/cut_height*h
+                # print(section_height)
+                if startY<section_height:
+                    if (box_height/2)<(section_height - startY):
+                        text = text + str(h) + ")"
+                        break
             cv2.putText(image, text, (startX, y),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 2)
-        try:
-            image_id = str(labels[0])
+            reply_list.append(text)
+        if len(reply_list)!=0:
             # save output image
             processed_image_path = 'processed_images/' + raw_image_name[:raw_image_name.rfind(".")] + "_processed" + IMAGE_ENCODING
             # save processed image
             save_success = cv2.imwrite(processed_image_path, image)
             print('save image successful?', save_success)
-        except:
-            image_id = 0
-        return image_id
+            return reply_list
+        else:
+            return 0
 
     def split_image(self,image,cdt,crop_w,crop_h):
         image2 = image
@@ -417,3 +435,38 @@ class ImageProcessingServer:
                 print('save image successful?', save_success)
                 image = image2
                 cdt = cdt[2:]
+
+    def stitch_images(self):
+        frame_width = 1920
+        images_per_row = 5
+        padding = 0
+
+        os.chdir('processed_images')
+        images = glob.glob("*.png")
+
+        img_width, img_height = Image.open(images[0]).size
+        sf = (frame_width-(images_per_row-1)*padding)/(images_per_row*img_width)       #scaling factor
+        scaled_img_width = ceil(img_width*sf)                   #s
+        scaled_img_height = ceil(img_height*sf)
+
+        number_of_rows = ceil(len(images)/images_per_row)
+        frame_height = ceil(sf*img_height*number_of_rows) 
+
+        new_im = Image.new('RGB', (frame_width, frame_height))
+
+        i,j=0,0
+        for num, im in enumerate(images):
+            if num%images_per_row==0:
+                i=0
+            im = Image.open(im)
+            #Here I resize my opened image, so it is no bigger than 100,100
+            im.thumbnail((scaled_img_width,scaled_img_height))
+            #Iterate through a 4 by 4 grid with 100 spacing, to place my image
+            y_cord = (j//images_per_row)*scaled_img_height
+            new_im.paste(im, (i,y_cord))
+            print(i, y_cord)
+            i=(i+scaled_img_width)+padding
+            j+=1
+
+        new_im.save("stitched_output.png", "PNG", quality=80, optimize=True, progressive=True)
+        os.chdir("..")
