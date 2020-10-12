@@ -30,6 +30,10 @@ public class AgentSettings {
     public static final int LONG_MIN = 1;
     public static final int LONG_MAX = 5;
 
+    // Camera default range (In grids)
+    public static final int CAMERA_MIN = 1;
+    public static final int CAMERA_MAX = SHORT_MAX;     // Should be the same as SHORT_MAX
+
     public static final double RIGHT_THRES = 0.5;       // Threshold value or right sensor will calibrate once exceeded
     public static final double RIGHT_DIS_THRES_CLOSE = 1.0;
     public static final double RIGHT_DIS_THRES_FAR = 3.8;
