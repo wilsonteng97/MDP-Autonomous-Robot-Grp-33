@@ -169,8 +169,10 @@ public class ImageRegExp extends ExplorationAlgo {
     }
 
     private void removeFromNotYetTaken(ObsSurface obsSurface) {
-        notYetTaken.remove(obsSurface.toString());
-        LOGGER.info("[remove] Remove from not yet taken: " + obsSurface.toString());
+        if (notYetTaken.containsKey(obsSurface.toString())) {
+            notYetTaken.remove(obsSurface.toString());
+            LOGGER.info("[remove] Remove from not yet taken: " + obsSurface.toString());
+        }
     }
 
     private HashMap<String, ObsSurface> getAllPossibleObsSurfaces() {

@@ -527,16 +527,16 @@ public class Agent {
 
         switch (agtDir) {
             case NORTH:
-                rowInc = 0; colInc = 1; obsDir = WEST;
+                rowInc = 0; colInc = 1; obsDir = EAST;
                 break;
             case SOUTH:
-                rowInc = 0; colInc = -1; obsDir = EAST;
+                rowInc = 0; colInc = -1; obsDir = WEST;
                 break;
             case WEST:
-                rowInc = 1; colInc = 0; obsDir = SOUTH;
+                rowInc = 1; colInc = 0; obsDir = NORTH;
                 break;
             case EAST:
-                rowInc = -1; colInc = 0; obsDir = NORTH;
+                rowInc = -1; colInc = 0; obsDir = SOUTH;
                 break;
         }
 
@@ -566,7 +566,7 @@ public class Agent {
             if (rowInc==0) temp_row++; if (colInc==0) temp_col++;
             if (!left && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
                 if (tempCell.isObstacle()) {
-                    tempObsSurface = new ObsSurface(new Point(temp_col, temp_row), obsDir);
+                    tempObsSurface = new ObsSurface(new Point(temp_col - colInc, temp_row - rowInc), obsDir);
                     System.out.println("left tempObsSurface " + tempObsSurface);
                     surfaceTaken.put(tempObsSurface.toString(), tempObsSurface);
                     surfaceTakenList.add(tempObsSurface);
@@ -578,7 +578,7 @@ public class Agent {
             if (rowInc==0) temp_row--; if (colInc==0) temp_col--;
             if (!mid && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
                 if (tempCell.isObstacle()) {
-                    tempObsSurface = new ObsSurface(new Point(temp_col, temp_row), obsDir);
+                    tempObsSurface = new ObsSurface(new Point(temp_col - colInc, temp_row - rowInc), obsDir);
                     System.out.println("mid tempObsSurface " + tempObsSurface);
                     surfaceTaken.put(tempObsSurface.toString(), tempObsSurface);
                     surfaceTakenList.add(tempObsSurface);
@@ -590,7 +590,7 @@ public class Agent {
             if (rowInc==0) temp_row--; if (colInc==0) temp_col--;
             if (!right && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
                 if (tempCell.isObstacle()) {
-                    tempObsSurface = new ObsSurface(new Point(temp_col, temp_row), obsDir);
+                    tempObsSurface = new ObsSurface(new Point(temp_col - colInc, temp_row - rowInc), obsDir);
                     System.out.println("right tempObsSurface " + tempObsSurface);
                     surfaceTaken.put(tempObsSurface.toString(), tempObsSurface);
                     surfaceTakenList.add(tempObsSurface);
