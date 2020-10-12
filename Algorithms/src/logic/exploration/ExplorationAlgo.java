@@ -12,6 +12,7 @@ import network.NetworkMgr;
 import utils.SimulatorSettings;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -23,9 +24,9 @@ import static utils.SimulatorSettings.GOHOMESLOW_SLEEP;
 import static utils.SimulatorSettings.SIM;
 
 abstract public class ExplorationAlgo {
-    protected final Map exploredMap;
-    protected final Map realMap;
-    protected final Agent bot;
+    protected static Map exploredMap;
+    protected static Map realMap;
+    protected static Agent bot;
     protected int coverageLimit = 300;
     protected int timeLimit = 3600;    // in second
     protected int areaExplored;
@@ -334,6 +335,16 @@ abstract public class ExplorationAlgo {
         System.out.println("Went home");
     }
 
+    protected void goToPoint(int row, int col) {
+        AStarHeuristicSearch goToPoint = new AStarHeuristicSearch(exploredMap, bot, realMap);
+        goToPoint.runFastestPath(row, col);
+    }
+
+    protected void goToPoint(Point coord) {
+        AStarHeuristicSearch goToPoint = new AStarHeuristicSearch(exploredMap, bot, realMap);
+        goToPoint.runFastestPath(coord.y, coord.x);
+    }
+
     /**
      * Send bot back home following the original route
      * Shall only be used in simulation
@@ -564,7 +575,7 @@ abstract public class ExplorationAlgo {
     /**
      * Checks if there's wall/obstacle in front of the bot so can alignfront
      */
-    private boolean canAlignFront(Direction botDir) {
+    boolean canAlignFront(Direction botDir) {
         int row = bot.getAgtRow();
         int col = bot.getAgtCol();
 
@@ -585,7 +596,7 @@ abstract public class ExplorationAlgo {
     /**
      * Checks if there's wall/obstacle at RHS of the bot so can align right
      */
-    private boolean canAlignRight(Direction botDir) {
+    boolean canAlignRight(Direction botDir) {
 //        System.out.println(canAlignFront(Direction.clockwise90(botDir)));
         return canAlignFront(Direction.clockwise90(botDir));
     }

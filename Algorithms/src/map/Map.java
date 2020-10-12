@@ -6,6 +6,7 @@ import hardware.AgentSettings;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * @author Wilson Thurman Teng
@@ -167,8 +168,8 @@ public class Map extends JPanel {
     public boolean isWallOrObstacleCell(int row, int col) {
         return !checkValidCell(row, col) || getCell(row, col).isObstacle();
     }
-    public boolean checkValidMove(int row, int col) {
-        return checkValidCell(row, col) && getCell(row, col).isMovableCell();
+    public boolean checkValidCellAndNotObs(int row, int col) {
+        return checkValidCell(row, col) && !getCell(row, col).isObstacle();
     }
     public boolean checkWayPointClear(int row, int col) {
         return checkValidCell(row, col) && getCell(row, col).isExplorableCell();
@@ -198,21 +199,47 @@ public class Map extends JPanel {
     public ArrayList<Cell> getNeighbours(Cell c) {
         ArrayList<Cell> neighbours = new ArrayList<Cell>();
         // UP
-        if (checkValidMove(c.getY() + 1, c.getX())) {
+        if (checkValidCellAndNotObs(c.getY() + 1, c.getX())) {
             neighbours.add(getCell(c.getY() + 1, c.getX()));
         }
         // DOWN
-        if (checkValidMove( c.getY() - 1, c.getX())) {
+        if (checkValidCellAndNotObs( c.getY() - 1, c.getX())) {
             neighbours.add(getCell(c.getY() - 1, c.getX()));
         }
         // RIGHT
-        if (checkValidMove(c.getY(), c.getX() + 1)) {
+        if (checkValidCellAndNotObs(c.getY(), c.getX() + 1)) {
             neighbours.add(getCell(c.getY(), c.getX() + 1));
         }
         // LEFT
-        if (checkValidMove( c.getY(), c.getX() - 1)) {
+        if (checkValidCellAndNotObs( c.getY(), c.getX() - 1)) {
             neighbours.add(getCell(c.getY(), c.getX() - 1));
         }
+        return neighbours;
+    }
+    public HashMap<AgentSettings.Direction, Cell> getNeighboursHashMap(Cell c) {
+        HashMap<AgentSettings.Direction, Cell> neighbours = new HashMap<AgentSettings.Direction, Cell>();
+        // UP
+        if (checkValidCellAndNotObs(c.getY() + 1, c.getX())) {
+//            System.out.println("neighbours up");
+            neighbours.put(AgentSettings.Direction.NORTH, getCell(c.getY() + 1, c.getX()));
+        }
+        // DOWN
+        if (checkValidCellAndNotObs(c.getY() - 1, c.getX())) {
+//            System.out.println("neighbours down");
+            neighbours.put(AgentSettings.Direction.SOUTH, getCell(c.getY() - 1, c.getX()));
+        }
+        // RIGHT
+        if (checkValidCellAndNotObs(c.getY(), c.getX() + 1)) {
+//            System.out.println("neighbours right");
+            neighbours.put(AgentSettings.Direction.EAST, getCell(c.getY(), c.getX() + 1));
+        }
+        // LEFT
+        if (checkValidCellAndNotObs(c.getY(), c.getX() - 1)) {
+//            System.out.println("neighbours left");
+            neighbours.put(AgentSettings.Direction.WEST, getCell(c.getY(), c.getX() - 1));
+        }
+
+//        System.out.println(neighbours.size());
         return neighbours;
     }
     // Check if 3x3 robot fits if centered at a specific cell

@@ -1,5 +1,7 @@
 package hardware;
 
+import map.Cell;
+import map.ObsSurface;
 import map.Map;
 import map.MapSettings;
 import network.NetworkMgr;
@@ -7,7 +9,12 @@ import utils.SimulatorSettings;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
+
+import static hardware.AgentSettings.CAMERA_DIRECTION;
+import static hardware.AgentSettings.Direction.*;
 
 /**
  * Represents the Agent moving on the map.
@@ -51,6 +58,11 @@ public class Agent {
     private Sensor LR1;     // LRLeftTop
     private Sensor SR4;     // SRRightTop
     private Sensor SR5;     // SRRightBtm
+
+    // for image taking
+    private int imageCount = 0;
+    private HashSet<String> imageHashSet = new HashSet<String>();
+    private HashMap<String, ObsSurface> surfaceTaken = new HashMap<String, ObsSurface>();
 
     private boolean sim;
 
@@ -128,6 +140,7 @@ public class Agent {
     }
     public int getAgtRow() { return ctrY; }
     public int getAgtCol() { return ctrX; }
+    public Point getAgtPos() { return new Point(ctrX, ctrY); }
     public void setAgtCtrCoord(int row, int col) {
         int xDispl = ctrX - col; int yDispl = ctrY - row;
         this.ctrY = row; this.ctrX = col;
@@ -458,6 +471,23 @@ public class Agent {
 
 
     /**
+     * Image Recognition methods
+     */
+    public AgentSettings.Direction getCameraDirection() {
+        switch (CAMERA_DIRECTION) {
+            case EAST:
+                return AgentSettings.Direction.clockwise90(this.agtDir);
+            case WEST:
+                return AgentSettings.Direction.antiClockwise90(this.agtDir);
+            case NORTH:
+                return this.agtDir;
+            case SOUTH:
+                return AgentSettings.Direction.reverse(this.agtDir);
+        }
+        return null;
+    }
+
+    /**
      * take picture and send out command
      * @param row row of the sticker
      * @param col column of the sticker
@@ -472,5 +502,80 @@ public class Agent {
         System.out.println("Taking image: " + msg);
     }
 
+    public void takePicture(Point leftObs, Point middleObs, Point rightObs) {
+        String msg = AgentSettings.Actions.parsePictureMsg(leftObs, middleObs, rightObs);
 
+//        if (!sim) {
+//            NetworkMgr comm = NetworkMgr.getInstance();
+//            comm.sendMsg(msg + "", NetworkMgr.INSTRUCTIONS);
+//        }
+        System.out.println("Taking image: " + msg);
+    }
+
+
+    public HashMap<String, ObsSurface> getSurfaceTaken() {
+        return surfaceTaken;
+    }
+
+    public ArrayList<ObsSurface> imageRecognitionRight(Map exploredMap) {
+        ArrayList<ObsSurface> surfaceTakenList = new ArrayList<ObsSurface>();
+        int rowInc = 0, colInc = 0;
+        int camera_row, camera_col, temp_row, temp_col;
+        AgentSettings.Direction obsDir = null;
+        Cell tempCell;
+
+        switch (agtDir) {
+            case NORTH:
+                rowInc = 0; colInc = 1; obsDir = WEST;
+                break;
+            case SOUTH:
+                rowInc = 0; colInc = -1; obsDir = EAST;
+                break;
+            case WEST:
+                rowInc = 1; colInc = 0; obsDir = SOUTH;
+                break;
+            case EAST:
+                rowInc = -1; colInc = 0; obsDir = NORTH;
+                break;
+        }
+
+        camera_row = getAgtY() + rowInc;
+        camera_col = getAgtX() + colInc;
+
+        System.out.println("camera_row|camera_col" + camera_row + "|" + camera_col);
+        for (int offset = AgentSettings.CAMERA_MIN; offset <= AgentSettings.CAMERA_MAX; offset++) {
+            temp_row = camera_row + rowInc * offset;
+            temp_col = camera_col + colInc * offset;
+            tempCell = exploredMap.getCell(temp_row, temp_col);
+//            System.out.println("camera_row|camera_col " + camera_row + "|" + camera_col);
+            // leftObs
+            if (rowInc==0) temp_row++; if (colInc==0) temp_col++;
+            if (tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
+                if (tempCell.isObstacle()) {
+                    ObsSurface os = new ObsSurface(new Point(temp_row, temp_col), obsDir);
+                    surfaceTakenList.add(os);
+                }
+            }
+
+            // middleObs
+            if (rowInc==0) temp_row--; if (colInc==0) temp_col--;
+            if (tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
+                if (tempCell.isObstacle()) {
+                    ObsSurface os = new ObsSurface(new Point(temp_row, temp_col), obsDir);
+                    surfaceTakenList.add(os);
+                }
+            }
+
+            // rightObs
+            if (rowInc==0) temp_row--; if (colInc==0) temp_col--;
+            if (tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
+                if (tempCell.isObstacle()) {
+                    ObsSurface os = new ObsSurface(new Point(temp_row, temp_col), obsDir);
+                    surfaceTakenList.add(os);
+                }
+            }
+        }
+        System.out.println("surfaceTakenList" + surfaceTakenList);
+        return surfaceTakenList;
+    }
 }

@@ -8,7 +8,7 @@ public class ObsSurface {
     private Point blkPos;
     private AgentSettings.Direction surface;
 
-    public ObsSurface(int row, int col, AgentSettings.Direction surface) {
+    public ObsSurface(int col, int row, AgentSettings.Direction surface) {
         this.blkPos = new Point(col, row);
         this.surface = surface;
     }
@@ -18,6 +18,7 @@ public class ObsSurface {
         this.blkPos = blkPos;
         this.surface = surface;
     }
+
 
     public Point getPos() {
         return blkPos;
@@ -49,6 +50,6 @@ public class ObsSurface {
 
     @Override
     public String toString() {
-        return String.format("%d|%d|%s", this.blkPos.y, this.blkPos.x, this.surface.toString());   // row|col|surface
+        return String.format("%d|%d|%s", this.getRow(), this.getCol(), AgentSettings.Direction.print(this.surface)); // row|col|surface
     }
 }
