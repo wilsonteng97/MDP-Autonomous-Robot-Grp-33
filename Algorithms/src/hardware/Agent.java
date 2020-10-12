@@ -25,6 +25,9 @@ import java.util.concurrent.TimeUnit;
  * [01] represents position at 0 row, 1 col
  * SR = Short Range Sensor, LR = Long Range Sensor, US = Ultrasonic Sensor
  *
+ * [RPI Camera Placement] :
+ * Camera is overlooking the right side of the robot and has 3 grids-wide vision.
+ *
  * @author Wilson Thurman Teng
  */
 
