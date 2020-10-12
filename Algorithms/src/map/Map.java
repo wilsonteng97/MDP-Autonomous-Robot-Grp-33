@@ -107,7 +107,7 @@ public class Map extends JPanel {
     }
 
     /**
-     * Set grid Methods
+     * Grid Methods
      */
     public void removePaths() {
         for (int row = 0; row < MapSettings.MAP_ROWS; row++) {
@@ -198,20 +198,20 @@ public class Map extends JPanel {
     public ArrayList<Cell> getNeighbours(Cell c) {
         ArrayList<Cell> neighbours = new ArrayList<Cell>();
         // UP
-        if (checkValidMove(c.getCoord().y + 1, c.getCoord().x)) {
-            neighbours.add(getCell(c.getCoord().y + 1, c.getCoord().x));
+        if (checkValidMove(c.getY() + 1, c.getX())) {
+            neighbours.add(getCell(c.getY() + 1, c.getX()));
         }
         // DOWN
-        if (checkValidMove( c.getCoord().y - 1, c.getCoord().x)) {
-            neighbours.add(getCell(c.getCoord().y - 1, c.getCoord().x));
+        if (checkValidMove( c.getY() - 1, c.getX())) {
+            neighbours.add(getCell(c.getY() - 1, c.getX()));
         }
         // RIGHT
-        if (checkValidMove(c.getCoord().y, c.getCoord().x + 1)) {
-            neighbours.add(getCell(c.getCoord().y, c.getCoord().x + 1));
+        if (checkValidMove(c.getY(), c.getX() + 1)) {
+            neighbours.add(getCell(c.getY(), c.getX() + 1));
         }
         // LEFT
-        if (checkValidMove( c.getCoord().y, c.getCoord().x - 1)) {
-            neighbours.add(getCell(c.getCoord().y, c.getCoord().x - 1));
+        if (checkValidMove( c.getY(), c.getX() - 1)) {
+            neighbours.add(getCell(c.getY(), c.getX() - 1));
         }
         return neighbours;
     }
@@ -240,6 +240,7 @@ public class Map extends JPanel {
         }
         return true;
     }
+    
 //    public boolean checkCanMoveThruCell(int row, int col) {
 //        for(int r = row-1; r <= row+1; r++) {
 //            for(int c = col-1; c <= col+1; c++) {
