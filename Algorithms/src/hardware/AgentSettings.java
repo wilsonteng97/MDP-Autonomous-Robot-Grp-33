@@ -1,5 +1,7 @@
 package hardware;
 
+import java.awt.*;
+
 public class AgentSettings {
     // Agent Start Direction
     public static final Direction START_DIR = Direction.NORTH;
@@ -33,6 +35,9 @@ public class AgentSettings {
     // Camera default range (In grids)
     public static final int CAMERA_MIN = 1;
     public static final int CAMERA_MAX = SHORT_MAX;     // Should be the same as SHORT_MAX
+
+    // Camera Direction
+    public static final Direction CAMERA_DIRECTION = Direction.EAST;
 
     public static final double RIGHT_THRES = 0.5;       // Threshold value or right sensor will calibrate once exceeded
     public static final double RIGHT_DIS_THRES_CLOSE = 1.0;
@@ -145,6 +150,24 @@ public class AgentSettings {
          */
         public static String parsePictureMsg(int row, int col) {
             return "P|" + Integer.toString(col) + "|" + Integer.toString(row) + "|";
+        }
+
+        public static String parsePictureMsg(Point leftObs, Point middleObs, Point rightObs) {
+            if (leftObs == null) {
+                leftObs = new Point(-1,-1);
+            }
+            if (middleObs == null) {
+                middleObs = new Point(-1,-1);
+            }
+            if (rightObs == null) {
+                rightObs = new Point(-1,-1);
+            }
+
+            String s = String.join(":", Integer.toString(leftObs.x), Integer.toString(leftObs.y),
+                    Integer.toString(middleObs.x), Integer.toString(middleObs.y),
+                    Integer.toString(rightObs.x), Integer.toString(rightObs.y));
+
+            return "P:" + s.toString() + "|";
         }
     }
 }
