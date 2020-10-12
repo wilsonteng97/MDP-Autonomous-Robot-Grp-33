@@ -4,24 +4,19 @@ import hardware.AgentSettings;
 
 import java.awt.*;
 
-public class BlkSurface {
+public class ObsSurface {
     private Point blkPos;
     private AgentSettings.Direction surface;
 
-    public BlkSurface(int row, int col, AgentSettings.Direction surface) {
+    public ObsSurface(int row, int col, AgentSettings.Direction surface) {
         this.blkPos = new Point(col, row);
         this.surface = surface;
     }
 
 
-    public BlkSurface(Point blkPos, AgentSettings.Direction surface) {
+    public ObsSurface(Point blkPos, AgentSettings.Direction surface) {
         this.blkPos = blkPos;
         this.surface = surface;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("%d|%d|%s", this.blkPos.y, this.blkPos.x, this.surface.toString());   // row|col|surface
     }
 
     public Point getPos() {
@@ -50,5 +45,10 @@ public class BlkSurface {
 
     public void setPos(int row, int col) {
         this.blkPos = new Point(col, row);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%d|%d|%s", this.blkPos.y, this.blkPos.x, this.surface.toString());   // row|col|surface
     }
 }
