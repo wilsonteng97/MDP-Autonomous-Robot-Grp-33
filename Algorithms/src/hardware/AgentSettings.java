@@ -149,7 +149,7 @@ public class AgentSettings {
          * @return taking picture command
          */
         public static String parsePictureMsg(int row, int col) {
-            return "P|" + Integer.toString(col) + "|" + Integer.toString(row) + "|";
+            return "P" + Integer.toString(col) + ":" + Integer.toString(row) + "|";
         }
 
         public static String parsePictureMsg(Point leftObs, Point middleObs, Point rightObs) {
@@ -167,7 +167,7 @@ public class AgentSettings {
                     Integer.toString(middleObs.x), Integer.toString(middleObs.y),
                     Integer.toString(rightObs.x), Integer.toString(rightObs.y));
 
-            return "P:" + s.toString() + "|";
+            return "P" + s.toString() + "|";
         }
     }
 }
