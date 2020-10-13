@@ -233,27 +233,19 @@ public class ImageRegExp extends ExplorationAlgo {
                 break;
         }
 
-        // left/right reachable
-        if (rowInc==0) obsY++; if (colInc==0) obsX++;
         for (int offset = AgentSettings.CAMERA_MIN; offset <= AgentSettings.CAMERA_MAX + 1; offset++) {
             row = obsY + rowInc * offset;
             col = obsX + colInc * offset;
+            // left/right reachable
+            if (rowInc==0) row++; if (colInc==0) col++;
             if (exploredMap.checkRobotFitsCell(row, col)) return true;
-        }
 
-        // Mid reachable
-        if (rowInc==0) obsY--; if (colInc==0) obsX--;
-        for (int offset = AgentSettings.CAMERA_MIN; offset <= AgentSettings.CAMERA_MAX + 1; offset++) {
-            row = obsY + rowInc * offset;
-            col = obsX + colInc * offset;
+            // Mid reachable
+            if (rowInc==0) row--; if (colInc==0) col--;
             if (exploredMap.checkRobotFitsCell(row, col)) return true;
-        }
 
-        // left/right reachable
-        if (rowInc==0) obsY--; if (colInc==0) obsX--;
-        for (int offset = AgentSettings.CAMERA_MIN; offset <= AgentSettings.CAMERA_MAX + 1; offset++) {
-            row = obsY + rowInc * offset;
-            col = obsX + colInc * offset;
+            // left/right reachable
+            if (rowInc==0) row--; if (colInc==0) col--;
             if (exploredMap.checkRobotFitsCell(row, col)) return true;
         }
 
