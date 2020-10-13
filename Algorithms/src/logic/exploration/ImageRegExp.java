@@ -85,7 +85,7 @@ public class ImageRegExp extends ExplorationAlgo {
         ArrayList<ObsSurface> surfTaken;
 
         ObsSurface nearestObstacle = nearestObsSurface(bot.getAgtPos(), notYetTaken);
-        Cell nearestCell = findSurroundingReachable(nearestObstacle.getRow(), nearestObstacle.getCol());
+        Cell nearestCell = findSurfaceSurroundingReachable(nearestObstacle.getRow(), nearestObstacle.getCol(), nearestObstacle.getSurface());
 
         if (nearestCell != null) {
             // go to nearest cell
@@ -378,5 +378,47 @@ public class ImageRegExp extends ExplorationAlgo {
         }
     }
 
-
+    /**
+     * find the closest reachable cell that is not blocked by obstacle near the target surface
+     * @return
+     */
+    protected Cell findSurfaceSurroundingReachable(int row, int col, AgentSettings.Direction dir) {
+        return super.findSurroundingReachable(row, col);
+//        boolean leftClear = true, rightClear = true, topClear = true, botClear = true;
+//        int offset = 1;
+//        Cell tmpCell;
+//        while (true) {
+//            // bot
+//            if (row - offset >= 0) {
+//                tmpCell = exploredMap.getCell(row - offset, col);
+//                if (!tmpCell.isExplored() || tmpCell.isObstacle()) botClear = false;
+//                else if (botClear && !tmpCell.isObstacle() && !tmpCell.isVirtualWall()) return tmpCell;
+//            }
+//
+//            // left
+//            if (col - offset >= 0) {
+//                tmpCell = exploredMap.getCell(row, col - offset);
+//                if (!tmpCell.isExplored() || tmpCell.isObstacle()) leftClear = false;
+//                else if (leftClear && !tmpCell.isObstacle() && !tmpCell.isVirtualWall()) return tmpCell;
+//            }
+//
+//            // right
+//            if (row + offset < MapSettings.MAP_ROWS) {
+//                tmpCell = exploredMap.getCell(row + offset, col);
+//                if (!tmpCell.isExplored() || tmpCell.isObstacle()) rightClear = false;
+//                else if (rightClear && !tmpCell.isObstacle() && !tmpCell.isVirtualWall()) return tmpCell;
+//            }
+//
+//            // top
+//            if (col + offset < MapSettings.MAP_COLS) {
+//                tmpCell = exploredMap.getCell(row, col + offset);
+//                if (!tmpCell.isExplored() || tmpCell.isObstacle()) topClear = false;
+//                else if (topClear && !tmpCell.isObstacle() && !tmpCell.isVirtualWall()) return tmpCell;
+//            }
+//
+//            if (!topClear && !botClear && !leftClear && !rightClear) return null;
+//
+//            offset++;
+//        }
+    }
 }
