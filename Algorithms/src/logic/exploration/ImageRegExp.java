@@ -320,9 +320,9 @@ public class ImageRegExp extends ExplorationAlgo {
             }
         } else {
 //            System.out.println("[DEBUG]Reverse Direction");
-//            moveBot(Actions.FACE_LEFT);
+            moveBot(Actions.FACE_LEFT);
 //            tryTakePicture();
-//            moveBot(Actions.FACE_LEFT);
+            moveBot(Actions.FACE_LEFT);
         }
 
         if (!bot.isSim()) {
