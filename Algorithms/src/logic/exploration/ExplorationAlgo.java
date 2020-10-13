@@ -534,42 +534,42 @@ abstract public class ExplorationAlgo {
         return sensorReadings;
     }
 
-    /**
-     * take picture and send out coordinate is there are walls/obstacles in surrounding
-     */
-    protected void tryTakePicture() {
-        Direction botDir = bot.getAgtDir();
-        for (int offset = AgentSettings.SHORT_MIN; offset <= AgentSettings.SHORT_MAX; offset++) {
-            if (canTakePicture(botDir, offset)) {
-                if (botDir == Direction.NORTH) bot.takePicture(bot.getAgtRow(), bot.getAgtCol() + (1 + offset));
-                else if (botDir == Direction.EAST) bot.takePicture(bot.getAgtRow() - (1 + offset), bot.getAgtCol());
-                else if (botDir == Direction.WEST) bot.takePicture(bot.getAgtRow() + (1 + offset), bot.getAgtCol());
-                else bot.takePicture(bot.getAgtRow(), bot.getAgtCol() - (1 + offset));
-                break;
-            }
-        }
-    }
+//    /**
+//     * take picture and send out coordinate is there are walls/obstacles in surrounding
+//     */
+//    protected void tryTakePicture() {
+//        Direction botDir = bot.getAgtDir();
+//        for (int offset = AgentSettings.SHORT_MIN; offset <= AgentSettings.SHORT_MAX; offset++) {
+//            if (canTakePicture(botDir, offset)) {
+//                if (botDir == Direction.NORTH) bot.takePicture(bot.getAgtRow(), bot.getAgtCol() + (1 + offset));
+//                else if (botDir == Direction.EAST) bot.takePicture(bot.getAgtRow() - (1 + offset), bot.getAgtCol());
+//                else if (botDir == Direction.WEST) bot.takePicture(bot.getAgtRow() + (1 + offset), bot.getAgtCol());
+//                else bot.takePicture(bot.getAgtRow(), bot.getAgtCol() - (1 + offset));
+//                break;
+//            }
+//        }
+//    }
 
-    /**
-     * Check if the if the center cell on the RHS of the bot is wall/obstacle so can take picture
-     */
-    private boolean canTakePicture(Direction botDir, int offset) {
-        int row = bot.getAgtRow();
-        int col = bot.getAgtCol();
-
-        switch (botDir) {
-            case NORTH:
-                return exploredMap.isWallOrObstacleCell(row, col + (1 + offset));
-            case EAST:
-                return exploredMap.isWallOrObstacleCell(row - (1 + offset), col);
-            case SOUTH:
-                return exploredMap.isWallOrObstacleCell(row, col - (1 + offset));
-            case WEST:
-                return exploredMap.isWallOrObstacleCell(row + (1 + offset), col);
-        }
-
-        return false;
-    }
+//    /**
+//     * Check if the if the center cell on the RHS of the bot is wall/obstacle so can take picture
+//     */
+//    private boolean canTakePicture(Direction botDir, int offset) {
+//        int row = bot.getAgtRow();
+//        int col = bot.getAgtCol();
+//
+//        switch (botDir) {
+//            case NORTH:
+//                return exploredMap.isWallOrObstacleCell(row, col + (1 + offset));
+//            case EAST:
+//                return exploredMap.isWallOrObstacleCell(row - (1 + offset), col);
+//            case SOUTH:
+//                return exploredMap.isWallOrObstacleCell(row, col - (1 + offset));
+//            case WEST:
+//                return exploredMap.isWallOrObstacleCell(row + (1 + offset), col);
+//        }
+//
+//        return false;
+//    }
 
 
     /**

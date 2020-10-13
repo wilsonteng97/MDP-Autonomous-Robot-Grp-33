@@ -37,7 +37,7 @@ public class RightWallHugging extends ExplorationAlgo {
         } else {
 //            System.out.println("[DEBUG]Reverse Direction");
             moveBot(Actions.FACE_LEFT);
-            tryTakePicture();
+//            tryTakePicture();
             moveBot(Actions.FACE_LEFT);
         }
 

@@ -142,16 +142,6 @@ public class AgentSettings {
             }
         }
 
-        /**
-         * parse and returns a taking picture command
-         * @param row row of the sticker
-         * @param col column of the sticker
-         * @return taking picture command
-         */
-        public static String parsePictureMsg(int row, int col) {
-            return "P" + Integer.toString(col) + ":" + Integer.toString(row) + "|";
-        }
-
         public static String parsePictureMsg(Point leftObs, Point middleObs, Point rightObs) {
             if (leftObs == null) {
                 leftObs = new Point(-1,-1);

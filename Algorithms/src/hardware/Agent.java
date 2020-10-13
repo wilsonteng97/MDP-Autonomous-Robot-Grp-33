@@ -487,32 +487,6 @@ public class Agent {
         return null;
     }
 
-    /**
-     * take picture and send out command
-     * @param row row of the sticker
-     * @param col column of the sticker
-     */
-    public void takePicture(int row, int col) {
-        String msg = AgentSettings.Actions.parsePictureMsg(row, col);
-
-//        if (!sim) {
-//            NetworkMgr comm = NetworkMgr.getInstance();
-//            comm.sendMsg(msg + "", NetworkMgr.INSTRUCTIONS);
-//        }
-        System.out.println("Taking image: " + msg);
-    }
-
-    public void takePicture(Point leftObs, Point middleObs, Point rightObs) {
-        String msg = AgentSettings.Actions.parsePictureMsg(leftObs, middleObs, rightObs);
-
-//        if (!sim) {
-//            NetworkMgr comm = NetworkMgr.getInstance();
-//            comm.sendMsg(msg + "", NetworkMgr.INSTRUCTIONS);
-//        }
-        System.out.println("Taking image: " + msg);
-    }
-
-
     public HashMap<String, ObsSurface> getSurfaceTaken() {
         return surfaceTaken;
     }
