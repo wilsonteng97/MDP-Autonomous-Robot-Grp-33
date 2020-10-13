@@ -562,40 +562,35 @@ public class Agent {
             // Left/Right Obs
             if (rowInc==0) temp_row++; if (colInc==0) temp_col++;
             tempCell = exploredMap.getCell(temp_row, temp_col);
-            if (!left && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
-                if (tempCell.isObstacle()) {
-                    tempObsSurface = new ObsSurface(new Point(temp_col - colInc, temp_row - rowInc), obsDir);
+            if (tempCell.isObstacle() && !left && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
+                tempObsSurface = new ObsSurface(new Point(temp_col - colInc, temp_row - rowInc), obsDir);
 //                    System.out.println("left tempObsSurface " + tempObsSurface);
-                    surfaceTaken.put(tempObsSurface.toString(), tempObsSurface);
-                    surfaceTakenList.add(tempObsSurface);
-                    left = true;
-                }
+                surfaceTaken.put(tempObsSurface.toString(), tempObsSurface);
+                surfaceTakenList.add(tempObsSurface);
+                left = true;
+
             }
 
             // middleObs
             if (rowInc==0) temp_row--; if (colInc==0) temp_col--;
             tempCell = exploredMap.getCell(temp_row, temp_col);
-            if (!mid && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
-                if (tempCell.isObstacle()) {
-                    tempObsSurface = new ObsSurface(new Point(temp_col - colInc, temp_row - rowInc), obsDir);
+            if (tempCell.isObstacle() && !mid && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
+                tempObsSurface = new ObsSurface(new Point(temp_col - colInc, temp_row - rowInc), obsDir);
 //                    System.out.println("mid tempObsSurface " + tempObsSurface);
-                    surfaceTaken.put(tempObsSurface.toString(), tempObsSurface);
-                    surfaceTakenList.add(tempObsSurface);
-                    mid = true;
-                }
+                surfaceTaken.put(tempObsSurface.toString(), tempObsSurface);
+                surfaceTakenList.add(tempObsSurface);
+                mid = true;
             }
 
             // Left/Right obs
             if (rowInc==0) temp_row--; if (colInc==0) temp_col--;
             tempCell = exploredMap.getCell(temp_row, temp_col);
-            if (!right && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
-                if (tempCell.isObstacle()) {
-                    tempObsSurface = new ObsSurface(new Point(temp_col - colInc, temp_row - rowInc), obsDir);
+            if (tempCell.isObstacle() && !right && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
+                tempObsSurface = new ObsSurface(new Point(temp_col - colInc, temp_row - rowInc), obsDir);
 //                    System.out.println("right tempObsSurface " + tempObsSurface);
-                    surfaceTaken.put(tempObsSurface.toString(), tempObsSurface);
-                    surfaceTakenList.add(tempObsSurface);
-                    right = true;
-                }
+                surfaceTaken.put(tempObsSurface.toString(), tempObsSurface);
+                surfaceTakenList.add(tempObsSurface);
+                right = true;
             }
         }
 
@@ -647,33 +642,27 @@ public class Agent {
             // Left/Right Obs
             if (rowInc==0) temp_row++; if (colInc==0) temp_col++;
             tempCell = exploredMap.getCell(temp_row, temp_col);
-            if (!left && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
-                if (tempCell.isObstacle()) {
-                    if ((obsDir == NORTH) || (obsDir == WEST)) obsList.put("R", new Point(temp_col, temp_row));
-                    if ((obsDir == SOUTH) || (obsDir == EAST)) obsList.put("L", new Point(temp_col, temp_row));
-                    left = true;
-                }
+            if (tempCell.isObstacle() && !left && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
+                if ((obsDir == NORTH) || (obsDir == WEST)) obsList.put("R", new Point(temp_col, temp_row));
+                if ((obsDir == SOUTH) || (obsDir == EAST)) obsList.put("L", new Point(temp_col, temp_row));
+                left = true;
             }
 
             // middleObs
             if (rowInc==0) temp_row--; if (colInc==0) temp_col--;
             tempCell = exploredMap.getCell(temp_row, temp_col);
-            if (!mid && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
-                if (tempCell.isObstacle()) {
-                    obsList.put("M", new Point(temp_col, temp_row));
-                    mid = true;
-                }
+            if (tempCell.isObstacle() && !mid && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
+                obsList.put("M", new Point(temp_col, temp_row));
+                mid = true;
             }
 
             // Left/Right obs
             if (rowInc==0) temp_row--; if (colInc==0) temp_col--;
             tempCell = exploredMap.getCell(temp_row, temp_col);
-            if (!right && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
-                if (tempCell.isObstacle()) {
-                    if ((obsDir == NORTH) || (obsDir == WEST)) obsList.put("L", new Point(temp_col, temp_row));
-                    if ((obsDir == SOUTH) || (obsDir == EAST)) obsList.put("R", new Point(temp_col, temp_row));
-                    right = true;
-                }
+            if (tempCell.isObstacle() && !right && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
+                if ((obsDir == NORTH) || (obsDir == WEST)) obsList.put("L", new Point(temp_col, temp_row));
+                if ((obsDir == SOUTH) || (obsDir == EAST)) obsList.put("R", new Point(temp_col, temp_row));
+                right = true;
             }
         }
 
