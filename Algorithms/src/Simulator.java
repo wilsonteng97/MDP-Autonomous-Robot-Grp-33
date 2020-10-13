@@ -1,6 +1,7 @@
 import hardware.Agent;
 import hardware.AgentSettings;
 import logic.exploration.ExplorationAlgo;
+import logic.exploration.ImageRegExp;
 import logic.exploration.RightWallHugging;
 import logic.fastestpath.AStarHeuristicSearch;
 import logic.fastestpath.FastestPathAlgo;
@@ -246,7 +247,11 @@ public class Simulator {
                 explorationMap.repaint();
 
                 ExplorationAlgo exploration;
-                exploration = new RightWallHugging(explorationMap, dummyMap, agt, coverageLimit, timeLimit);
+                if (SimulatorSettings.EXPLORATION_ALGO_MODE == "P") {
+                    exploration = new ImageRegExp(explorationMap, dummyMap, agt, coverageLimit, timeLimit);
+                } else {
+                    exploration = new RightWallHugging(explorationMap, dummyMap, agt, coverageLimit, timeLimit);
+                }
 
 //                if (!sim) {
                     // Transmit signal to start Agent

@@ -12,6 +12,7 @@ import network.NetworkMgr;
 import utils.SimulatorSettings;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -23,9 +24,9 @@ import static utils.SimulatorSettings.GOHOMESLOW_SLEEP;
 import static utils.SimulatorSettings.SIM;
 
 abstract public class ExplorationAlgo {
-    protected final Map exploredMap;
-    protected final Map realMap;
-    protected final Agent bot;
+    protected static Map exploredMap;
+    protected static Map realMap;
+    protected static Agent bot;
     protected int coverageLimit = 300;
     protected int timeLimit = 3600;    // in second
     protected int areaExplored;
@@ -49,7 +50,7 @@ abstract public class ExplorationAlgo {
         System.out.println("[coverageLimit && timeLimit(s)] " + coverageLimit + " | " + timeLimit);
     }
 
-    public void runExploration() {
+    public void runExploration() throws InterruptedException {
         // FIXME check for real bot connection
 //        System.out.println("[DEBUG: runExploration] executed");
         if (!bot.isSim()) {
@@ -118,7 +119,7 @@ abstract public class ExplorationAlgo {
             System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
 
             // take picture on RHS if can
-            tryTakePicture();
+//            tryTakePicture();
 
 
             areaExplored = calculateAreaExplored();
@@ -334,6 +335,16 @@ abstract public class ExplorationAlgo {
         System.out.println("Went home");
     }
 
+    protected void goToPoint(int row, int col) {
+        AStarHeuristicSearch goToPoint = new AStarHeuristicSearch(exploredMap, bot, realMap);
+        goToPoint.runFastestPath(row, col);
+    }
+
+    protected void goToPoint(Point coord) {
+        AStarHeuristicSearch goToPoint = new AStarHeuristicSearch(exploredMap, bot, realMap);
+        goToPoint.runFastestPath(coord.y, coord.x);
+    }
+
     /**
      * Send bot back home following the original route
      * Shall only be used in simulation
@@ -504,58 +515,67 @@ abstract public class ExplorationAlgo {
     }
 
     /**
-     * Sets the bot's sensors, processes the sensor data and repaints the map.
+     * Sets the bot's sensors and processes the sensor data.
      */
-    protected int[] senseAndRepaint() {
+    protected int[] sense() {
         bot.setSensors();
         int[] sensorReadings = bot.senseEnv(exploredMap, realMap);
-        exploredMap.repaint();
 
         return sensorReadings;
     }
 
     /**
-     * take picture and send out coordinate is there are walls/obstacles in surrounding
+     * Sets the bot's sensors, processes the sensor data and repaints the map.
      */
-    protected void tryTakePicture() {
-        Direction botDir = bot.getAgtDir();
-        for (int offset = AgentSettings.SHORT_MIN; offset <= AgentSettings.SHORT_MAX; offset++) {
-            if (canTakePicture(botDir, offset)) {
-                if (botDir == Direction.NORTH) bot.takePicture(bot.getAgtRow(), bot.getAgtCol() + (1 + offset));
-                else if (botDir == Direction.EAST) bot.takePicture(bot.getAgtRow() - (1 + offset), bot.getAgtCol());
-                else if (botDir == Direction.WEST) bot.takePicture(bot.getAgtRow() + (1 + offset), bot.getAgtCol());
-                else bot.takePicture(bot.getAgtRow(), bot.getAgtCol() - (1 + offset));
-                break;
-            }
-        }
+    protected int[] senseAndRepaint() {
+        int[] sensorReadings = this.sense();
+        exploredMap.repaint();
+
+        return sensorReadings;
     }
 
-    /**
-     * Check if the if the center cell on the RHS of the bot is wall/obstacle so can take picture
-     */
-    private boolean canTakePicture(Direction botDir, int offset) {
-        int row = bot.getAgtRow();
-        int col = bot.getAgtCol();
+//    /**
+//     * take picture and send out coordinate is there are walls/obstacles in surrounding
+//     */
+//    protected void tryTakePicture() {
+//        Direction botDir = bot.getAgtDir();
+//        for (int offset = AgentSettings.SHORT_MIN; offset <= AgentSettings.SHORT_MAX; offset++) {
+//            if (canTakePicture(botDir, offset)) {
+//                if (botDir == Direction.NORTH) bot.takePicture(bot.getAgtRow(), bot.getAgtCol() + (1 + offset));
+//                else if (botDir == Direction.EAST) bot.takePicture(bot.getAgtRow() - (1 + offset), bot.getAgtCol());
+//                else if (botDir == Direction.WEST) bot.takePicture(bot.getAgtRow() + (1 + offset), bot.getAgtCol());
+//                else bot.takePicture(bot.getAgtRow(), bot.getAgtCol() - (1 + offset));
+//                break;
+//            }
+//        }
+//    }
 
-        switch (botDir) {
-            case NORTH:
-                return exploredMap.isWallOrObstacleCell(row, col + (1 + offset));
-            case EAST:
-                return exploredMap.isWallOrObstacleCell(row - (1 + offset), col);
-            case SOUTH:
-                return exploredMap.isWallOrObstacleCell(row, col - (1 + offset));
-            case WEST:
-                return exploredMap.isWallOrObstacleCell(row + (1 + offset), col);
-        }
-
-        return false;
-    }
+//    /**
+//     * Check if the if the center cell on the RHS of the bot is wall/obstacle so can take picture
+//     */
+//    private boolean canTakePicture(Direction botDir, int offset) {
+//        int row = bot.getAgtRow();
+//        int col = bot.getAgtCol();
+//
+//        switch (botDir) {
+//            case NORTH:
+//                return exploredMap.isWallOrObstacleCell(row, col + (1 + offset));
+//            case EAST:
+//                return exploredMap.isWallOrObstacleCell(row - (1 + offset), col);
+//            case SOUTH:
+//                return exploredMap.isWallOrObstacleCell(row, col - (1 + offset));
+//            case WEST:
+//                return exploredMap.isWallOrObstacleCell(row + (1 + offset), col);
+//        }
+//
+//        return false;
+//    }
 
 
     /**
      * Checks if there's wall/obstacle in front of the bot so can alignfront
      */
-    private boolean canAlignFront(Direction botDir) {
+    boolean canAlignFront(Direction botDir) {
         int row = bot.getAgtRow();
         int col = bot.getAgtCol();
 
@@ -576,7 +596,7 @@ abstract public class ExplorationAlgo {
     /**
      * Checks if there's wall/obstacle at RHS of the bot so can align right
      */
-    private boolean canAlignRight(Direction botDir) {
+    boolean canAlignRight(Direction botDir) {
 //        System.out.println(canAlignFront(Direction.clockwise90(botDir)));
         return canAlignFront(Direction.clockwise90(botDir));
     }
