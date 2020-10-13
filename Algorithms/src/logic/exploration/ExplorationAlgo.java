@@ -119,7 +119,7 @@ abstract public class ExplorationAlgo {
             System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
 
             // take picture on RHS if can
-            tryTakePicture();
+//            tryTakePicture();
 
 
             areaExplored = calculateAreaExplored();

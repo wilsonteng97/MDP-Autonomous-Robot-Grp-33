@@ -517,9 +517,8 @@ public class Agent {
         return surfaceTaken;
     }
 
-    public ArrayList<ObsSurface> imageRecognitionRight(Map exploredMap) {
+    public ArrayList<ObsSurface> returnSurfacesTakenRight(Map exploredMap) {
         ArrayList<ObsSurface> surfaceTakenList = new ArrayList<ObsSurface>();
-        HashMap<String, Cell> obsList = new HashMap<String, Cell>();
         ObsSurface tempObsSurface;
         int rowInc = 0, colInc = 0;
         int camera_row, camera_col, temp_row, temp_col;
@@ -546,17 +545,17 @@ public class Agent {
 
         boolean left = false; boolean mid = false; boolean right = false;
 
-        System.out.println("camera_row|camera_col " + camera_row + "|" + camera_col);
+//        System.out.println("camera_row|camera_col " + camera_row + "|" + camera_col);
         for (int offset = AgentSettings.CAMERA_MIN; offset <= AgentSettings.CAMERA_MAX; offset++) {
-            System.out.println("offset| " + offset);
+//            System.out.println("offset| " + offset);
             temp_row = camera_row + rowInc * offset;
             temp_col = camera_col + colInc * offset;
 
-            System.out.println("temp_row|temp_col " + temp_row + "|"  + temp_col);
+//            System.out.println("temp_row|temp_col " + temp_row + "|"  + temp_col);
             if (exploredMap.checkValidCell(temp_row, temp_col)) {
                 tempCell = exploredMap.getCell(temp_row, temp_col);
             } else {
-                System.out.println("Not Valid|temp_row|temp_col " + temp_row + "|"  + temp_col);
+//                System.out.println("Not Valid|temp_row|temp_col " + temp_row + "|"  + temp_col);
                 break;
             }
 
@@ -565,9 +564,8 @@ public class Agent {
             tempCell = exploredMap.getCell(temp_row, temp_col);
             if (!left && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
                 if (tempCell.isObstacle()) {
-                    obsList.put("L", tempCell);
                     tempObsSurface = new ObsSurface(new Point(temp_col - colInc, temp_row - rowInc), obsDir);
-                    System.out.println("left tempObsSurface " + tempObsSurface);
+//                    System.out.println("left tempObsSurface " + tempObsSurface);
                     surfaceTaken.put(tempObsSurface.toString(), tempObsSurface);
                     surfaceTakenList.add(tempObsSurface);
                     left = true;
@@ -579,9 +577,8 @@ public class Agent {
             tempCell = exploredMap.getCell(temp_row, temp_col);
             if (!mid && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
                 if (tempCell.isObstacle()) {
-                    obsList.put("M", tempCell);
                     tempObsSurface = new ObsSurface(new Point(temp_col - colInc, temp_row - rowInc), obsDir);
-                    System.out.println("mid tempObsSurface " + tempObsSurface);
+//                    System.out.println("mid tempObsSurface " + tempObsSurface);
                     surfaceTaken.put(tempObsSurface.toString(), tempObsSurface);
                     surfaceTakenList.add(tempObsSurface);
                     mid = true;
@@ -593,9 +590,8 @@ public class Agent {
             tempCell = exploredMap.getCell(temp_row, temp_col);
             if (!right && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
                 if (tempCell.isObstacle()) {
-                    obsList.put("R", tempCell);
                     tempObsSurface = new ObsSurface(new Point(temp_col - colInc, temp_row - rowInc), obsDir);
-                    System.out.println("right tempObsSurface " + tempObsSurface);
+//                    System.out.println("right tempObsSurface " + tempObsSurface);
                     surfaceTaken.put(tempObsSurface.toString(), tempObsSurface);
                     surfaceTakenList.add(tempObsSurface);
                     right = true;
@@ -603,8 +599,85 @@ public class Agent {
             }
         }
 
-        System.out.println("obsList" + obsList + "\n");
         System.out.println("surfaceTakenList" + surfaceTakenList + "\n");
         return surfaceTakenList;
+    }
+
+    public HashMap<String, Point> returnObsRight(Map exploredMap) {
+        int rowInc = 0, colInc = 0;
+        int camera_row, camera_col, temp_row, temp_col;
+        HashMap<String, Point> obsList = new HashMap<String, Point>();
+        AgentSettings.Direction obsDir = null;
+        Cell tempCell;
+
+        switch (agtDir) {
+            case NORTH:
+                rowInc = 0; colInc = 1; obsDir = EAST;
+                break;
+            case SOUTH:
+                rowInc = 0; colInc = -1; obsDir = WEST;
+                break;
+            case WEST:
+                rowInc = 1; colInc = 0; obsDir = NORTH;
+                break;
+            case EAST:
+                rowInc = -1; colInc = 0; obsDir = SOUTH;
+                break;
+        }
+
+        camera_row = getAgtY() + rowInc;
+        camera_col = getAgtX() + colInc;
+
+        boolean left = false; boolean mid = false; boolean right = false;
+
+//        System.out.println("camera_row|camera_col " + camera_row + "|" + camera_col);
+        for (int offset = AgentSettings.CAMERA_MIN; offset <= AgentSettings.CAMERA_MAX; offset++) {
+//            System.out.println("offset| " + offset);
+            temp_row = camera_row + rowInc * offset;
+            temp_col = camera_col + colInc * offset;
+
+//            System.out.println("temp_row|temp_col " + temp_row + "|"  + temp_col);
+            if (exploredMap.checkValidCell(temp_row, temp_col)) {
+                tempCell = exploredMap.getCell(temp_row, temp_col);
+            } else {
+//                System.out.println("Not Valid|temp_row|temp_col " + temp_row + "|"  + temp_col);
+                break;
+            }
+
+            // Left/Right Obs
+            if (rowInc==0) temp_row++; if (colInc==0) temp_col++;
+            tempCell = exploredMap.getCell(temp_row, temp_col);
+            if (!left && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
+                if (tempCell.isObstacle()) {
+                    if ((obsDir == NORTH) || (obsDir == WEST)) obsList.put("R", new Point(temp_col, temp_row));
+                    if ((obsDir == SOUTH) || (obsDir == EAST)) obsList.put("L", new Point(temp_col, temp_row));
+                    left = true;
+                }
+            }
+
+            // middleObs
+            if (rowInc==0) temp_row--; if (colInc==0) temp_col--;
+            tempCell = exploredMap.getCell(temp_row, temp_col);
+            if (!mid && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
+                if (tempCell.isObstacle()) {
+                    obsList.put("M", new Point(temp_col, temp_row));
+                    mid = true;
+                }
+            }
+
+            // Left/Right obs
+            if (rowInc==0) temp_row--; if (colInc==0) temp_col--;
+            tempCell = exploredMap.getCell(temp_row, temp_col);
+            if (!right && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
+                if (tempCell.isObstacle()) {
+                    if ((obsDir == NORTH) || (obsDir == WEST)) obsList.put("L", new Point(temp_col, temp_row));
+                    if ((obsDir == SOUTH) || (obsDir == EAST)) obsList.put("R", new Point(temp_col, temp_row));
+                    right = true;
+                }
+            }
+        }
+
+        System.out.println("obsList" + obsList + "\n");
+        return obsList;
     }
 }

@@ -13,7 +13,6 @@ import utils.MapDescriptorFormat;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 public class ImageRegExp extends ExplorationAlgo {
@@ -98,12 +97,11 @@ public class ImageRegExp extends ExplorationAlgo {
         goToPoint(loc);
         Point after = bot.getAgtPos();
         if (before == after) return false;
-        ArrayList<ObsSurface> surfTaken;
+        HashMap<String, Point> obsList;
 
         System.out.println("imageRecognitionRight before");
-        surfTaken = bot.imageRecognitionRight(exploredMap);
+        obsList = imageRecognitionRight(exploredMap);
         System.out.println("imageRecognitionRight after");
-        updateNotYetTaken(surfTaken);
 
         AgentSettings.Direction desiredDir = AgentSettings.Direction.antiClockwise90(obsSurface.getSurface());
         if (desiredDir == bot.getAgtDir()) {
@@ -113,31 +111,34 @@ public class ImageRegExp extends ExplorationAlgo {
         else if (desiredDir == AgentSettings.Direction.clockwise90(bot.getAgtDir())) {
             LOGGER.info("desiredDir clockwise " + bot.getAgtDir());
             moveBot(AgentSettings.Actions.FACE_RIGHT);
-            surfTaken = bot.imageRecognitionRight(exploredMap);
-            updateNotYetTaken(surfTaken);
-            senseAndRepaint();
+            obsList = imageRecognitionRight(exploredMap);
         }
         else if (desiredDir == AgentSettings.Direction.antiClockwise90(bot.getAgtDir())) {
             LOGGER.info("desiredDir anticlockwise" + bot.getAgtDir());
             moveBot(AgentSettings.Actions.FACE_LEFT);
-            surfTaken = bot.imageRecognitionRight(exploredMap);
-            updateNotYetTaken(surfTaken);
-            senseAndRepaint();
+            obsList = imageRecognitionRight(exploredMap);
         }
         // opposite
         else {
             System.out.println("desiredDir opposite" + bot.getAgtDir());
             moveBot(AgentSettings.Actions.FACE_LEFT);
-            surfTaken = bot.imageRecognitionRight(exploredMap);
-            updateNotYetTaken(surfTaken);
-            senseAndRepaint();
+            obsList = imageRecognitionRight(exploredMap);
 
             moveBot(AgentSettings.Actions.FACE_LEFT);
-            surfTaken = bot.imageRecognitionRight(exploredMap);
-            updateNotYetTaken(surfTaken);
-            senseAndRepaint();
+            obsList = imageRecognitionRight(exploredMap);
         }
         return true;
+    }
+
+    private HashMap<String, Point> imageRecognitionRight(Map exploredMap) {
+        ArrayList<ObsSurface> surfTaken = bot.returnSurfacesTakenRight(exploredMap);
+        updateNotYetTaken(surfTaken);
+        HashMap<String, Point> obsList = bot.returnObsRight(exploredMap);
+        senseAndRepaint();
+        takePicture(obsList.getOrDefault("L", null),
+                    obsList.getOrDefault("M", null),
+                    obsList.getOrDefault("R", null));
+        return obsList;
     }
 
     private HashMap<String, ObsSurface> getUnTakenSurfaces() {
@@ -237,42 +238,62 @@ public class ImageRegExp extends ExplorationAlgo {
         return null;
     }
 
-    /**
-     * take picture and send out coordinate is there are walls/obstacles in surrounding
-     */
-    protected void tryTakePicture() {
-        AgentSettings.Direction botDir = bot.getAgtDir();
-        for (int offset = AgentSettings.CAMERA_MIN; offset <= AgentSettings.CAMERA_MAX; offset++) {
-            if (canTakePicture(botDir, offset)) {
-                if (botDir == AgentSettings.Direction.NORTH) bot.takePicture(bot.getAgtRow(), bot.getAgtCol() + (1 + offset));
-                else if (botDir == AgentSettings.Direction.EAST) bot.takePicture(bot.getAgtRow() - (1 + offset), bot.getAgtCol());
-                else if (botDir == AgentSettings.Direction.WEST) bot.takePicture(bot.getAgtRow() + (1 + offset), bot.getAgtCol());
-                else bot.takePicture(bot.getAgtRow(), bot.getAgtCol() - (1 + offset));
-                break;
-            }
+    public void takePicture(Point leftObs, Point middleObs, Point rightObs) {
+        if ((leftObs==null) && (middleObs==null) && (rightObs==null)) return;
+
+        String msg = AgentSettings.Actions.parsePictureMsg(leftObs, middleObs, rightObs);
+
+        if (!bot.isSim()) {
+            NetworkMgr comm = NetworkMgr.getInstance();
+            comm.sendMsg(msg + "", NetworkMgr.INSTRUCTIONS);
         }
+        System.out.println("Taking image: " + msg);
     }
 
-    /**
-     * Check if the if the center cell on the RHS of the bot is wall/obstacle so can take picture
-     */
-    private boolean canTakePicture(AgentSettings.Direction botDir, int offset) {
-        int row = bot.getAgtRow();
-        int col = bot.getAgtCol();
+//    /**
+//     * take picture and send out coordinate is there are walls/obstacles in surrounding
+//     */
+//    protected void tryTakePicture() {
+//        AgentSettings.Direction botDir = bot.getAgtDir();
+//        for (int offset = AgentSettings.CAMERA_MIN; offset <= AgentSettings.CAMERA_MAX; offset++) {
+//            if (canTakePicture(botDir, offset)) {
+//                if (botDir == AgentSettings.Direction.NORTH) {
+//                    bot.takePicture(bot.getAgtRow(), bot.getAgtCol() + (1 + offset));
+//                }
+//                else if (botDir == AgentSettings.Direction.EAST) {
+//                    bot.takePicture(bot.getAgtRow() - (1 + offset), bot.getAgtCol());
+//                }
+//                else if (botDir == AgentSettings.Direction.WEST) {
+//                    bot.takePicture(bot.getAgtRow() + (1 + offset), bot.getAgtCol());
+//                }
+//                else {
+//                    bot.takePicture(bot.getAgtRow(), bot.getAgtCol() - (1 + offset));
+//                }
+//                break;
+//            }
+//        }
+//    }
 
-        switch (botDir) {
-            case NORTH:
-                return exploredMap.isWallOrObstacleCell(row, col + (1 + offset));
-            case EAST:
-                return exploredMap.isWallOrObstacleCell(row - (1 + offset), col);
-            case SOUTH:
-                return exploredMap.isWallOrObstacleCell(row, col - (1 + offset));
-            case WEST:
-                return exploredMap.isWallOrObstacleCell(row + (1 + offset), col);
-        }
-
-        return false;
-    }
+//    /**
+//     * Check if the if the center cell on the RHS of the bot is wall/obstacle so can take picture
+//     */
+//    private boolean canTakePicture(AgentSettings.Direction botDir, int offset) {
+//        int row = bot.getAgtRow();
+//        int col = bot.getAgtCol();
+//
+//        switch (botDir) {
+//            case NORTH:
+//                return exploredMap.isWallOrObstacleCell(row, col + (1 + offset));
+//            case EAST:
+//                return exploredMap.isWallOrObstacleCell(row - (1 + offset), col);
+//            case SOUTH:
+//                return exploredMap.isWallOrObstacleCell(row, col - (1 + offset));
+//            case WEST:
+//                return exploredMap.isWallOrObstacleCell(row + (1 + offset), col);
+//        }
+//
+//        return false;
+//    }
 
     /**
      * Determines the next move for the robot and executes it accordingly.
@@ -299,9 +320,9 @@ public class ImageRegExp extends ExplorationAlgo {
             }
         } else {
 //            System.out.println("[DEBUG]Reverse Direction");
-            moveBot(Actions.FACE_LEFT);
-            tryTakePicture();
-            moveBot(Actions.FACE_LEFT);
+//            moveBot(Actions.FACE_LEFT);
+//            tryTakePicture();
+//            moveBot(Actions.FACE_LEFT);
         }
 
         if (!bot.isSim()) {
