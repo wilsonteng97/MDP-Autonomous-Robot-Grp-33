@@ -143,7 +143,7 @@ class ImageProcessingServer:
         #self._initialise_directories()
         self.frame_list = []
 
-    def _initialise_directories():
+    def _initialise_directories(self):
         image_dir_path = os.path.join(cwd_path, MAIN_IMAGE_DIR)
 
     def start(self):
@@ -158,10 +158,11 @@ class ImageProcessingServer:
 
             #form image file path for saving
             # raw_image_name = RAW_IMAGE_PREFIX + str(len(self.frame_list)) + IMAGE_ENCODING
-            raw_image_name = cdt + IMAGE_ENCODING
+            raw_image_name = cdt.replace(":","") + IMAGE_ENCODING
             raw_image_path = os.path.join('captured_images', raw_image_name)
             # save raw image
             save_success = cv2.imwrite(raw_image_path, frame)
+            print("raw image saved? ", raw_image_name, " ", save_success)
 
             # split images
             # need to find out how to get crop width and crop height numbers
@@ -180,111 +181,116 @@ class ImageProcessingServer:
             #     cdt_list = cdt_list[2:0]                
 
             # split using bounding boxes
-            reply = self.detect_image(frame,raw_image_name,cut_width=3,cut_height=3)	
-            if reply == 0:
+            cdt_list = list(cdt.split(":"))
+            print(cdt_list)
+            cut_width = 3
+            cut_height = 3
+            reply = self.detect_image(frame,raw_image_name,cut_width,cut_height,cdt_list)	
+            if not reply:
                 self.image_hub.send_reply("None")
             else:
-                self.image_hub.send_reply(reply)
+                self.image_hub.send_reply(str(reply))
             
             # to add in when image sending ends
             # self.stitch_images()
 
-    def _get_true_positives(self, bbox_list, class_list, score_list):
-            """
-            params:
-            - bbox_list (list): [
-                [top_left_y (float), top_left_x (float), bot_right_y (float), bot_right_x (float)],
-                ...,
-            ]
-            - class_list (list): [class_id (int), ]
-            - score_list (list): [confidence_score (float)]
-            return: (
-                { LEFT_OBSTACLE: SYMBOL, MIDDLE_OBSTACLE: SYMBOL, RIGHT_OBSTACLE: SYMBOL },
-                true positive bounding boxes (list),
-                true positive classes (list),
-                true positive confidence scores (list),
-            )
-            """
-            bounding_boxes, classes, scores = [], [], []
+    # def _get_true_positives(self, bbox_list, class_list, score_list):
+    #         """
+    #         params:
+    #         - bbox_list (list): [
+    #             [top_left_y (float), top_left_x (float), bot_right_y (float), bot_right_x (float)],
+    #             ...,
+    #         ]
+    #         - class_list (list): [class_id (int), ]
+    #         - score_list (list): [confidence_score (float)]
+    #         return: (
+    #             { LEFT_OBSTACLE: SYMBOL, MIDDLE_OBSTACLE: SYMBOL, RIGHT_OBSTACLE: SYMBOL },
+    #             true positive bounding boxes (list),
+    #             true positive classes (list),
+    #             true positive confidence scores (list),
+    #         )
+    #         """
+    #         bounding_boxes, classes, scores = [], [], []
 
-            # -1 means no detection for that obstacle
-            obstacle_symbol_map = {
-                LEFT_OBSTACLE: NO_SYMBOL,
-                MIDDLE_OBSTACLE: NO_SYMBOL,
-                RIGHT_OBSTACLE: NO_SYMBOL,
-            }
+    #         # -1 means no detection for that obstacle
+    #         obstacle_symbol_map = {
+    #             LEFT_OBSTACLE: NO_SYMBOL,
+    #             MIDDLE_OBSTACLE: NO_SYMBOL,
+    #             RIGHT_OBSTACLE: NO_SYMBOL,
+    #         }
 
-            num_symbols = 0
+    #         num_symbols = 0
 
-            left_xmax = float('-inf')
-            right_xmin = float('inf')
+    #         left_xmax = float('-inf')
+    #         right_xmin = float('inf')
 
-            for bbox, class_id, score in zip(bbox_list, class_list, score_list):
-                if num_symbols >= 3:
-                    break
+    #         for bbox, class_id, score in zip(bbox_list, class_list, score_list):
+    #             if num_symbols >= 3:
+    #                 break
 
-                top_left_y, top_left_x, bot_right_y, bot_right_x = tuple(bbox)
+    #             top_left_y, top_left_x, bot_right_y, bot_right_x = tuple(bbox)
 
-                top_left_y = top_left_y * IMAGE_HEIGHT
-                top_left_x = top_left_x * IMAGE_WIDTH
-                bot_right_y = bot_right_y * IMAGE_HEIGHT
-                bot_right_x = bot_right_x * IMAGE_WIDTH
+    #             top_left_y = top_left_y * IMAGE_HEIGHT
+    #             top_left_x = top_left_x * IMAGE_WIDTH
+    #             bot_right_y = bot_right_y * IMAGE_HEIGHT
+    #             bot_right_x = bot_right_x * IMAGE_WIDTH
 
-                not_red = class_id != 2 and class_id != 8 and class_id != 11
+    #             not_red = class_id != 2 and class_id != 8 and class_id != 11
 
-                # false positive if:
-                # confidence score is lower than a generic threshold (for all classes)
-                # confidence score is lower than a higher threshold (for non-reds)
-                # the bottom y-coordinate is lower than its repective threshold (too far)
-                if ((score <= MIN_CONFIDENCE_THRESHOLD)
-                    or (not_red and score < NON_RED_CONFIDENCE_THRESHOLD) \
-                    or (bot_right_y < YMAX_THRESHOLD) \
-                    ):
-                    continue  # false positive -> skip
+    #             # false positive if:
+    #             # confidence score is lower than a generic threshold (for all classes)
+    #             # confidence score is lower than a higher threshold (for non-reds)
+    #             # the bottom y-coordinate is lower than its repective threshold (too far)
+    #             if ((score <= MIN_CONFIDENCE_THRESHOLD)
+    #                 or (not_red and score < NON_RED_CONFIDENCE_THRESHOLD) \
+    #                 or (bot_right_y < YMAX_THRESHOLD) \
+    #                 ):
+    #                 continue  # false positive -> skip
 
-                if (bot_right_x < SYMBOL_ON_LEFT_OF_IMAGE_THRESHOLD):  # symbol left
-                    # obstacle already has a symbol of higher confidence,
-                    # and is directly to the left of middle
-                    if obstacle_symbol_map[LEFT_OBSTACLE] != NO_SYMBOL and bot_right_x < left_xmax:
-                        continue
+    #             if (bot_right_x < SYMBOL_ON_LEFT_OF_IMAGE_THRESHOLD):  # symbol left
+    #                 # obstacle already has a symbol of higher confidence,
+    #                 # and is directly to the left of middle
+    #                 if obstacle_symbol_map[LEFT_OBSTACLE] != NO_SYMBOL and bot_right_x < left_xmax:
+    #                     continue
 
-                    left_xmax = bot_right_x
-                    obstacle_symbol_map[LEFT_OBSTACLE] = str(class_id)
+    #                 left_xmax = bot_right_x
+    #                 obstacle_symbol_map[LEFT_OBSTACLE] = str(class_id)
 
-                elif (top_left_x  > SYMBOL_ON_RIGHT_OF_IMAGE_THRESHOLD):  # symbol right
-                    # obstacle already has a symbol of higher confidence,
-                    # and is directly to the right of middle
-                    if obstacle_symbol_map[RIGHT_OBSTACLE] != NO_SYMBOL and top_left_x > right_xmin:
-                        continue
+    #             elif (top_left_x  > SYMBOL_ON_RIGHT_OF_IMAGE_THRESHOLD):  # symbol right
+    #                 # obstacle already has a symbol of higher confidence,
+    #                 # and is directly to the right of middle
+    #                 if obstacle_symbol_map[RIGHT_OBSTACLE] != NO_SYMBOL and top_left_x > right_xmin:
+    #                     continue
 
-                    right_xmin = top_left_x
-                    obstacle_symbol_map[RIGHT_OBSTACLE] = str(class_id)
+    #                 right_xmin = top_left_x
+    #                 obstacle_symbol_map[RIGHT_OBSTACLE] = str(class_id)
 
-                else:  # symbol middle
-                    # obstacle already has a symbol of higher confidence
-                    if obstacle_symbol_map[MIDDLE_OBSTACLE] != NO_SYMBOL:
-                        continue
+    #             else:  # symbol middle
+    #                 # obstacle already has a symbol of higher confidence
+    #                 if obstacle_symbol_map[MIDDLE_OBSTACLE] != NO_SYMBOL:
+    #                     continue
 
-                    obstacle_symbol_map[MIDDLE_OBSTACLE] = str(class_id)
+    #                 obstacle_symbol_map[MIDDLE_OBSTACLE] = str(class_id)
 
-                bounding_boxes.append(bbox)
-                classes.append(class_id)
-                scores.append(score)
+    #             bounding_boxes.append(bbox)
+    #             classes.append(class_id)
+    #             scores.append(score)
 
-                print(
-                    'id: ', class_id,
-                    'confidence: ', '{:.3f}'.format(score),
-                    '\n',
-                    'xmin: ', '{:.3f}'.format(top_left_x),
-                    'xmax: ', '{:.3f}'.format(bot_right_x),
-                    'ymax: ', '{:.3f}'.format(bot_right_y),
-                    '\n',
-                )
+    #             print(
+    #                 'id: ', class_id,
+    #                 'confidence: ', '{:.3f}'.format(score),
+    #                 '\n',
+    #                 'xmin: ', '{:.3f}'.format(top_left_x),
+    #                 'xmax: ', '{:.3f}'.format(bot_right_x),
+    #                 'ymax: ', '{:.3f}'.format(bot_right_y),
+    #                 '\n',
+    #             )
 
-                num_symbols += 1
+    #             num_symbols += 1
 
-            return obstacle_symbol_map, bounding_boxes, classes, scores
-    def detect_image(self, image, raw_image_name, cut_width, cut_height):
+    #         return obstacle_symbol_map, bounding_boxes, classes, scores
+
+    def detect_image(self, image, raw_image_name, cut_width, cut_height,cdt_list):
         # load the our fine-tuned model and label binarizer from disk
         print("[INFO] loading model and label binarizer...")
         model = load_model(config.MODEL_PATH)
@@ -292,7 +298,7 @@ class ImageProcessingServer:
 
         # resize and rotate image
         image = imutils.resize(image, width=500)
-        image = imutils.rotate(image, 180)
+        # image = imutils.rotate(image, 180)
         brightness = np.average(np.linalg.norm(image, axis=2)) / np.sqrt(3)
         while brightness > 125:
             hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
@@ -391,17 +397,18 @@ class ImageProcessingServer:
                 section_width = float(image.shape[1])/cut_width*w
                 # print(section_width)
                 if startX<section_width:
-                    if (box_width/2)<(section_width - startX):
-                        text = text + ", (" + str(w) + ", "
+                    if (box_width/2)<(section_width - startX) and cdt_list[2*w-1]!=-1:
+                        # text = text + ", (" + str(w) + ", "
+                        text = text + ", (" + cdt_list[2*w-2] + ", " + cdt_list[2*w-1] + ")"
                         break
-            for h in range(cut_height):
-                h = h+1
-                section_height = float(image.shape[0])/cut_height*h
-                # print(section_height)
-                if startY<section_height:
-                    if (box_height/2)<(section_height - startY):
-                        text = text + str(h) + ")"
-                        break
+            # for h in range(cut_height):
+            #     h = h+1
+            #     section_height = float(image.shape[0])/cut_height*h
+            #     # print(section_height)
+            #     if startY<section_height:
+            #         if (box_height/2)<(section_height - startY):
+            #             text = text + cdt_list[1] + ")"
+            #             break
             cv2.putText(image, text, (startX, y),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 2)
             reply_list.append(text)
@@ -411,9 +418,7 @@ class ImageProcessingServer:
             # save processed image
             save_success = cv2.imwrite(processed_image_path, image)
             print('save image successful?', save_success)
-            return reply_list
-        else:
-            return 0
+        return reply_list
 
     def split_image(self,image,cdt,crop_w,crop_h):
         image2 = image
