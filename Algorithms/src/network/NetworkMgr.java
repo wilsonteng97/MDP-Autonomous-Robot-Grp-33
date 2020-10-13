@@ -107,15 +107,15 @@ public class NetworkMgr {
     public boolean sendMsg(String msg, String msgType) {
         try {
             System.out.println("[sendMsg()] Sending Message...");
-            String outputMsg;
+            String outputMsg = msg;
             // FIXME finalize message format here
-            if (msgType == INSTRUCTIONS) {
-                outputMsg = msg;
-            } else if (msgType == MAP_STRINGS) {
-                outputMsg = MAP_STRINGS + msg;
-            } else {
-                    outputMsg = msg;
-            }
+//            if (msgType == INSTRUCTIONS) {
+//                outputMsg = msg;
+//            } else if (msgType == MAP_STRINGS) {
+//                outputMsg = MAP_STRINGS + msg;
+//            } else {
+//                    outputMsg = msg;
+//            }
 
 //            if (msg == null) {
 //                outputMsg = msgType + "\n";
@@ -150,58 +150,16 @@ public class NetworkMgr {
 
     }
 
-    // A naive receiveMsg()
-//     public String receiveMsg() {
-//         try {
-//             System.out.println("[receiveMsg()] Receiving Message...");
-//             String receivedMsg, parsedMsg;
-//             StringBuilder msgParser = new StringBuilder();
-//             InputStream din=socket.getInputStream();
-//             while (true) {
-//                 if(din.available()!=0){
-//                     byte[] data321 = new byte[512];
-//                     din.read(data321);
-//                     receivedMsg=new String(data321, StandardCharsets.UTF_8);
-//                     for (int i = 0, n = receivedMsg.length(); i < n; i++) {
-//                         char c = receivedMsg.charAt(i);
-//                         msgParser.append(c);
-//                         if (c == '|') {
-//                             break;
-//                         }
-//                     }
-//                     parsedMsg = msgParser.toString();
-// //                    System.out.println("Message Length: " + parsedMsg.length());
-
-//                     if (parsedMsg != null && parsedMsg.length() > 0) {
-//                         System.out.println("[receiveMsg()] Received Message: "+parsedMsg);
-//                         return parsedMsg;
-//                     }
-//                 }
-//             }
-
-
-//         } catch (IOException e) {
-//             System.out.println("[receiveMsg()] Receiving Message Failed (IOException)!");
-//             return receiveMsg();
-//         } catch (Exception e) {
-//             System.out.println("[receiveMsg()] Receiving Message Failed!"); e.printStackTrace();
-//         }
-//         return null;
-//     }
-
     // Wait and receive Message
     public String receiveMsg() {
         try {
             System.out.println("[receiveMsg()] Receiving Message...");
             String receivedMsg;
-//            StringBuilder sb = new StringBuilder();
             while (true) {
                 receivedMsg = in.readLine();
-//                    sb.append(receivedMsg);
                 if (receivedMsg != null && receivedMsg.length() > 0) {
-//                if (receivedMsg=="|" && sb.length() > 1) {
-                        System.out.println("[receiveMsg()] Received Message: "+receivedMsg);
-                        return receivedMsg;
+                    System.out.println("[receiveMsg()] Received Message: "+receivedMsg);
+                    return receivedMsg;
                 }
             }
         } catch (IOException e) {
