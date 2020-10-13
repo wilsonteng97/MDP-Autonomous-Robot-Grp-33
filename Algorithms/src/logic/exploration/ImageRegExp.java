@@ -373,7 +373,7 @@ public class ImageRegExp extends ExplorationAlgo {
 
         if (!bot.isSim()) {
             String[] MDFString = MapDescriptorFormat.generateMapDescriptorFormat(exploredMap);
-            String msg = MDFString[0] + "|" + MDFString[1];
+            String msg = MDFString[0] + ":" + MDFString[1] + "|";
             NetworkMgr.getInstance().sendMsg(msg, NetworkMgr.MAP_STRINGS);
         }
     }
