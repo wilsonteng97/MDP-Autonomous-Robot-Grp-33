@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
+import static hardware.AgentSettings.Direction.*;
+import static hardware.AgentSettings.Direction.SOUTH;
+
 public class ImageRegExp extends ExplorationAlgo {
     private static final Logger LOGGER = Logger.getLogger(ImageRegExp.class.getName());
 
@@ -195,8 +198,12 @@ public class ImageRegExp extends ExplorationAlgo {
 
                         if (!neighTempCell.isObstacle()) {
                             tempObsSurface = new ObsSurface(neighTempCell.getCoord(), nDir);
-//                            System.out.println("tempObsSusrface" + tempObsSurface);
-                            allPossibleObsSurfaces.put(tempObsSurface.toString(), tempObsSurface);
+                            if (isSurfaceReachable(tempObsSurface, exploredMap)) {
+//                                System.out.println("tempObsSusrface" + tempObsSurface);
+                                allPossibleObsSurfaces.put(tempObsSurface.toString(), tempObsSurface);
+                            } else {
+                                LOGGER.info("[getAllPossibleObsSurfaces] Unreachable surface removed" + tempObsSurface.toString());
+                            }
                         }
                     }
                 }
@@ -204,6 +211,53 @@ public class ImageRegExp extends ExplorationAlgo {
         }
         System.out.println("allPossibleObsSurfaces | " + allPossibleObsSurfaces.size() + " :\n" + allPossibleObsSurfaces);
         return allPossibleObsSurfaces;
+    }
+
+    public boolean isSurfaceReachable(ObsSurface obsSurface, Map exploredMap) {
+        int row = 0; int col = 0;
+        int rowInc = 0; int colInc = 0;
+        int obsX = obsSurface.getCol(); int obsY = obsSurface.getRow();
+
+        switch (obsSurface.getSurface()) {
+            case NORTH:
+                rowInc = -1; colInc = 0;
+                break;
+            case SOUTH:
+                rowInc = 1; colInc = 0;
+                break;
+            case WEST:
+                rowInc = 0; colInc = 1;
+                break;
+            case EAST:
+                rowInc = 0; colInc = -1;
+                break;
+        }
+
+        // left/right reachable
+        if (rowInc==0) obsY++; if (colInc==0) obsX++;
+        for (int offset = AgentSettings.CAMERA_MIN; offset <= AgentSettings.CAMERA_MAX + 1; offset++) {
+            row = obsY + rowInc * offset;
+            col = obsX + colInc * offset;
+            if (exploredMap.checkRobotFitsCell(row, col)) return true;
+        }
+
+        // Mid reachable
+        if (rowInc==0) obsY--; if (colInc==0) obsX--;
+        for (int offset = AgentSettings.CAMERA_MIN; offset <= AgentSettings.CAMERA_MAX + 1; offset++) {
+            row = obsY + rowInc * offset;
+            col = obsX + colInc * offset;
+            if (exploredMap.checkRobotFitsCell(row, col)) return true;
+        }
+
+        // left/right reachable
+        if (rowInc==0) obsY--; if (colInc==0) obsX--;
+        for (int offset = AgentSettings.CAMERA_MIN; offset <= AgentSettings.CAMERA_MAX + 1; offset++) {
+            row = obsY + rowInc * offset;
+            col = obsX + colInc * offset;
+            if (exploredMap.checkRobotFitsCell(row, col)) return true;
+        }
+
+        return false;
     }
 
     public ObsSurface nearestObsSurface(Point loc, HashMap<String, ObsSurface> notYetTaken) {
