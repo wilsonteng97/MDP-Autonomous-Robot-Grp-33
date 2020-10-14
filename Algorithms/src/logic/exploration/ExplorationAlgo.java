@@ -37,6 +37,8 @@ abstract public class ExplorationAlgo {
 
     ArrayList<Actions> actionsTaken = new ArrayList<>();
 
+    private static String goToPointActionsString;
+
 
     Scanner scanner = new Scanner(System.in);
 
@@ -127,7 +129,7 @@ abstract public class ExplorationAlgo {
                 }
             }
             elapsedTime = getElapsedTime();
-//            scanner.nextLine();
+            scanner.nextLine();
             System.out.println("[doWhile loop elapsed time] " + getElapsedTime());
         } while (areaExplored <= coverageLimit && elapsedTime < timeLimit);
 
@@ -330,13 +332,14 @@ abstract public class ExplorationAlgo {
     }
 
     protected void goToPoint(int row, int col) {
-        AStarHeuristicSearch goToPoint = new AStarHeuristicSearch(exploredMap, bot, realMap);
-        goToPoint.runFastestPath(row, col);
+        goToPoint(new Point(col, row));
     }
 
     protected void goToPoint(Point coord) {
         AStarHeuristicSearch goToPoint = new AStarHeuristicSearch(exploredMap, bot, realMap);
-        goToPoint.runFastestPath(coord.y, coord.x);
+        goToPointActionsString = goToPoint.runFastestPath(coord.y, coord.x);
+
+        if (!bot.isSim()) NetworkMgr.getInstance().sendMsg("K" + goToPointActionsString, NetworkMgr.INSTRUCTIONS);
     }
 
     /**

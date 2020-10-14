@@ -17,7 +17,10 @@ abstract public class FastestPathAlgo {
 //    private int waypointX;
 //    private int waypointY;
 
-
+    /**
+     * Constructor called during Fastest Path leaderboard.
+     * explorationMode not used here
+     */
     public FastestPathAlgo(Map exploredMap, Agent bot) {
         this.realMap = null;
         initObject(exploredMap, bot);
@@ -25,6 +28,10 @@ abstract public class FastestPathAlgo {
 //        this.waypointY = waypointY;
     }
 
+    /**
+     * Constructor called during Exploration/ImageReg leaderboard (to use fastest path for ImageReg leaderboard)
+     * explorationMode = true
+     */
     public FastestPathAlgo(Map exploredMap, Agent bot, Map realMap) {
         this.realMap = realMap;
         this.explorationMode = true;
