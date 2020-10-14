@@ -337,7 +337,7 @@ abstract public class ExplorationAlgo {
     }
 
     protected void goToPoint(Point coord) {
-        AStarHeuristicSearch goToPoint = new AStarHeuristicSearch(exploredMap, bot, realMap);
+        AStarHeuristicSearch goToPoint = new AStarHeuristicSearch(exploredMap, bot);
         String mergedOutputString = parseFastestPathString(goToPoint.runFastestPath(coord.y, coord.x));;
 
         if (!bot.isSim()) NetworkMgr.getInstance().sendMsg("K" + mergedOutputString, NetworkMgr.INSTRUCTIONS);
