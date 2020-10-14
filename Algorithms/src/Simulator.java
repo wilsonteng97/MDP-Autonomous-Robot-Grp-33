@@ -20,6 +20,7 @@ import java.util.Scanner;
 
 import static utils.FileIO.loadMap;
 import static utils.MapDescriptorFormat.generateMapDescriptorFormat;
+import static utils.MsgParsingUtils.parseFastestPathString;
 
 public class Simulator {
     private static final boolean sim = SimulatorSettings.SIM;
@@ -209,10 +210,10 @@ public class Simulator {
                 FastestPathAlgo toGoal, toWaypoint;
                 if (sim) readWaypointFromStdin();
                 toWaypoint = new AStarHeuristicSearch(explorationMap, fakeBot);
-                startToWaypoint = toWaypoint.runFastestPath(waypointY, waypointX);
+                startToWaypoint = parseFastestPathString(toWaypoint.runFastestPath(waypointY, waypointX));
 
                 toGoal = new AStarHeuristicSearch(explorationMap, fakeBot);
-                waypointToGoal = toGoal.runFastestPath(MapSettings.GOAL_ROW, MapSettings.GOAL_COL);
+                waypointToGoal = parseFastestPathString(toGoal.runFastestPath(MapSettings.GOAL_ROW, MapSettings.GOAL_COL));
 
                 if (!sim) {
                     // Transmit signal to get Agent to start. Initiate handshake signals.

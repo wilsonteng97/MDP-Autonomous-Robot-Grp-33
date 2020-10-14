@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 
 import static hardware.AgentSettings.Direction.*;
 import static hardware.AgentSettings.Direction.SOUTH;
+import static utils.MsgParsingUtils.parsePictureMsg;
 
 public class ImageRegExp extends ExplorationAlgo {
     private static final Logger LOGGER = Logger.getLogger(ImageRegExp.class.getName());
@@ -285,11 +286,11 @@ public class ImageRegExp extends ExplorationAlgo {
     public void takePicture(Point leftObs, Point middleObs, Point rightObs) {
         if ((leftObs==null) && (middleObs==null) && (rightObs==null)) return;
 
-        String msg = AgentSettings.Actions.parsePictureMsg(leftObs, middleObs, rightObs);
+        String msg = parsePictureMsg(leftObs, middleObs, rightObs);
 
         if (!bot.isSim()) {
             NetworkMgr comm = NetworkMgr.getInstance();
-            comm.sendMsg(msg + "", NetworkMgr.INSTRUCTIONS);
+            comm.sendMsg(msg, NetworkMgr.INSTRUCTIONS);
         }
         System.out.println("Taking image: " + msg);
     }

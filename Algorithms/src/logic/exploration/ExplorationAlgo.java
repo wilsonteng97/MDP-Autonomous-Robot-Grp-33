@@ -20,6 +20,7 @@ import java.util.Queue;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
+import static utils.MsgParsingUtils.parseFastestPathString;
 import static utils.SimulatorSettings.GOHOMESLOW_SLEEP;
 import static utils.SimulatorSettings.SIM;
 
@@ -135,7 +136,7 @@ abstract public class ExplorationAlgo {
                 }
             }
             elapsedTime = getElapsedTime();
-            scanner.nextLine();
+//            scanner.nextLine();
             System.out.println("[doWhile loop elapsed time] " + getElapsedTime());
         } while (areaExplored <= coverageLimit && elapsedTime < timeLimit);
 
@@ -343,9 +344,9 @@ abstract public class ExplorationAlgo {
 
     protected void goToPoint(Point coord) {
         AStarHeuristicSearch goToPoint = new AStarHeuristicSearch(exploredMap, bot, realMap);
-        goToPointActionsString = goToPoint.runFastestPath(coord.y, coord.x);
+        String mergedOutputString = parseFastestPathString(goToPoint.runFastestPath(coord.y, coord.x));;
 
-        if (!bot.isSim()) NetworkMgr.getInstance().sendMsg("K" + goToPointActionsString, NetworkMgr.INSTRUCTIONS);
+        if (!bot.isSim()) NetworkMgr.getInstance().sendMsg("K" + mergedOutputString, NetworkMgr.INSTRUCTIONS);
     }
 
     /**

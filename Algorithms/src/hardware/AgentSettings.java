@@ -141,23 +141,5 @@ public class AgentSettings {
                     return "E";
             }
         }
-
-        public static String parsePictureMsg(Point leftObs, Point middleObs, Point rightObs) {
-            if (leftObs == null) {
-                leftObs = new Point(-1,-1);
-            }
-            if (middleObs == null) {
-                middleObs = new Point(-1,-1);
-            }
-            if (rightObs == null) {
-                rightObs = new Point(-1,-1);
-            }
-
-            String s = String.join(":", Integer.toString(leftObs.x), Integer.toString(leftObs.y),
-                    Integer.toString(middleObs.x), Integer.toString(middleObs.y),
-                    Integer.toString(rightObs.x), Integer.toString(rightObs.y));
-
-            return "P" + s.toString() + "|";
-        }
     }
 }
