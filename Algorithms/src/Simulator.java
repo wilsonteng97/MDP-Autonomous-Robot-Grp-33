@@ -224,8 +224,8 @@ public class Simulator {
                     }
                 }
                 
-                if (!sim) NetworkMgr.getInstance().sendMsg("K" + startToWaypoint + waypointToGoal, NetworkMgr.INSTRUCTIONS);
-                else System.out.println("K" + startToWaypoint + waypointToGoal);
+                if (!sim) NetworkMgr.getInstance().sendMsg("K" + startToWaypoint + waypointToGoal + "|", NetworkMgr.INSTRUCTIONS);
+                else System.out.println("K" + startToWaypoint + waypointToGoal + "|");
 
 //                if (!sim) agt.setSim(false);
 
