@@ -27,14 +27,18 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
 
     private Scanner scanner = new Scanner(System.in);
 
-    // Constructor called during Fastest Path leaderboard.
-    // explorationMode not used here
+    /**
+     * Constructor called during Fastest Path leaderboard.
+     * explorationMode not used here
+     */
     public AStarHeuristicSearch(Map exploredMap, Agent bot) {
         super(exploredMap, bot);
     }
 
-    // Constructor called during Exploration/ImageReg leaderboard (to use fastest path for ImageReg leaderboard)
-    // explorationMode = true
+    /**
+     * Constructor called during Exploration/ImageReg leaderboard (to use fastest path for ImageReg leaderboard)
+     * explorationMode = true
+     */
     public AStarHeuristicSearch(Map exploredMap, Agent bot, Map realMap) {
         super(exploredMap, bot, realMap);
     }

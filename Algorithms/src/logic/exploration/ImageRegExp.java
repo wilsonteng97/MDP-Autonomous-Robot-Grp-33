@@ -130,7 +130,6 @@ public class ImageRegExp extends ExplorationAlgo {
         ArrayList<ObsSurface> surfTaken = bot.returnSurfacesTakenRight(exploredMap);
         updateNotYetTaken(surfTaken);
         HashMap<String, Point> obsList = bot.returnObsRight(exploredMap);
-        senseAndRepaint();
 //        senseAndRepaint();
         repaintWithoutSense();
         takePicture(obsList.getOrDefault("L", null),
