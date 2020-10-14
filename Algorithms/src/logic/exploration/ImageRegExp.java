@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import static hardware.AgentSettings.Direction.*;
@@ -182,7 +183,7 @@ public class ImageRegExp extends ExplorationAlgo {
             System.out.println("imageLoop end " + notYetTaken.size() + ":\n" + notYetTaken);
         }
 
-        goToPoint(new Point (MapSettings.START_COL, MapSettings.START_ROW));
+        goHome();
     }
 
     private void imageLoop() {
@@ -191,7 +192,8 @@ public class ImageRegExp extends ExplorationAlgo {
 
         ObsSurface nearestObstacle = nearestObsSurface(bot.getAgtPos(), notYetTaken);
         Cell nearestCell = findSurfaceSurroundingReachable(nearestObstacle.getRow(), nearestObstacle.getCol(), nearestObstacle.getSurface());
-
+        LOGGER.info("nearestObstacle |" + nearestObstacle.toString());
+        LOGGER.info("nearestCell | " + nearestCell.toString());
         if (nearestCell != null) {
             // go to nearest cell
             success = goToPointTakePicture(nearestCell.getCoord(), nearestObstacle);
@@ -444,46 +446,63 @@ public class ImageRegExp extends ExplorationAlgo {
     }
 
     /**
-     * find the closest reachable cell that is not blocked by obstacle near the target surface
+     * find the closest reachable position that is not blocked by obstacle near the target surface
+     * Assumption : surface is known to be reachable.
      * @return
      */
-    protected Cell findSurfaceSurroundingReachable(int row, int col, AgentSettings.Direction dir) {
-        return super.findSurroundingReachable(row, col);
-//        boolean leftClear = true, rightClear = true, topClear = true, botClear = true;
-//        int offset = 1;
-//        Cell tmpCell;
-//        while (true) {
-//            // bot
-//            if (row - offset >= 0) {
-//                tmpCell = exploredMap.getCell(row - offset, col);
-//                if (!tmpCell.isExplored() || tmpCell.isObstacle()) botClear = false;
-//                else if (botClear && !tmpCell.isObstacle() && !tmpCell.isVirtualWall()) return tmpCell;
-//            }
-//
-//            // left
-//            if (col - offset >= 0) {
-//                tmpCell = exploredMap.getCell(row, col - offset);
-//                if (!tmpCell.isExplored() || tmpCell.isObstacle()) leftClear = false;
-//                else if (leftClear && !tmpCell.isObstacle() && !tmpCell.isVirtualWall()) return tmpCell;
-//            }
-//
-//            // right
-//            if (row + offset < MapSettings.MAP_ROWS) {
-//                tmpCell = exploredMap.getCell(row + offset, col);
-//                if (!tmpCell.isExplored() || tmpCell.isObstacle()) rightClear = false;
-//                else if (rightClear && !tmpCell.isObstacle() && !tmpCell.isVirtualWall()) return tmpCell;
-//            }
-//
-//            // top
-//            if (col + offset < MapSettings.MAP_COLS) {
-//                tmpCell = exploredMap.getCell(row, col + offset);
-//                if (!tmpCell.isExplored() || tmpCell.isObstacle()) topClear = false;
-//                else if (topClear && !tmpCell.isObstacle() && !tmpCell.isVirtualWall()) return tmpCell;
-//            }
-//
-//            if (!topClear && !botClear && !leftClear && !rightClear) return null;
-//
-//            offset++;
-//        }
+    protected Cell findSurfaceSurroundingReachable(int surfaceRow, int surfaceCol, AgentSettings.Direction dir) {
+//        super.findSurroundingReachable(surfaceRow, surfaceCol);
+        boolean leftClear = true, rightClear = true, topClear = true, botClear = true;
+        int offset = 1;
+        int rowInc = 0, colInc = 0;
+        Cell tempCell;
+        int tempFreeX = 0; int tempFreeY = 0;
+
+        switch(dir) {
+            case NORTH :
+                rowInc = -1; colInc = 0;
+                break;
+            case SOUTH:
+                rowInc = 1; colInc = 0;
+                break;
+            case EAST:
+                rowInc = 0; colInc = -1;
+                break;
+            case WEST:
+                rowInc = 0; colInc = 1;
+                break;
+        }
+
+        while (true) {
+            tempFreeX = surfaceCol + offset * colInc;
+            tempFreeY = surfaceRow + offset * rowInc;
+
+            // Left/Right displacement
+            if (rowInc==0) tempFreeY--; if (colInc==0) tempFreeX--;
+            tempCell = exploredMap.getCell(tempFreeY, tempFreeX);
+            if (exploredMap.checkRobotFitsCell(tempFreeY, tempFreeX) && tempCell.isExplored()) {
+                return tempCell;
+            }
+
+            // No displacement (middle)
+            if (rowInc==0) tempFreeY++; if (colInc==0) tempFreeX++;
+            tempCell = exploredMap.getCell(tempFreeY, tempFreeX);
+            if (exploredMap.checkRobotFitsCell(tempFreeY, tempFreeX) && tempCell.isExplored()) {
+                return tempCell;
+            }
+
+            // Left/Right displacement
+            if (rowInc==0) tempFreeY++; if (colInc==0) tempFreeX++;
+            tempCell = exploredMap.getCell(tempFreeY, tempFreeX);
+            if (exploredMap.checkRobotFitsCell(tempFreeY, tempFreeX) && tempCell.isExplored()) {
+                return tempCell;
+            }
+
+            if (offset>=5) {
+                LOGGER.warning("Surface is unreachable!!");
+                return new Cell(new Point(MapSettings.START_COL, MapSettings.START_ROW));
+            }
+            offset++;
+        }
     }
 }
