@@ -40,7 +40,7 @@ public class RightWallHugging extends ExplorationAlgo {
 //            tryTakePicture();
             moveBot(Actions.FACE_LEFT);
         }
-
+        System.out.println("New Bot Direction: " + bot.getAgtDir());
         if (!bot.isSim()) {
             String[] MDFString = MapDescriptorFormat.generateMapDescriptorFormat(exploredMap);
             String msg = MDFString[0] + ":" + MDFString[1] + "|";

@@ -51,8 +51,6 @@ abstract public class ExplorationAlgo {
     }
 
     public void runExploration() throws InterruptedException {
-        // FIXME check for real bot connection
-//        System.out.println("[DEBUG: runExploration] executed");
         if (!bot.isSim()) {
             System.out.println("Starting calibration...");
 
@@ -117,10 +115,6 @@ abstract public class ExplorationAlgo {
 //            senseAndRepaint();
             nextMove();
             System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
-
-            // take picture on RHS if can
-//            tryTakePicture();
-
 
             areaExplored = calculateAreaExplored();
             System.out.println("Area explored: " + areaExplored);
