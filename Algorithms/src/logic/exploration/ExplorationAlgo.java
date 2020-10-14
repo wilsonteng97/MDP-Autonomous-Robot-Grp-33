@@ -617,7 +617,7 @@ abstract public class ExplorationAlgo {
     /**
      * Turns the robot to the required direction.
      */
-    private void turnBotDirection(Direction targetDir) {
+    protected void turnBotDirection(Direction targetDir) {
         int numOfTurn = Math.abs(bot.getAgtDir().ordinal() - targetDir.ordinal()) / 2;
         if (numOfTurn > 2) numOfTurn = numOfTurn % 2;
 
