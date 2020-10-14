@@ -13,6 +13,7 @@ import utils.MapDescriptorFormat;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Scanner;
 import java.util.logging.Logger;
 
 import static hardware.AgentSettings.Direction.*;
@@ -102,34 +103,22 @@ public class ImageRegExp extends ExplorationAlgo {
         if (before == after) return false;
         HashMap<String, Point> obsList;
 
-        System.out.println("imageRecognitionRight before");
-        obsList = imageRecognitionRight(exploredMap);
-        System.out.println("imageRecognitionRight after");
+//        System.out.println("imageRecognitionRight before");
+//        obsList = imageRecognitionRight(exploredMap);
+//        System.out.println("imageRecognitionRight after");
+
+
 
         AgentSettings.Direction desiredDir = AgentSettings.Direction.antiClockwise90(obsSurface.getSurface());
         if (desiredDir == bot.getAgtDir()) {
             LOGGER.info("desiredDir" + bot.getAgtDir());
-            return true;
+        } else {
+            LOGGER.info("Not desiredDir " + bot.getAgtDir());
+            turnBotDirection(desiredDir);
         }
-        else if (desiredDir == AgentSettings.Direction.clockwise90(bot.getAgtDir())) {
-            LOGGER.info("desiredDir clockwise " + bot.getAgtDir());
-            moveBot(AgentSettings.Actions.FACE_RIGHT);
-            obsList = imageRecognitionRight(exploredMap);
-        }
-        else if (desiredDir == AgentSettings.Direction.antiClockwise90(bot.getAgtDir())) {
-            LOGGER.info("desiredDir anticlockwise" + bot.getAgtDir());
-            moveBot(AgentSettings.Actions.FACE_LEFT);
-            obsList = imageRecognitionRight(exploredMap);
-        }
-        // opposite
-        else {
-            System.out.println("desiredDir opposite" + bot.getAgtDir());
-            moveBot(AgentSettings.Actions.FACE_LEFT);
-            obsList = imageRecognitionRight(exploredMap);
+        obsList = imageRecognitionRight(exploredMap);
 
-            moveBot(AgentSettings.Actions.FACE_LEFT);
-            obsList = imageRecognitionRight(exploredMap);
-        }
+
         return true;
     }
 
