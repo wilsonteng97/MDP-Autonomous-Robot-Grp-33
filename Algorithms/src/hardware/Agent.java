@@ -568,7 +568,7 @@ public class Agent {
             }
         }
 
-        System.out.println("surfaceTakenList" + surfaceTakenList + "\n");
+        System.out.println("surfaceTakenList" + surfaceTakenList);
         return surfaceTakenList;
     }
 

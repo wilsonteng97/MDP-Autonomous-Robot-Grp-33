@@ -3,6 +3,7 @@ package logic.exploration;
 import hardware.Agent;
 import hardware.AgentSettings;
 import hardware.AgentSettings.Actions;
+import logic.fastestpath.AStarHeuristicSearch;
 import map.Cell;
 import map.Map;
 import map.MapSettings;
@@ -14,11 +15,14 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import static hardware.AgentSettings.Direction.*;
 import static hardware.AgentSettings.Direction.SOUTH;
 import static utils.MsgParsingUtils.parsePictureMsg;
+import static utils.SimulatorSettings.GOHOMESLOW_SLEEP;
+import static utils.SimulatorSettings.SIM;
 
 public class ImageRegExp extends ExplorationAlgo {
     private static final Logger LOGGER = Logger.getLogger(ImageRegExp.class.getName());
@@ -63,6 +67,105 @@ public class ImageRegExp extends ExplorationAlgo {
         imageExploration();
         System.out.println("Test image end");
         exploredMap.repaint();
+    }
+
+    @Override
+    protected void explorationLoop(int r, int c) {
+        System.out.println("[coverageLimit + timeLimit] " + coverageLimit + " | " + timeLimit);
+
+        // initialization for tracking notYetTaken surfaces
+        notYetTaken = getUnTakenSurfaces();
+        System.out.println(notYetTaken);
+
+        long elapsedTime = 0;
+        do {
+            nextMove();
+            System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
+
+            areaExplored = calculateAreaExplored();
+            System.out.println("Area explored: " + areaExplored);
+            System.out.println();
+
+            if (bot.getAgtY() == r && bot.getAgtX() == c) {
+                if (areaExplored >= 100) {
+                    System.out.println("Exploration finished in advance!");
+                    break;
+                }
+            }
+            elapsedTime = getElapsedTime();
+//            scanner.nextLine();
+            System.out.println("[doWhile loop elapsed time] " + getElapsedTime());
+        } while (areaExplored <= coverageLimit && elapsedTime < timeLimit);
+
+        if (areaExplored == 300) {
+            goHome();
+        } else if ((areaExplored >= coverageLimit && areaExplored < 300) || (elapsedTime >= timeLimit && areaExplored < 300)) {
+            // Exceed coverage or time limit
+
+            elapsedTime = getElapsedTime();
+            if (areaExplored >= coverageLimit) System.out.printf("Reached coverage limit, successfully explored %d grids\n", areaExplored);
+            if (elapsedTime >= timeLimit) System.out.printf("Reached time limit, exploration has taken %d millisecond(ms)\n", elapsedTime);
+
+            if (SIM) {
+                System.out.println("Arena not fully explored, goHomeSlow() option can be chosen, enter \"Y\" or \"y\" to continue: ");
+                String userInput = scanner.nextLine();
+                if (userInput.toLowerCase().equals("y")) {
+                    try {
+                        System.out.println("[explorationLoop()] Agent sleeping for " + GOHOMESLOW_SLEEP/1000 + " second(s) before executing goHomeSlow()");
+                        TimeUnit.MILLISECONDS.sleep(GOHOMESLOW_SLEEP);
+                    } catch (InterruptedException e) {
+                        System.out.println("[explorationLoop()] Sleeping interruption exception");
+                    }
+                    goHomeSlow();
+                } else {
+                    System.out.println("goHomeSlow() option not chosen, robot will be stationary.");
+                }
+            } else {
+                goHomeSlow();
+            }
+
+        } else {
+            // have unexplored cells, visit surrounding cells of those unvisited cells
+            goHome();
+
+            System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
+
+            AStarHeuristicSearch keepExploring;
+            ArrayList<Cell> unExploredCells;
+            Cell destCell;
+            unExploredCells = findUnexplored();
+            int i = 0;
+            while (!unExploredCells.isEmpty()) {
+                int targetRow, targetCol;
+                System.out.println("Unexplored cells: " + unExploredCells.size());
+                Cell targetCell = unExploredCells.get(i);
+                targetRow = targetCell.getRow();
+                targetCol = targetCell.getCol();
+                destCell = findSurroundingReachable(targetRow, targetCol);
+                if (destCell != null) {
+                    System.out.println(destCell);
+                    keepExploring = new AStarHeuristicSearch(exploredMap, bot, realMap);
+                    keepExploring.runFastestPath(destCell.getRow(), destCell.getCol());
+                    i = 0;
+                } else {
+                    i++;
+                }
+
+                elapsedTime = getElapsedTime();
+                if (areaExplored >= coverageLimit) {
+                    System.out.printf("Reached coverage limit, successfully explored %d grids\n", areaExplored);
+                    break;
+                }
+                if (elapsedTime >= timeLimit) {
+                    System.out.printf("Reached time limit, exploration has taken %d millisecond(ms)\n", elapsedTime);
+                    break;
+                }
+
+                if (i == 0) unExploredCells = findUnexplored();
+            }
+            goHome();
+        }
+        System.out.println("Exploration Completed!");
     }
 
     public void imageExploration() {
@@ -295,80 +398,43 @@ public class ImageRegExp extends ExplorationAlgo {
         System.out.println("Taking image: " + msg);
     }
 
-//    /**
-//     * take picture and send out coordinate is there are walls/obstacles in surrounding
-//     */
-//    protected void tryTakePicture() {
-//        AgentSettings.Direction botDir = bot.getAgtDir();
-//        for (int offset = AgentSettings.CAMERA_MIN; offset <= AgentSettings.CAMERA_MAX; offset++) {
-//            if (canTakePicture(botDir, offset)) {
-//                if (botDir == AgentSettings.Direction.NORTH) {
-//                    bot.takePicture(bot.getAgtRow(), bot.getAgtCol() + (1 + offset));
-//                }
-//                else if (botDir == AgentSettings.Direction.EAST) {
-//                    bot.takePicture(bot.getAgtRow() - (1 + offset), bot.getAgtCol());
-//                }
-//                else if (botDir == AgentSettings.Direction.WEST) {
-//                    bot.takePicture(bot.getAgtRow() + (1 + offset), bot.getAgtCol());
-//                }
-//                else {
-//                    bot.takePicture(bot.getAgtRow(), bot.getAgtCol() - (1 + offset));
-//                }
-//                break;
-//            }
-//        }
-//    }
-
-//    /**
-//     * Check if the if the center cell on the RHS of the bot is wall/obstacle so can take picture
-//     */
-//    private boolean canTakePicture(AgentSettings.Direction botDir, int offset) {
-//        int row = bot.getAgtRow();
-//        int col = bot.getAgtCol();
-//
-//        switch (botDir) {
-//            case NORTH:
-//                return exploredMap.isWallOrObstacleCell(row, col + (1 + offset));
-//            case EAST:
-//                return exploredMap.isWallOrObstacleCell(row - (1 + offset), col);
-//            case SOUTH:
-//                return exploredMap.isWallOrObstacleCell(row, col - (1 + offset));
-//            case WEST:
-//                return exploredMap.isWallOrObstacleCell(row + (1 + offset), col);
-//        }
-//
-//        return false;
-//    }
-
     /**
-     * Determines the next move for the robot and executes it accordingly.
+     * Determines the next move for the robot and executes it accordingly and take picture
      */
     @Override
     protected void nextMove() {
         System.out.println("Bot Direction: " + bot.getAgtDir());
+        HashMap<String, Point> obsList;
         if (lookRight()) {
 //            System.out.println("[DEBUG] Right Clear");
             moveBot(Actions.FACE_RIGHT);
+            obsList = imageRecognitionRight(exploredMap);
             if (lookForward()) {
 //                System.out.println("  ->[DEBUG]Forward Clear");
                 moveBot(Actions.FORWARD);
+                obsList = imageRecognitionRight(exploredMap);
             }
         } else if (lookForward()) {
 //            System.out.println("[DEBUG]Forward Clear");
             moveBot(Actions.FORWARD);
+            obsList = imageRecognitionRight(exploredMap);
         } else if (lookLeft()) {
 //            System.out.println("[DEBUG]Left Clear");
             moveBot(Actions.FACE_LEFT);
+            obsList = imageRecognitionRight(exploredMap);
             if (lookForward()) {
 //                System.out.println("  ->[DEBUG]Forward Clear");
                 moveBot(Actions.FORWARD);
+                obsList = imageRecognitionRight(exploredMap);
             }
         } else {
 //            System.out.println("[DEBUG]Reverse Direction");
             moveBot(Actions.FACE_LEFT);
-//            tryTakePicture();
+            obsList = imageRecognitionRight(exploredMap);
             moveBot(Actions.FACE_LEFT);
+            obsList = imageRecognitionRight(exploredMap);
         }
+        System.out.println("New Bot Direction: " + bot.getAgtDir());
 
         if (!bot.isSim()) {
             String[] MDFString = MapDescriptorFormat.generateMapDescriptorFormat(exploredMap);
