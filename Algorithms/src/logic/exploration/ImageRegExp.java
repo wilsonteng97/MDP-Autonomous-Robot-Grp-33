@@ -107,6 +107,8 @@ public class ImageRegExp extends ExplorationAlgo {
 //        obsList = imageRecognitionRight(exploredMap);
 //        System.out.println("imageRecognitionRight after");
 
+        System.out.println("desired dir before");
+//        scanner.nextLine();
 
 
         AgentSettings.Direction desiredDir = AgentSettings.Direction.antiClockwise90(obsSurface.getSurface());
@@ -118,6 +120,8 @@ public class ImageRegExp extends ExplorationAlgo {
         }
         obsList = imageRecognitionRight(exploredMap);
 
+        System.out.println("desired dir after " + bot.getAgtDir());
+//        scanner.nextLine();
 
         return true;
     }
