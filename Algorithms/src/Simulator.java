@@ -202,32 +202,37 @@ public class Simulator {
             protected Integer doInBackground() throws Exception {
                 System.out.println("Executing Fastest path");
                 agt.setAgtCtrCoord(agt.getAgtRow(), agt.getAgtCol());
-//                if (!sim) agt.setSim(true);
-                Agent fakeBot = new Agent(agt.getAgtRow(), agt.getAgtCol(), true);
-                explorationMap.repaint();
-
-                // Compute fastest path beforehand
-                FastestPathAlgo toGoal, toWaypoint;
-                if (sim) readWaypointFromStdin();
-                toWaypoint = new AStarHeuristicSearch(explorationMap, fakeBot);
-                startToWaypoint = parseFastestPathString(toWaypoint.runFastestPath(waypointY, waypointX));
-
-                toGoal = new AStarHeuristicSearch(explorationMap, fakeBot);
-                waypointToGoal = parseFastestPathString(toGoal.runFastestPath(MapSettings.GOAL_ROW, MapSettings.GOAL_COL));
 
                 if (!sim) {
+                    Agent fakeBot = new Agent(agt.getAgtRow(), agt.getAgtCol(), true);
+                    FastestPathAlgo toWaypoint, toGoal ;
+                    toWaypoint = new AStarHeuristicSearch(explorationMap, fakeBot);
+                    startToWaypoint = parseFastestPathString(toWaypoint.runFastestPath(waypointY, waypointX));
+
+                    toGoal = new AStarHeuristicSearch(explorationMap, fakeBot);
+                    waypointToGoal = parseFastestPathString(toGoal.runFastestPath(MapSettings.GOAL_ROW, MapSettings.GOAL_COL));
+
                     // Transmit signal to get Agent to start. Initiate handshake signals.
                     while (true) {
                         System.out.println("Waiting for FS|...");
                         String msg = comm.receiveMsg();
                         if (msg.equals(NetworkMgr.FP_START)) break;
                     }
-                }
-                
-                if (!sim) NetworkMgr.getInstance().sendMsg("K" + startToWaypoint + waypointToGoal + "|", NetworkMgr.INSTRUCTIONS);
-                else System.out.println("K" + startToWaypoint + waypointToGoal + "|");
 
-//                if (!sim) agt.setSim(false);
+                    NetworkMgr.getInstance().sendMsg("K" + startToWaypoint + waypointToGoal + "|", NetworkMgr.INSTRUCTIONS);
+                } else {
+                    explorationMap.repaint();
+                    readWaypointFromStdin();
+                    FastestPathAlgo toWaypoint, toGoal ;
+                    toWaypoint = new AStarHeuristicSearch(explorationMap, agt);
+                    startToWaypoint = parseFastestPathString(toWaypoint.runFastestPath(waypointY, waypointX));
+
+                    toGoal = new AStarHeuristicSearch(explorationMap, agt);
+                    waypointToGoal = parseFastestPathString(toGoal.runFastestPath(MapSettings.GOAL_ROW, MapSettings.GOAL_COL));
+
+                    System.out.println("K" + startToWaypoint + waypointToGoal + "|");
+                }
+
 
                 return 222;
             }
