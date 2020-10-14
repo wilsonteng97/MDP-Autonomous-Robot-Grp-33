@@ -13,6 +13,7 @@ import argparse
 import imutils
 import pickle
 import cv2
+import time
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
@@ -20,8 +21,9 @@ ap.add_argument("-i", "--image", required=True,
 	help="path to input image")
 args = vars(ap.parse_args())
 
+start_time = time.time()
 # load the our fine-tuned model and label binarizer from disk
-print("[INFO] loading model and label binarizer...")
+print("[INFO] loading model and label binarizer...",)
 model = load_model(config.MODEL_PATH)
 lb = pickle.loads(open(config.ENCODER_PATH, "rb").read())
 
@@ -129,6 +131,7 @@ filename = args["image"]
 filename = filename[:filename.rfind(".")] + "_output" + filename[filename.rfind("."):]
 cv2.imwrite(filename, image)
 
+print("time taken:", time.time()-start_time)
 # def brightness(self,img):
 #     if len(img.shape) == 3:
 #         # Colored RGB or BGR (*Do Not* use HSV images with this function)

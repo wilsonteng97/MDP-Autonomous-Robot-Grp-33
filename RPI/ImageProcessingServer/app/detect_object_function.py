@@ -17,11 +17,11 @@ import os
 IMAGE_ENCODING = '.png'
 
 class ImageDetector:
-	def start(self,image,raw_image_name,cut_width,cut_height):
-		# load the our fine-tuned model and label binarizer from disk
-		print("[INFO] loading model and label binarizer...")
-		model = load_model(config.MODEL_PATH)
-		lb = pickle.loads(open(config.ENCODER_PATH, "rb").read())
+	def start(self, model,image,raw_image_name,cut_width,cut_height):
+		# # load the our fine-tuned model and label binarizer from disk
+		# print("[INFO] loading model and label binarizer...")
+		# model = load_model(config.MODEL_PATH)
+		# lb = pickle.loads(open(config.ENCODER_PATH, "rb").read())
 
 		# resize and rotate image
 		image = imutils.resize(image, width=500)
