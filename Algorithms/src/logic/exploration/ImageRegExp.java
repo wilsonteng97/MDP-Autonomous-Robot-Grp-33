@@ -369,20 +369,27 @@ public class ImageRegExp extends ExplorationAlgo {
         // check if current surfaces facing camera have different directions (but not opposite).
         tempSurface = currentCameraMiddleSurface.getSideSurfaces(1, bot.getAgtDir()).get(1);
         tempDir = tempSurface.getSurface();
-
         tempSurface.setSurface(antiClockwise90(tempDir));
         LOGGER.info("tempSurface | " + 1 + " " + tempSurface.toString());
         if (notYetTaken.containsKey(tempSurface.toString())) {
             LOGGER.info("=============== [side surfaces | " + "offset = " + 1 + "] For " + loc + "\n" + notYetTaken + "\nos return " + tempSurface + "\n===============");
             return tempSurface;
         }
-
         tempSurface.setSurface(reverse(tempDir));
         LOGGER.info("tempSurface | " + 1 + " " + tempSurface.toString());
         if (notYetTaken.containsKey(tempSurface.toString())) {
             LOGGER.info("=============== [side surfaces | " + "offset = " + 1 + "] For " + loc + "\n" + notYetTaken + "\nos return " + tempSurface + "\n===============");
             return tempSurface;
         }
+
+        // check for surfaces at the corner (if any)
+        tempSurface = bot.getAgentDiagonalRightSurface();
+        LOGGER.info("tempSurface | " + 1 + " " + tempSurface.toString());
+        if (notYetTaken.containsKey(tempSurface.toString())) {
+            LOGGER.info("=============== [diagonal surfaces] For " + loc + "\n" + notYetTaken + "\nos return " + tempSurface + "\n===============");
+            return tempSurface;
+        }
+
 
         // check 3, then 2 blocks away from currentCameraMiddleSurface in same dir as agent
         for (int offset = 3; offset >= 2; offset--) {

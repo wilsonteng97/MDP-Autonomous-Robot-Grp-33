@@ -507,6 +507,30 @@ public class Agent {
         return new ObsSurface(new Point(getAgtX()+colInc, getAgtY()+rowInc), getAgtDir());
     }
 
+    /**
+     *
+     * @return
+     */
+    public ObsSurface getAgentDiagonalRightSurface() {
+        int rowInc = 0; int colInc = 0;
+
+        switch (getAgtDir()) {
+            case EAST:
+                rowInc = -2; colInc = 2;
+                break;
+            case WEST:
+                rowInc = 2; colInc = -2;
+                break;
+            case NORTH:
+                rowInc = 2; colInc = 2;
+                break;
+            case SOUTH:
+                rowInc = -2; colInc = -2;
+                break;
+        }
+        return new ObsSurface(new Point(getAgtX()+colInc, getAgtY()+rowInc), reverse(getAgtDir()));
+    }
+
     public ObsSurface getAgentMiddleSurfaceOpposite() {
         int rowInc = 0; int colInc = 0;
 
