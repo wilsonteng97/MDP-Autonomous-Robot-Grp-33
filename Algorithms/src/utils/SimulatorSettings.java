@@ -11,6 +11,6 @@ public class SimulatorSettings {
 //    public static final String NETWORK_IP_ADDRESS = "localhost";
     public static final int NETWORK_PORT = 5040;
 
-    public static final String EXPLORATION_ALGO_MODE = "E";
-//    public static final String EXPLORATION_ALGO_MODE = "P";
+//    public static final String EXPLORATION_ALGO_MODE = "E";
+    public static final String EXPLORATION_ALGO_MODE = "P";
 }
