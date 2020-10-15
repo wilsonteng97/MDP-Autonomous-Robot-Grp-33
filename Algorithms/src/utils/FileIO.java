@@ -1,6 +1,6 @@
 package utils;
 
-import map.Map;
+import map.ArenaMap;
 import map.MapSettings;
 
 import java.io.*;
@@ -9,8 +9,8 @@ import static utils.IOsettings.FILE_DIR;
 import static utils.IOsettings.FILE_EXT;
 
 public class FileIO {
-    public static Map loadMap(Map map, String filename) {
-        map.resetMap();
+    public static ArenaMap loadMap(ArenaMap arenaMap, String filename) {
+        arenaMap.resetMap();
         try {
             String basePath = new File("").getAbsolutePath();
             BufferedReader buf;
@@ -35,15 +35,15 @@ public class FileIO {
             for (int row = MapSettings.MAP_ROWS - 1; row >= 0; row--) {
                 for (int col = 0; col < MapSettings.MAP_COLS; col++) {
                     if (bin.charAt(binPtr) == '1') {
-                        map.getCell(row, col).setObstacle(true);
+                        arenaMap.getCell(row, col).setObstacle(true);
                     }
                     binPtr++;
                 }
             }
-            map.setAllExplored();
+            arenaMap.setAllExplored();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return map;
+        return arenaMap;
     }
 }

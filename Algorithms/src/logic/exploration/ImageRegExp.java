@@ -4,19 +4,16 @@ import hardware.Agent;
 import hardware.AgentSettings;
 import hardware.AgentSettings.Actions;
 import logic.fastestpath.AStarHeuristicSearch;
+import map.ArenaMap;
 import map.Cell;
-import map.Map;
 import map.MapSettings;
 import map.ObsSurface;
 import network.NetworkMgr;
 import utils.MapDescriptorFormat;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import static hardware.AgentSettings.Direction.*;
@@ -29,10 +26,10 @@ public class ImageRegExp extends ExplorationAlgo {
     private static final Logger LOGGER = Logger.getLogger(ImageRegExp.class.getName());
 
     // for image reg
-    private static HashMap<String, ObsSurface> notYetTaken;
+    private static LinkedHashMap<String, ObsSurface> notYetTaken;
 
-    public ImageRegExp(Map exploredMap, Map realMap, Agent bot, int coverageLimit, int timeLimit) {
-        super(exploredMap, realMap, bot, coverageLimit, timeLimit);
+    public ImageRegExp(ArenaMap exploredArenaMap, ArenaMap realArenaMap, Agent bot, int coverageLimit, int timeLimit) {
+        super(exploredArenaMap, realArenaMap, bot, coverageLimit, timeLimit);
     }
 
     @Override
@@ -67,7 +64,7 @@ public class ImageRegExp extends ExplorationAlgo {
         System.out.println("Test image start");
         imageExploration();
         System.out.println("Test image end");
-        exploredMap.repaint();
+        exploredArenaMap.repaint();
     }
 
     @Override
@@ -145,7 +142,7 @@ public class ImageRegExp extends ExplorationAlgo {
                 destCell = findSurroundingReachable(targetRow, targetCol);
                 if (destCell != null) {
                     System.out.println(destCell);
-                    keepExploring = new AStarHeuristicSearch(exploredMap, bot, realMap);
+                    keepExploring = new AStarHeuristicSearch(exploredArenaMap, bot, realArenaMap);
                     keepExploring.runFastestPath(destCell.getRow(), destCell.getCol());
                     i = 0;
                 } else {
@@ -189,10 +186,11 @@ public class ImageRegExp extends ExplorationAlgo {
     private void imageLoop() {
         boolean success;
         ArrayList<ObsSurface> surfTaken;
-
+        System.out.println("before nearestObsSurface");
+        scanner.nextLine();
         ObsSurface nearestObstacle = nearestObsSurface(bot.getAgtPos(), notYetTaken);
+        LOGGER.info("nearestObstacle after " + nearestObstacle);
         Cell nearestCell = findSurfaceSurroundingReachable(nearestObstacle.getRow(), nearestObstacle.getCol(), nearestObstacle.getSurface());
-        LOGGER.info("nearestObstacle |" + nearestObstacle.toString());
         LOGGER.info("nearestCell | " + nearestCell.toString());
         if (nearestCell != null) {
             // go to nearest cell
@@ -200,6 +198,8 @@ public class ImageRegExp extends ExplorationAlgo {
             System.out.println("success: " + success);
         }
         removeFromNotYetTaken(nearestObstacle);
+        System.out.println("after nearestObsSurface");
+        scanner.nextLine();
     }
 
     private boolean goToPointTakePicture(Point loc, ObsSurface obsSurface) {
@@ -207,10 +207,10 @@ public class ImageRegExp extends ExplorationAlgo {
         goToPoint(loc);
         Point after = bot.getAgtPos();
         if (before == after) return false;
-        HashMap<String, Point> obsList;
+        LinkedHashMap<String, Point> obsList;
 
 //        System.out.println("imageRecognitionRight before");
-//        obsList = imageRecognitionRight(exploredMap);
+//        obsList = imageRecognitionRight(exploredArenaMap);
 //        System.out.println("imageRecognitionRight after");
 
         System.out.println("desired dir before");
@@ -224,7 +224,7 @@ public class ImageRegExp extends ExplorationAlgo {
             LOGGER.info("Not desiredDir " + bot.getAgtDir());
             turnBotDirection(desiredDir);
         }
-        obsList = imageRecognitionRight(exploredMap);
+        obsList = imageRecognitionRight(exploredArenaMap);
 
         System.out.println("desired dir after " + bot.getAgtDir());
 //        scanner.nextLine();
@@ -232,10 +232,10 @@ public class ImageRegExp extends ExplorationAlgo {
         return true;
     }
 
-    private HashMap<String, Point> imageRecognitionRight(Map exploredMap) {
-        ArrayList<ObsSurface> surfTaken = bot.returnSurfacesTakenRight(exploredMap);
+    private LinkedHashMap<String, Point> imageRecognitionRight(ArenaMap exploredArenaMap) {
+        ArrayList<ObsSurface> surfTaken = bot.returnSurfacesTakenRight(exploredArenaMap);
         updateNotYetTaken(surfTaken);
-        HashMap<String, Point> obsList = bot.returnObsRight(exploredMap);
+        LinkedHashMap<String, Point> obsList = bot.returnObsRight(exploredArenaMap);
 //        senseAndRepaint();
         repaintWithoutSense();
         takePicture(obsList.getOrDefault("L", null),
@@ -245,11 +245,11 @@ public class ImageRegExp extends ExplorationAlgo {
     }
 
     private void repaintWithoutSense() {
-        exploredMap.repaint();
+        exploredArenaMap.repaint();
     }
 
-    private HashMap<String, ObsSurface> getUnTakenSurfaces() {
-        HashMap<String, ObsSurface> notYetTaken;
+    private LinkedHashMap<String, ObsSurface> getUnTakenSurfaces() {
+        LinkedHashMap<String, ObsSurface> notYetTaken;
 
         // get all possible obstacle surfaces
         notYetTaken = getAllPossibleObsSurfaces();
@@ -283,18 +283,18 @@ public class ImageRegExp extends ExplorationAlgo {
         }
     }
 
-    private HashMap<String, ObsSurface> getAllPossibleObsSurfaces() {
+    private LinkedHashMap<String, ObsSurface> getAllPossibleObsSurfaces() {
         Cell tempCell; Cell neighTempCell;
         ObsSurface tempObsSurface;
-        HashMap<AgentSettings.Direction, Cell> tempNeighbours;
-        HashMap<String, ObsSurface> allPossibleObsSurfaces = new HashMap<String, ObsSurface>();
+        LinkedHashMap<AgentSettings.Direction, Cell> tempNeighbours;
+        LinkedHashMap<String, ObsSurface> allPossibleObsSurfaces = new LinkedHashMap<String, ObsSurface>();
 
         for (int r = 0; r < MapSettings.MAP_ROWS; r++) {
             for (int c = 0; c < MapSettings.MAP_COLS; c++) {
-                tempCell = exploredMap.getCell(r, c);
+                tempCell = exploredArenaMap.getCell(r, c);
                 if (tempCell.isObstacle()) {
                     System.out.println("tempCell" + tempCell);
-                    tempNeighbours = exploredMap.getNeighboursHashMap(tempCell);
+                    tempNeighbours = exploredArenaMap.getNeighboursHashMap(tempCell);
                     System.out.println("tempNeighbours" + tempNeighbours);
                     for (AgentSettings.Direction nDir : tempNeighbours.keySet()) {
                         neighTempCell = tempNeighbours.get(nDir);
@@ -302,7 +302,7 @@ public class ImageRegExp extends ExplorationAlgo {
 
                         if (!neighTempCell.isObstacle()) {
                             tempObsSurface = new ObsSurface(neighTempCell.getCoord(), nDir);
-                            if (isSurfaceReachable(tempObsSurface, exploredMap)) {
+                            if (isSurfaceReachable(tempObsSurface, exploredArenaMap)) {
 //                                System.out.println("tempObsSusrface" + tempObsSurface);
                                 allPossibleObsSurfaces.put(tempObsSurface.toString(), tempObsSurface);
                             } else {
@@ -317,7 +317,7 @@ public class ImageRegExp extends ExplorationAlgo {
         return allPossibleObsSurfaces;
     }
 
-    public boolean isSurfaceReachable(ObsSurface obsSurface, Map exploredMap) {
+    public boolean isSurfaceReachable(ObsSurface obsSurface, ArenaMap exploredArenaMap) {
         int row = 0; int col = 0;
         int rowInc = 0; int colInc = 0;
         int obsX = obsSurface.getCol(); int obsY = obsSurface.getRow();
@@ -342,21 +342,45 @@ public class ImageRegExp extends ExplorationAlgo {
             col = obsX + colInc * offset;
             // left/right reachable
             if (rowInc==0) row++; if (colInc==0) col++;
-            if (exploredMap.checkRobotFitsCell(row, col)) return true;
+            if (exploredArenaMap.checkRobotFitsCell(row, col)) return true;
 
             // Mid reachable
             if (rowInc==0) row--; if (colInc==0) col--;
-            if (exploredMap.checkRobotFitsCell(row, col)) return true;
+            if (exploredArenaMap.checkRobotFitsCell(row, col)) return true;
 
             // left/right reachable
             if (rowInc==0) row--; if (colInc==0) col--;
-            if (exploredMap.checkRobotFitsCell(row, col)) return true;
+            if (exploredArenaMap.checkRobotFitsCell(row, col)) return true;
         }
 
         return false;
     }
 
-    public ObsSurface nearestObsSurface(Point loc, HashMap<String, ObsSurface> notYetTaken) {
+    public ObsSurface nearestObsSurface(Point loc, LinkedHashMap<String, ObsSurface> notYetTaken) {
+        Point tempObsPoint = null;
+        int tempX; int tempY;
+        ObsSurface tempSurface;
+        ArrayList<ObsSurface> tempSurfaces;
+        ArrayList<ObsSurface> tempObsSurfaceList = new ArrayList<ObsSurface>();
+
+        // check 3, then 2 blocks away from currentCameraMiddleSurface, same dir surface
+        ObsSurface currentCameraMiddleSurface = bot.getCameraMiddleSurface();
+        LOGGER.info("currentCameraMiddleSurface " + currentCameraMiddleSurface.toString());
+        for (int offset = 3; offset >= 2; offset--) {
+            tempSurfaces = currentCameraMiddleSurface.getSideSurfaces(offset);
+            LOGGER.info("tempSurfaces | " + offset + " " + tempSurfaces.toString());
+            for (ObsSurface os : tempSurfaces) {
+                if (notYetTaken.containsKey(os.toString())) {
+                    LOGGER.info("=============== [side surfaces | " + "offset = " + offset + "] For " + loc + "\n" + notYetTaken + "\nos return " + os + "\n===============");
+                    return os;
+                }
+            }
+        }
+
+        return absoluteNearestSurface(loc, notYetTaken);
+    }
+
+    public ObsSurface absoluteNearestSurface(Point loc, LinkedHashMap<String, ObsSurface> notYetTaken) {
         double dist = 1000, tempDist;
         Point tempPos;
         ObsSurface nearest = null;
@@ -371,6 +395,7 @@ public class ImageRegExp extends ExplorationAlgo {
                 nearest = obstacle;
             }
         }
+        LOGGER.info("-------------- [absoluteNearestSurface] For " + loc + "\n" + notYetTaken + "\n--------------");
         return nearest;
     }
 
@@ -406,40 +431,40 @@ public class ImageRegExp extends ExplorationAlgo {
     @Override
     protected void nextMove() {
         System.out.println("Bot Direction: " + bot.getAgtDir());
-        HashMap<String, Point> obsList;
+        LinkedHashMap<String, Point> obsList;
         if (lookRight()) {
 //            System.out.println("[DEBUG] Right Clear");
             moveBot(Actions.FACE_RIGHT);
-            obsList = imageRecognitionRight(exploredMap);
+            obsList = imageRecognitionRight(exploredArenaMap);
             if (lookForward()) {
 //                System.out.println("  ->[DEBUG]Forward Clear");
                 moveBot(Actions.FORWARD);
-                obsList = imageRecognitionRight(exploredMap);
+                obsList = imageRecognitionRight(exploredArenaMap);
             }
         } else if (lookForward()) {
 //            System.out.println("[DEBUG]Forward Clear");
             moveBot(Actions.FORWARD);
-            obsList = imageRecognitionRight(exploredMap);
+            obsList = imageRecognitionRight(exploredArenaMap);
         } else if (lookLeft()) {
 //            System.out.println("[DEBUG]Left Clear");
             moveBot(Actions.FACE_LEFT);
-            obsList = imageRecognitionRight(exploredMap);
+            obsList = imageRecognitionRight(exploredArenaMap);
             if (lookForward()) {
 //                System.out.println("  ->[DEBUG]Forward Clear");
                 moveBot(Actions.FORWARD);
-                obsList = imageRecognitionRight(exploredMap);
+                obsList = imageRecognitionRight(exploredArenaMap);
             }
         } else {
 //            System.out.println("[DEBUG]Reverse Direction");
             moveBot(Actions.FACE_LEFT);
-            obsList = imageRecognitionRight(exploredMap);
+            obsList = imageRecognitionRight(exploredArenaMap);
             moveBot(Actions.FACE_LEFT);
-            obsList = imageRecognitionRight(exploredMap);
+            obsList = imageRecognitionRight(exploredArenaMap);
         }
         System.out.println("New Bot Direction: " + bot.getAgtDir());
 
         if (!bot.isSim()) {
-            String[] MDFString = MapDescriptorFormat.generateMapDescriptorFormat(exploredMap);
+            String[] MDFString = MapDescriptorFormat.generateMapDescriptorFormat(exploredArenaMap);
             String msg = MDFString[0] + ":" + MDFString[1] + "|";
             NetworkMgr.getInstance().sendMsg(msg, NetworkMgr.MAP_STRINGS);
         }
@@ -479,22 +504,22 @@ public class ImageRegExp extends ExplorationAlgo {
 
             // Left/Right displacement
             if (rowInc==0) tempFreeY--; if (colInc==0) tempFreeX--;
-            tempCell = exploredMap.getCell(tempFreeY, tempFreeX);
-            if (exploredMap.checkRobotFitsCell(tempFreeY, tempFreeX) && tempCell.isExplored()) {
+            tempCell = exploredArenaMap.getCell(tempFreeY, tempFreeX);
+            if (exploredArenaMap.checkRobotFitsCell(tempFreeY, tempFreeX) && tempCell.isExplored()) {
                 return tempCell;
             }
 
             // No displacement (middle)
             if (rowInc==0) tempFreeY++; if (colInc==0) tempFreeX++;
-            tempCell = exploredMap.getCell(tempFreeY, tempFreeX);
-            if (exploredMap.checkRobotFitsCell(tempFreeY, tempFreeX) && tempCell.isExplored()) {
+            tempCell = exploredArenaMap.getCell(tempFreeY, tempFreeX);
+            if (exploredArenaMap.checkRobotFitsCell(tempFreeY, tempFreeX) && tempCell.isExplored()) {
                 return tempCell;
             }
 
             // Left/Right displacement
             if (rowInc==0) tempFreeY++; if (colInc==0) tempFreeX++;
-            tempCell = exploredMap.getCell(tempFreeY, tempFreeX);
-            if (exploredMap.checkRobotFitsCell(tempFreeY, tempFreeX) && tempCell.isExplored()) {
+            tempCell = exploredArenaMap.getCell(tempFreeY, tempFreeX);
+            if (exploredArenaMap.checkRobotFitsCell(tempFreeY, tempFreeX) && tempCell.isExplored()) {
                 return tempCell;
             }
 
@@ -504,5 +529,9 @@ public class ImageRegExp extends ExplorationAlgo {
             }
             offset++;
         }
+    }
+
+    public static <K extends Comparable, V> Map<K,V> sortByKeys(Map<K,V> map) {
+        return new TreeMap<>(map);
     }
 }

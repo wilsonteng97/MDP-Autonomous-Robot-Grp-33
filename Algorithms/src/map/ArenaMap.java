@@ -7,27 +7,28 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * @author Wilson Thurman Teng
  * Adapted from @author Suyash Lakhotia
  */
 
-public class Map extends JPanel {
+public class ArenaMap extends JPanel {
     private Cell[][] grid;
 
     private static Agent agt;
     private ArrayList<Point> detectedImg;
 
-    public Map(Agent agt) {
-        Map.agt = agt;
+    public ArenaMap(Agent agt) {
+        ArenaMap.agt = agt;
         grid = new Cell[MapSettings.MAP_ROWS][MapSettings.MAP_COLS];
         detectedImg = new ArrayList<Point>();
         initGrid();
     }
 
     /**
-     * Init Map Methods
+     * Init ArenaMap Methods
      */
     public void setAgt(Agent agt) {
         this.agt = agt;
@@ -216,8 +217,8 @@ public class Map extends JPanel {
         }
         return neighbours;
     }
-    public HashMap<AgentSettings.Direction, Cell> getNeighboursHashMap(Cell c) {
-        HashMap<AgentSettings.Direction, Cell> neighbours = new HashMap<AgentSettings.Direction, Cell>();
+    public LinkedHashMap<AgentSettings.Direction, Cell> getNeighboursHashMap(Cell c) {
+        LinkedHashMap<AgentSettings.Direction, Cell> neighbours = new LinkedHashMap<AgentSettings.Direction, Cell>();
         // UP
         if (checkValidCellAndNotObs(c.getY() + 1, c.getX())) {
 //            System.out.println("neighbours up");
@@ -279,7 +280,7 @@ public class Map extends JPanel {
 //    }
 
     /**
-     * Reset Map Method
+     * Reset ArenaMap Method
      */
     public void resetMap() {
         grid = new Cell[MapSettings.MAP_ROWS][MapSettings.MAP_COLS];

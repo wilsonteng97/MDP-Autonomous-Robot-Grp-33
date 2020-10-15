@@ -1,16 +1,16 @@
 package hardware;
 
+import map.ArenaMap;
 import map.Cell;
 import map.ObsSurface;
-import map.Map;
 import map.MapSettings;
 import network.NetworkMgr;
 import utils.SimulatorSettings;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.concurrent.TimeUnit;
 
 import static hardware.AgentSettings.CAMERA_DIRECTION;
@@ -62,7 +62,7 @@ public class Agent {
     // for image taking
     private int imageCount = 0;
     private HashSet<String> imageHashSet = new HashSet<String>();
-    private HashMap<String, ObsSurface> surfaceTaken = new HashMap<String, ObsSurface>();
+    private LinkedHashMap<String, ObsSurface> surfaceTaken = new LinkedHashMap<String, ObsSurface>();
 
     private boolean sim;
 
@@ -233,25 +233,25 @@ public class Agent {
         return agtDir;
     }
 
-    public AgentSettings.Direction takeAction(AgentSettings.Actions action, int steps, Map explorationMap, Map map) {
+    public AgentSettings.Direction takeAction(AgentSettings.Actions action, int steps, ArenaMap explorationArenaMap, ArenaMap arenaMap) {
         switch (action) {
             case FORWARD:
             case BACKWARD:
             case MOVE_LEFT:
             case MOVE_RIGHT:
-                agtDir = move(action, steps, explorationMap, map);
+                agtDir = move(action, steps, explorationArenaMap, arenaMap);
                 break;
 
             case FACE_LEFT:
             case FACE_RIGHT:
             case FACE_REVERSE:
-                agtDir = changeDir(action, explorationMap, map);
+                agtDir = changeDir(action, explorationArenaMap, arenaMap);
                 break;
 
             case ALIGN_FRONT:
             case ALIGN_RIGHT:
             case CALIBRATE:
-                agtDir = calibrate(action, explorationMap, map);
+                agtDir = calibrate(action, explorationArenaMap, arenaMap);
                 break;
 
             case ERROR:
@@ -290,7 +290,7 @@ public class Agent {
     }
 
     // TODO
-    public AgentSettings.Direction calibrate(AgentSettings.Actions action, Map explorationMap, Map map) {
+    public AgentSettings.Direction calibrate(AgentSettings.Actions action, ArenaMap explorationArenaMap, ArenaMap arenaMap) {
         switch(action) {
             case ALIGN_FRONT:
             case ALIGN_RIGHT:
@@ -298,11 +298,11 @@ public class Agent {
                 break;
         }
 //        this.setSensors();
-//        this.senseEnv(explorationMap, map);
+//        this.senseEnv(explorationArenaMap, arenaMap);
         return agtDir;
     }
 
-    public AgentSettings.Direction changeDir(AgentSettings.Actions action, Map explorationMap, Map map) {
+    public AgentSettings.Direction changeDir(AgentSettings.Actions action, ArenaMap explorationArenaMap, ArenaMap arenaMap) {
         if (sim) {
             // Emulate real AgentSettings.Direction by pausing execution.
             try {
@@ -324,7 +324,7 @@ public class Agent {
     }
 
     // TODO MOVE_LEFT & MOVE_RIGHT
-    public AgentSettings.Direction move(AgentSettings.Actions action, int steps, Map explorationMap, Map map) {
+    public AgentSettings.Direction move(AgentSettings.Actions action, int steps, ArenaMap explorationArenaMap, ArenaMap arenaMap) {
 //        System.out.printf("[DEBUG: Function executed] move(%s)\n", action);
         if (sim) {
             // Emulate real AgentSettings.Direction by pausing execution.
@@ -381,13 +381,13 @@ public class Agent {
      * Agent environment sensing Method
      * (with the help of sensors)
      */
-    public int[] senseEnv(Map explorationMap, Map map) {
+    public int[] senseEnv(ArenaMap explorationArenaMap, ArenaMap arenaMap) {
         int[] result = new int[sensorLst.size()];
         int sensorCount = 0;
 
         if (sim) {
             for (Sensor s : sensorLst) {
-                result[sensorCount] = s.simDetect(explorationMap, map);
+                result[sensorCount] = s.simDetect(explorationArenaMap, arenaMap);
                 sensorCount++;
             }
         } else {
@@ -406,12 +406,12 @@ public class Agent {
         }
         sensorCount = 0;
         for (Sensor s : sensorLst) {
-            s.realDetect(explorationMap, result[sensorCount]);
+            s.realDetect(explorationArenaMap, result[sensorCount]);
             sensorCount++;
         }
 //        System.out.println("Sensor Readings -> " + result[0] + " | " +  + result[1] + " | " +  + result[2] + " | " +  + result[3] + " | " +  + result[4] + " | " +  + result[5] + " | ");
 
-//        String[] mapStrings = MapDescriptor.generateMapDescriptor(explorationMap);
+//        String[] mapStrings = MapDescriptor.generateMapDescriptor(explorationArenaMap);
 //        comm.sendMsg(mapStrings[0] + " " + mapStrings[1], CommMgr.MAP_STRINGS);
         return result;
     }
@@ -487,11 +487,93 @@ public class Agent {
         return null;
     }
 
-    public HashMap<String, ObsSurface> getSurfaceTaken() {
+    public ObsSurface getAgentMiddleSurface() {
+        int rowInc = 0; int colInc = 0;
+
+        switch (getAgtDir()) {
+            case EAST:
+                rowInc = 0; colInc = 1;
+                break;
+            case WEST:
+                rowInc = 0; colInc = -1;
+                break;
+            case NORTH:
+                rowInc = 1; colInc = 0;
+                break;
+            case SOUTH:
+                rowInc = -1; colInc = 0;
+                break;
+        }
+        return new ObsSurface(new Point(getAgtX()+colInc, getAgtY()+rowInc), getAgtDir());
+    }
+
+    public ObsSurface getAgentMiddleSurfaceOpposite() {
+        int rowInc = 0; int colInc = 0;
+
+        switch (getAgtDir()) {
+            case EAST:
+                rowInc = 0; colInc = -1;
+                break;
+            case WEST:
+                rowInc = 0; colInc = 1;
+                break;
+            case NORTH:
+                rowInc = -1; colInc = 0;
+                break;
+            case SOUTH:
+                rowInc = 1; colInc = 0;
+                break;
+        }
+        return new ObsSurface(new Point(getAgtX()+colInc, getAgtY()+rowInc), getAgtDir());
+    }
+
+    public ObsSurface getCameraMiddleSurface() {
+        AgentSettings.Direction cam_dir = getCameraDirection();
+        int rowInc = 0; int colInc = 0;
+
+        switch (cam_dir) {
+            case EAST:
+                rowInc = 0; colInc = 1;
+                break;
+            case WEST:
+                rowInc = 0; colInc = -1;
+                break;
+            case NORTH:
+                rowInc = 1; colInc = 0;
+                break;
+            case SOUTH:
+                rowInc = -1; colInc = 0;
+                break;
+        }
+        return new ObsSurface(new Point(getAgtX()+colInc, getAgtY()+rowInc), cam_dir);
+    }
+
+    public ObsSurface getCameraMiddleSurfaceOpposite() {
+        AgentSettings.Direction cam_dir = getCameraDirection();
+        int rowInc = 0; int colInc = 0;
+
+        switch (cam_dir) {
+            case EAST:
+                rowInc = 0; colInc = -1;
+                break;
+            case WEST:
+                rowInc = 0; colInc = 1;
+                break;
+            case NORTH:
+                rowInc = -1; colInc = 0;
+                break;
+            case SOUTH:
+                rowInc = 1; colInc = 0;
+                break;
+        }
+        return new ObsSurface(new Point(getAgtX()+colInc, getAgtY()+rowInc), cam_dir);
+    }
+
+    public LinkedHashMap<String, ObsSurface> getSurfaceTaken() {
         return surfaceTaken;
     }
 
-    public ArrayList<ObsSurface> returnSurfacesTakenRight(Map exploredMap) {
+    public ArrayList<ObsSurface> returnSurfacesTakenRight(ArenaMap exploredArenaMap) {
         ArrayList<ObsSurface> surfaceTakenList = new ArrayList<ObsSurface>();
         ObsSurface tempObsSurface;
         int rowInc = 0, colInc = 0;
@@ -526,8 +608,8 @@ public class Agent {
             temp_col = camera_col + colInc * offset;
 
 //            System.out.println("temp_row|temp_col " + temp_row + "|"  + temp_col);
-            if (exploredMap.checkValidCell(temp_row, temp_col)) {
-                tempCell = exploredMap.getCell(temp_row, temp_col);
+            if (exploredArenaMap.checkValidCell(temp_row, temp_col)) {
+                tempCell = exploredArenaMap.getCell(temp_row, temp_col);
             } else {
 //                System.out.println("Not Valid|temp_row|temp_col " + temp_row + "|"  + temp_col);
                 break;
@@ -535,8 +617,8 @@ public class Agent {
 
             // Left/Right Obs
             if (rowInc==0) temp_row++; if (colInc==0) temp_col++;
-            tempCell = exploredMap.getCell(temp_row, temp_col);
-            if (tempCell.isObstacle() && !left && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
+            tempCell = exploredArenaMap.getCell(temp_row, temp_col);
+            if (tempCell.isObstacle() && !left && tempCell.isExplored() && exploredArenaMap.checkValidCell(temp_row, temp_col)) {
                 tempObsSurface = new ObsSurface(new Point(temp_col - colInc, temp_row - rowInc), obsDir);
 //                    System.out.println("left tempObsSurface " + tempObsSurface);
                 surfaceTaken.put(tempObsSurface.toString(), tempObsSurface);
@@ -547,8 +629,8 @@ public class Agent {
 
             // middleObs
             if (rowInc==0) temp_row--; if (colInc==0) temp_col--;
-            tempCell = exploredMap.getCell(temp_row, temp_col);
-            if (tempCell.isObstacle() && !mid && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
+            tempCell = exploredArenaMap.getCell(temp_row, temp_col);
+            if (tempCell.isObstacle() && !mid && tempCell.isExplored() && exploredArenaMap.checkValidCell(temp_row, temp_col)) {
                 tempObsSurface = new ObsSurface(new Point(temp_col - colInc, temp_row - rowInc), obsDir);
 //                    System.out.println("mid tempObsSurface " + tempObsSurface);
                 surfaceTaken.put(tempObsSurface.toString(), tempObsSurface);
@@ -558,8 +640,8 @@ public class Agent {
 
             // Left/Right obs
             if (rowInc==0) temp_row--; if (colInc==0) temp_col--;
-            tempCell = exploredMap.getCell(temp_row, temp_col);
-            if (tempCell.isObstacle() && !right && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
+            tempCell = exploredArenaMap.getCell(temp_row, temp_col);
+            if (tempCell.isObstacle() && !right && tempCell.isExplored() && exploredArenaMap.checkValidCell(temp_row, temp_col)) {
                 tempObsSurface = new ObsSurface(new Point(temp_col - colInc, temp_row - rowInc), obsDir);
 //                    System.out.println("right tempObsSurface " + tempObsSurface);
                 surfaceTaken.put(tempObsSurface.toString(), tempObsSurface);
@@ -572,10 +654,10 @@ public class Agent {
         return surfaceTakenList;
     }
 
-    public HashMap<String, Point> returnObsRight(Map exploredMap) {
+    public LinkedHashMap<String, Point> returnObsRight(ArenaMap exploredArenaMap) {
         int rowInc = 0, colInc = 0;
         int camera_row, camera_col, temp_row, temp_col;
-        HashMap<String, Point> obsList = new HashMap<String, Point>();
+        LinkedHashMap<String, Point> obsList = new LinkedHashMap<String, Point>();
         AgentSettings.Direction obsDir = null;
         Cell tempCell;
 
@@ -606,8 +688,8 @@ public class Agent {
             temp_col = camera_col + colInc * offset;
 
 //            System.out.println("temp_row|temp_col " + temp_row + "|"  + temp_col);
-            if (exploredMap.checkValidCell(temp_row, temp_col)) {
-                tempCell = exploredMap.getCell(temp_row, temp_col);
+            if (exploredArenaMap.checkValidCell(temp_row, temp_col)) {
+                tempCell = exploredArenaMap.getCell(temp_row, temp_col);
             } else {
 //                System.out.println("Not Valid|temp_row|temp_col " + temp_row + "|"  + temp_col);
                 break;
@@ -615,8 +697,8 @@ public class Agent {
 
             // Left/Right Obs
             if (rowInc==0) temp_row++; if (colInc==0) temp_col++;
-            tempCell = exploredMap.getCell(temp_row, temp_col);
-            if (tempCell.isObstacle() && !left && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
+            tempCell = exploredArenaMap.getCell(temp_row, temp_col);
+            if (tempCell.isObstacle() && !left && tempCell.isExplored() && exploredArenaMap.checkValidCell(temp_row, temp_col)) {
                 if ((obsDir == NORTH) || (obsDir == WEST)) obsList.put("R", new Point(temp_col, temp_row));
                 if ((obsDir == SOUTH) || (obsDir == EAST)) obsList.put("L", new Point(temp_col, temp_row));
                 left = true;
@@ -624,16 +706,16 @@ public class Agent {
 
             // middleObs
             if (rowInc==0) temp_row--; if (colInc==0) temp_col--;
-            tempCell = exploredMap.getCell(temp_row, temp_col);
-            if (tempCell.isObstacle() && !mid && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
+            tempCell = exploredArenaMap.getCell(temp_row, temp_col);
+            if (tempCell.isObstacle() && !mid && tempCell.isExplored() && exploredArenaMap.checkValidCell(temp_row, temp_col)) {
                 obsList.put("M", new Point(temp_col, temp_row));
                 mid = true;
             }
 
             // Left/Right obs
             if (rowInc==0) temp_row--; if (colInc==0) temp_col--;
-            tempCell = exploredMap.getCell(temp_row, temp_col);
-            if (tempCell.isObstacle() && !right && tempCell.isExplored() && exploredMap.checkValidCell(temp_row, temp_col)) {
+            tempCell = exploredArenaMap.getCell(temp_row, temp_col);
+            if (tempCell.isObstacle() && !right && tempCell.isExplored() && exploredArenaMap.checkValidCell(temp_row, temp_col)) {
                 if ((obsDir == NORTH) || (obsDir == WEST)) obsList.put("L", new Point(temp_col, temp_row));
                 if ((obsDir == SOUTH) || (obsDir == EAST)) obsList.put("R", new Point(temp_col, temp_row));
                 right = true;

@@ -2,14 +2,14 @@ package logic.fastestpath;
 
 import hardware.Agent;
 import hardware.AgentSettings;
+import map.ArenaMap;
 import map.Cell;
-import map.Map;
 
 import java.util.Stack;
 
 abstract public class FastestPathAlgo {
-    protected Map exploredMap;
-    protected final Map realMap;
+    protected ArenaMap exploredArenaMap;
+    protected final ArenaMap realArenaMap;
     protected Agent bot;
     protected AgentSettings.Direction curDir; // current direction of robot
     protected Cell current;                   // current Cell
@@ -21,9 +21,9 @@ abstract public class FastestPathAlgo {
      * Constructor called during Fastest Path leaderboard.
      * explorationMode not used here
      */
-    public FastestPathAlgo(Map exploredMap, Agent bot) {
-        this.realMap = null;
-        initObject(exploredMap, bot);
+    public FastestPathAlgo(ArenaMap exploredArenaMap, Agent bot) {
+        this.realArenaMap = null;
+        initObject(exploredArenaMap, bot);
 //        this.waypointX = waypointX;
 //        this.waypointY = waypointY;
     }
@@ -32,18 +32,18 @@ abstract public class FastestPathAlgo {
      * Constructor called during Exploration/ImageReg leaderboard (to use fastest path for ImageReg leaderboard)
      * explorationMode = true
      */
-    public FastestPathAlgo(Map exploredMap, Agent bot, Map realMap) {
-        this.realMap = realMap;
+    public FastestPathAlgo(ArenaMap exploredArenaMap, Agent bot, ArenaMap realArenaMap) {
+        this.realArenaMap = realArenaMap;
         this.explorationMode = true;
-        initObject(exploredMap, bot);
+        initObject(exploredArenaMap, bot);
 //        this.waypointX = waypointX;
 //        this.waypointY = waypointY;
     }
 
-    protected void initObject(Map map, Agent bot) {
+    protected void initObject(ArenaMap arenaMap, Agent bot) {
         this.bot = bot;
-        this.exploredMap = map;
-        this.current = map.getCell(bot.getAgtRow(), bot.getAgtCol());
+        this.exploredArenaMap = arenaMap;
+        this.current = arenaMap.getCell(bot.getAgtRow(), bot.getAgtCol());
         this.curDir = bot.getAgtDir();
     }
 
@@ -98,22 +98,22 @@ abstract public class FastestPathAlgo {
 
         switch (bot.getAgtDir()) {
             case NORTH:
-                if (!exploredMap.isObstacleCell(row + 2, col - 1) && !exploredMap.isObstacleCell(row + 2, col) && !exploredMap.isObstacleCell(row + 2, col + 1)) {
+                if (!exploredArenaMap.isObstacleCell(row + 2, col - 1) && !exploredArenaMap.isObstacleCell(row + 2, col) && !exploredArenaMap.isObstacleCell(row + 2, col + 1)) {
                     return true;
                 }
                 break;
             case EAST:
-                if (!exploredMap.isObstacleCell(row + 1, col + 2) && !exploredMap.isObstacleCell(row, col + 2) && !exploredMap.isObstacleCell(row - 1, col + 2)) {
+                if (!exploredArenaMap.isObstacleCell(row + 1, col + 2) && !exploredArenaMap.isObstacleCell(row, col + 2) && !exploredArenaMap.isObstacleCell(row - 1, col + 2)) {
                     return true;
                 }
                 break;
             case SOUTH:
-                if (!exploredMap.isObstacleCell(row - 2, col - 1) && !exploredMap.isObstacleCell(row - 2, col) && !exploredMap.isObstacleCell(row - 2, col + 1)) {
+                if (!exploredArenaMap.isObstacleCell(row - 2, col - 1) && !exploredArenaMap.isObstacleCell(row - 2, col) && !exploredArenaMap.isObstacleCell(row - 2, col + 1)) {
                     return true;
                 }
                 break;
             case WEST:
-                if (!exploredMap.isObstacleCell(row + 1, col - 2) && !exploredMap.isObstacleCell(row, col - 2) && !exploredMap.isObstacleCell(row - 1, col - 2)) {
+                if (!exploredArenaMap.isObstacleCell(row + 1, col - 2) && !exploredArenaMap.isObstacleCell(row, col - 2) && !exploredArenaMap.isObstacleCell(row - 1, col - 2)) {
                     return true;
                 }
                 break;

@@ -3,33 +3,34 @@ package map;
 import hardware.AgentSettings;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 public class ObsSurface {
-    private Point blkPos;
+    private Point pos;
     private AgentSettings.Direction surface;
 
     public ObsSurface(int col, int row, AgentSettings.Direction surface) {
-        this.blkPos = new Point(col, row);
+        this.pos = new Point(col, row);
         this.surface = surface;
     }
 
 
-    public ObsSurface(Point blkPos, AgentSettings.Direction surface) {
-        this.blkPos = blkPos;
+    public ObsSurface(Point pos, AgentSettings.Direction surface) {
+        this.pos = pos;
         this.surface = surface;
     }
 
 
     public Point getPos() {
-        return blkPos;
+        return pos;
     }
 
     public int getRow() {
-        return this.blkPos.y;
+        return this.pos.y;
     }
 
     public int getCol() {
-        return this.blkPos.x;
+        return this.pos.x;
     }
 
     public AgentSettings.Direction getSurface() {
@@ -37,7 +38,7 @@ public class ObsSurface {
     }
 
     public void setPos(Point blkPos) {
-        this.blkPos = blkPos;
+        this.pos = blkPos;
     }
 
     public void setSurface(AgentSettings.Direction dir) {
@@ -45,7 +46,32 @@ public class ObsSurface {
     }
 
     public void setPos(int row, int col) {
-        this.blkPos = new Point(col, row);
+        this.pos = new Point(col, row);
+    }
+
+    public ArrayList<ObsSurface> getSideSurfaces(int offset) {
+        Point p1; Point p2;
+        ArrayList<ObsSurface> obsSurfaces = new ArrayList<ObsSurface>();
+
+        switch (surface) {
+            case EAST:
+            case WEST:
+                p1 = new Point(pos.x, pos.y + 1 * offset);
+                p2 = new Point(pos.x, pos.y + -1 * offset);
+                break;
+            case NORTH:
+            case SOUTH:
+                p1 = new Point(pos.x + 1 * offset, pos.y);
+                p2 = new Point(pos.x + -1 * offset, pos.y);
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + surface);
+        }
+
+        obsSurfaces.add(new ObsSurface(p1, surface));
+        obsSurfaces.add(new ObsSurface(p2, surface));
+
+        return obsSurfaces;
     }
 
     @Override

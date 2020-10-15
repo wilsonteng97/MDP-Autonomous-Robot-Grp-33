@@ -5,13 +5,12 @@ import hardware.AgentSettings;
 import hardware.AgentSettings.Actions;
 import hardware.AgentSettings.Direction;
 import logic.fastestpath.AStarHeuristicSearch;
+import map.ArenaMap;
 import map.Cell;
-import map.Map;
 import map.MapSettings;
 import network.NetworkMgr;
 import utils.SimulatorSettings;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -25,8 +24,8 @@ import static utils.SimulatorSettings.GOHOMESLOW_SLEEP;
 import static utils.SimulatorSettings.SIM;
 
 abstract public class ExplorationAlgo {
-    protected static Map exploredMap;
-    protected static Map realMap;
+    protected static ArenaMap exploredArenaMap;
+    protected static ArenaMap realArenaMap;
     protected static Agent bot;
     protected int coverageLimit = 300;
     protected int timeLimit = 3600;    // in second
@@ -43,9 +42,9 @@ abstract public class ExplorationAlgo {
 
     Scanner scanner = new Scanner(System.in);
 
-    public ExplorationAlgo(Map exploredMap, Map realMap, Agent bot, int coverageLimit, int timeLimit) {
-        this.exploredMap = exploredMap;
-        this.realMap = realMap;
+    public ExplorationAlgo(ArenaMap exploredArenaMap, ArenaMap realArenaMap, Agent bot, int coverageLimit, int timeLimit) {
+        this.exploredArenaMap = exploredArenaMap;
+        this.realArenaMap = realArenaMap;
         this.bot = bot;
         this.coverageLimit = coverageLimit;
         this.timeLimit = timeLimit * 1000;
@@ -62,13 +61,13 @@ abstract public class ExplorationAlgo {
 //            // TODO initial calibration
             if (!bot.isSim()) {
                 // Facing the back
-//                bot.takeAction(Actions.BACKWARD, 0, exploredMap, realMap);
+//                bot.takeAction(Actions.BACKWARD, 0, exploredArenaMap, realArenaMap);
 //                NetworkMgr.getInstance().receiveMsg();
-//                bot.takeAction(Actions.ALIGN_FRONT, 0, exploredMap, realMap);
+//                bot.takeAction(Actions.ALIGN_FRONT, 0, exploredArenaMap, realArenaMap);
 //                NetworkMgr.getInstance().receiveMsg();
 //                bot.takeAction(Actions.FACE_LEFT);
 //                NetworkMgr.getInstance().receiveMsg();
-//                bot.takeAction(Actions.ALIGN_FRONT, 0, exploredMap, realMap);
+//                bot.takeAction(Actions.ALIGN_FRONT, 0, exploredArenaMap, realArenaMap);
 //                NetworkMgr.getInstance().receiveMsg();
 //                bot.takeAction(Actions.FACE_LEFT);
 //                NetworkMgr.getInstance().receiveMsg();
@@ -98,7 +97,7 @@ abstract public class ExplorationAlgo {
 //            NetworkMgr.getInstance().sendMsg(null, NetworkMgr.BOT_START);
 //        }
 //        senseAndRepaint();
-        exploredMap.repaint();
+        exploredArenaMap.repaint();
     }
 
 
@@ -182,7 +181,7 @@ abstract public class ExplorationAlgo {
                 destCell = findSurroundingReachable(targetRow, targetCol);
                 if (destCell != null) {
                     System.out.println(destCell);
-                    keepExploring = new AStarHeuristicSearch(exploredMap, bot, realMap);
+                    keepExploring = new AStarHeuristicSearch(exploredArenaMap, bot, realArenaMap);
                     keepExploring.runFastestPath(destCell.getRow(), destCell.getCol());
                     i = 0;
                 } else {
@@ -305,11 +304,11 @@ abstract public class ExplorationAlgo {
      */
     protected void goHome() {
         if (!bot.hasEnteredGoal() && coverageLimit == 300 && timeLimit == 3600) {
-            AStarHeuristicSearch goToGoal = new AStarHeuristicSearch(exploredMap, bot, realMap);
+            AStarHeuristicSearch goToGoal = new AStarHeuristicSearch(exploredArenaMap, bot, realArenaMap);
             goToGoal.runFastestPath(AgentSettings.GOAL_ROW, AgentSettings.GOAL_COL);
         }
 
-        AStarHeuristicSearch returnToStart = new AStarHeuristicSearch(exploredMap, bot, realMap);
+        AStarHeuristicSearch returnToStart = new AStarHeuristicSearch(exploredArenaMap, bot, realArenaMap);
         returnToStart.runFastestPath(AgentSettings.START_ROW, AgentSettings.START_COL);
 
         System.out.println("Exploration complete!");
@@ -337,7 +336,7 @@ abstract public class ExplorationAlgo {
     }
 
     protected void goToPoint(Point coord) {
-        AStarHeuristicSearch goToPoint = new AStarHeuristicSearch(exploredMap, bot);
+        AStarHeuristicSearch goToPoint = new AStarHeuristicSearch(exploredArenaMap, bot);
         String mergedOutputString = parseFastestPathString(goToPoint.runFastestPath(coord.y, coord.x));;
 
         if (!bot.isSim()) NetworkMgr.getInstance().sendMsg("K" + mergedOutputString, NetworkMgr.INSTRUCTIONS);
@@ -365,7 +364,7 @@ abstract public class ExplorationAlgo {
         HashSet<Cell> hasSeen = new HashSet<>();
         ArrayList<Cell> result = new ArrayList<>();
 
-        curCell = exploredMap.getCell(0, 0);
+        curCell = exploredArenaMap.getCell(0, 0);
         queue.add(curCell);
         hasSeen.add(curCell);
         while (queue.size() != 0) {
@@ -374,7 +373,7 @@ abstract public class ExplorationAlgo {
             if (!curCell.isExplored() ) result.add(curCell);
 
             if (curRow + 1 < MapSettings.MAP_ROWS && curCol < MapSettings.MAP_COLS) {
-                topCell = exploredMap.getCell(curRow + 1, curCol);
+                topCell = exploredArenaMap.getCell(curRow + 1, curCol);
                 if (!hasSeen.contains(topCell)) {
                     hasSeen.add(topCell);
                     queue.add(topCell);
@@ -382,7 +381,7 @@ abstract public class ExplorationAlgo {
             }
 
             if (curRow < MapSettings.MAP_ROWS && curCol + 1 < MapSettings.MAP_COLS) {
-                rightCell = exploredMap.getCell(curRow, curCol + 1);
+                rightCell = exploredArenaMap.getCell(curRow, curCol + 1);
                 if (!hasSeen.contains(rightCell)) {
                     hasSeen.add(rightCell);
                     queue.add(rightCell);
@@ -403,28 +402,28 @@ abstract public class ExplorationAlgo {
         while (true) {
             // bot
             if (row - offset >= 0) {
-                tmpCell = exploredMap.getCell(row - offset, col);
+                tmpCell = exploredArenaMap.getCell(row - offset, col);
                 if (!tmpCell.isExplored() || tmpCell.isObstacle()) botClear = false;
                 else if (botClear && !tmpCell.isObstacle() && !tmpCell.isVirtualWall()) return tmpCell;
             }
 
             // left
             if (col - offset >= 0) {
-                tmpCell = exploredMap.getCell(row, col - offset);
+                tmpCell = exploredArenaMap.getCell(row, col - offset);
                 if (!tmpCell.isExplored() || tmpCell.isObstacle()) leftClear = false;
                 else if (leftClear && !tmpCell.isObstacle() && !tmpCell.isVirtualWall()) return tmpCell;
             }
 
             // right
             if (row + offset < MapSettings.MAP_ROWS) {
-                tmpCell = exploredMap.getCell(row + offset, col);
+                tmpCell = exploredArenaMap.getCell(row + offset, col);
                 if (!tmpCell.isExplored() || tmpCell.isObstacle()) rightClear = false;
                 else if (rightClear && !tmpCell.isObstacle() && !tmpCell.isVirtualWall()) return tmpCell;
             }
 
             // top
             if (col + offset < MapSettings.MAP_COLS) {
-                tmpCell = exploredMap.getCell(row, col + offset);
+                tmpCell = exploredArenaMap.getCell(row, col + offset);
                 if (!tmpCell.isExplored() || tmpCell.isObstacle()) topClear = false;
                 else if (topClear && !tmpCell.isObstacle() && !tmpCell.isVirtualWall()) return tmpCell;
             }
@@ -439,9 +438,9 @@ abstract public class ExplorationAlgo {
      * Returns true for cells that are explored and not obstacles.
      */
     protected boolean isExploredNotObstacle(int r, int c) {
-//        System.out.println(exploredMap.getCell(r, c));
-        if (exploredMap.checkValidCell(r, c)) {
-            Cell tmp = exploredMap.getCell(r, c);
+//        System.out.println(exploredArenaMap.getCell(r, c));
+        if (exploredArenaMap.checkValidCell(r, c)) {
+            Cell tmp = exploredArenaMap.getCell(r, c);
             return (tmp.isExplored() && !tmp.isObstacle());
         }
         return false;
@@ -451,8 +450,8 @@ abstract public class ExplorationAlgo {
      * Returns true for cells that are explored, not virtual walls and not obstacles.
      */
     protected boolean isExploredAndFree(int r, int c) {
-        if (exploredMap.checkValidCell(r, c)) {
-            Cell b = exploredMap.getCell(r, c);
+        if (exploredArenaMap.checkValidCell(r, c)) {
+            Cell b = exploredArenaMap.getCell(r, c);
             return (b.isExplored() && !b.isVirtualWall() && !b.isObstacle());
         }
         return false;
@@ -465,7 +464,7 @@ abstract public class ExplorationAlgo {
         int result = 0;
         for (int r = 0; r < MapSettings.MAP_ROWS; r++) {
             for (int c = 0; c < MapSettings.MAP_COLS; c++) {
-                if (exploredMap.getCell(r, c).isExplored()) {
+                if (exploredArenaMap.getCell(r, c).isExplored()) {
                     result++;
                 }
             }
@@ -506,7 +505,7 @@ abstract public class ExplorationAlgo {
         //        System.out.println("[Agent Dir] " + bot.getAgtDir());
         System.out.println("Action executed: " + m);
         actionsTaken.add(m);
-        bot.takeAction(m, 1, exploredMap, realMap);
+        bot.takeAction(m, 1, exploredArenaMap, realArenaMap);
 
         senseAndRepaint();
 
@@ -517,7 +516,7 @@ abstract public class ExplorationAlgo {
      */
     protected int[] sense() {
         bot.setSensors();
-        int[] sensorReadings = bot.senseEnv(exploredMap, realMap);
+        int[] sensorReadings = bot.senseEnv(exploredArenaMap, realArenaMap);
 
         return sensorReadings;
     }
@@ -527,7 +526,7 @@ abstract public class ExplorationAlgo {
      */
     protected int[] senseAndRepaint() {
         int[] sensorReadings = this.sense();
-        exploredMap.repaint();
+        exploredArenaMap.repaint();
 
         return sensorReadings;
     }
@@ -557,13 +556,13 @@ abstract public class ExplorationAlgo {
 //
 //        switch (botDir) {
 //            case NORTH:
-//                return exploredMap.isWallOrObstacleCell(row, col + (1 + offset));
+//                return exploredArenaMap.isWallOrObstacleCell(row, col + (1 + offset));
 //            case EAST:
-//                return exploredMap.isWallOrObstacleCell(row - (1 + offset), col);
+//                return exploredArenaMap.isWallOrObstacleCell(row - (1 + offset), col);
 //            case SOUTH:
-//                return exploredMap.isWallOrObstacleCell(row, col - (1 + offset));
+//                return exploredArenaMap.isWallOrObstacleCell(row, col - (1 + offset));
 //            case WEST:
-//                return exploredMap.isWallOrObstacleCell(row + (1 + offset), col);
+//                return exploredArenaMap.isWallOrObstacleCell(row + (1 + offset), col);
 //        }
 //
 //        return false;
@@ -579,13 +578,13 @@ abstract public class ExplorationAlgo {
 
         switch (botDir) {
             case NORTH:
-                return exploredMap.isWallOrObstacleCell(row + 2, col - 1) && exploredMap.isWallOrObstacleCell(row + 2, col) && exploredMap.isWallOrObstacleCell(row + 2, col + 1);
+                return exploredArenaMap.isWallOrObstacleCell(row + 2, col - 1) && exploredArenaMap.isWallOrObstacleCell(row + 2, col) && exploredArenaMap.isWallOrObstacleCell(row + 2, col + 1);
             case EAST:
-                return exploredMap.isWallOrObstacleCell(row + 1, col + 2) && exploredMap.isWallOrObstacleCell(row, col + 2) && exploredMap.isWallOrObstacleCell(row - 1, col + 2);
+                return exploredArenaMap.isWallOrObstacleCell(row + 1, col + 2) && exploredArenaMap.isWallOrObstacleCell(row, col + 2) && exploredArenaMap.isWallOrObstacleCell(row - 1, col + 2);
             case SOUTH:
-                return exploredMap.isWallOrObstacleCell(row - 2, col - 1) && exploredMap.isWallOrObstacleCell(row - 2, col) && exploredMap.isWallOrObstacleCell(row - 2, col + 1);
+                return exploredArenaMap.isWallOrObstacleCell(row - 2, col - 1) && exploredArenaMap.isWallOrObstacleCell(row - 2, col) && exploredArenaMap.isWallOrObstacleCell(row - 2, col + 1);
             case WEST:
-                return exploredMap.isWallOrObstacleCell(row + 1, col - 2) && exploredMap.isWallOrObstacleCell(row, col - 2) && exploredMap.isWallOrObstacleCell(row - 1, col - 2);
+                return exploredArenaMap.isWallOrObstacleCell(row + 1, col - 2) && exploredArenaMap.isWallOrObstacleCell(row, col - 2) && exploredArenaMap.isWallOrObstacleCell(row - 1, col - 2);
         }
 
         return false;
@@ -621,16 +620,16 @@ abstract public class ExplorationAlgo {
 
         if (numOfTurn == 1) {
             if (Direction.clockwise90(bot.getAgtDir()) == targetDir) {
-                bot.takeAction(Actions.FACE_RIGHT, 0, exploredMap, realMap);
+                bot.takeAction(Actions.FACE_RIGHT, 0, exploredArenaMap, realArenaMap);
                 senseAndRepaint();
             } else {
-                bot.takeAction(Actions.FACE_LEFT, 0, exploredMap, realMap);
+                bot.takeAction(Actions.FACE_LEFT, 0, exploredArenaMap, realArenaMap);
                 senseAndRepaint();
             }
         } else if (numOfTurn == 2) {
-            bot.takeAction(Actions.FACE_RIGHT, 0, exploredMap, realMap);
+            bot.takeAction(Actions.FACE_RIGHT, 0, exploredArenaMap, realArenaMap);
             senseAndRepaint();
-            bot.takeAction(Actions.FACE_RIGHT, 0, exploredMap, realMap);
+            bot.takeAction(Actions.FACE_RIGHT, 0, exploredArenaMap, realArenaMap);
             senseAndRepaint();
         }
 
