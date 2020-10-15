@@ -67,7 +67,7 @@ public class ImageRegExp extends ExplorationAlgo {
 
         explorationLoop(bot.getAgtY(), bot.getAgtX());
         System.out.println("Test image start");
-        imageExploration();
+//        imageExploration();
         goHome();
         System.out.println("Test image end");
         exploredArenaMap.repaint();
