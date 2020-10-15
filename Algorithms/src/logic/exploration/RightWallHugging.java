@@ -20,6 +20,8 @@ public class RightWallHugging extends ExplorationAlgo {
         if (lookRight()) {
 //            System.out.println("[DEBUG] Right Clear");
             moveBot(Actions.FACE_RIGHT);
+            NetworkMgr.getInstance().sendMsg("Z", NetworkMgr.INSTRUCTIONS);
+            senseAndRepaint();
             if (lookForward()) {
 //                System.out.println("  ->[DEBUG]Forward Clear");
                 moveBot(Actions.FORWARD);
@@ -30,6 +32,8 @@ public class RightWallHugging extends ExplorationAlgo {
         } else if (lookLeft()) {
 //            System.out.println("[DEBUG]Left Clear");
             moveBot(Actions.FACE_LEFT);
+            NetworkMgr.getInstance().sendMsg("Z", NetworkMgr.INSTRUCTIONS);
+            senseAndRepaint();
             if (lookForward()) {
 //                System.out.println("  ->[DEBUG]Forward Clear");
                 moveBot(Actions.FORWARD);
@@ -37,6 +41,8 @@ public class RightWallHugging extends ExplorationAlgo {
         } else {
 //            System.out.println("[DEBUG]Reverse Direction");
             moveBot(Actions.FACE_LEFT);
+            NetworkMgr.getInstance().sendMsg("Z", NetworkMgr.INSTRUCTIONS);
+            senseAndRepaint();
 //            tryTakePicture();
             moveBot(Actions.FACE_LEFT);
         }

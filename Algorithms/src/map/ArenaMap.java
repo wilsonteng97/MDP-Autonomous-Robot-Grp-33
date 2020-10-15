@@ -76,35 +76,44 @@ public class ArenaMap extends JPanel {
     }
     public void resetVirtualWalls(int row, int col) {
         grid[row][col].setObstacle(false);
-
+        grid[row][col].setVirtualWall(false);
+        setVirtualWallIfBorder(row, col);    // make sure never reset border
         if (row > 1) {
             // never set row 0
             grid[row - 1][col].setVirtualWall(false);            // bottom cell
+            setVirtualWallIfBorder(row - 1, col);
             if (col < MapSettings.MAP_COLS - 2) {
                 grid[row - 1][col + 1].setVirtualWall(false);    // bottom-right cell
+                setVirtualWallIfBorder(row - 1, col + 1);
             }
             if (col > 1) {
                 grid[row - 1][col - 1].setVirtualWall(false);    // bottom-left cell
+                setVirtualWallIfBorder(row - 1, col - 1);
             }
         }
 
         if (row < MapSettings.MAP_ROWS - 2) {
             // never set row 19
             grid[row + 1][col].setVirtualWall(false);            // top cell
+            setVirtualWallIfBorder(row + 1, col);
             if (col < MapSettings.MAP_COLS - 2) {
                 grid[row + 1][col + 1].setVirtualWall(false);    // top-right cell
+                setVirtualWallIfBorder(row + 1, col + 1);
             }
             if (col > 1) {
                 grid[row + 1][col - 1].setVirtualWall(false);    // top-left cell
+                setVirtualWallIfBorder(row + 1, col - 1);
             }
         }
 
         if (col > 1) {
             grid[row][col - 1].setVirtualWall(false);            // left cell
+            setVirtualWallIfBorder(row, col - 1);
         }
 
         if (col < MapSettings.MAP_COLS - 2) {
             grid[row][col + 1].setVirtualWall(false);            // right cell
+            setVirtualWallIfBorder(row, col + 1);
         }
     }
 

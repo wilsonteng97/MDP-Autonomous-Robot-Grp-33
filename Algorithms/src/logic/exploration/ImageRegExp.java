@@ -39,7 +39,12 @@ public class ImageRegExp extends ExplorationAlgo {
             System.out.println("Starting calibration...");
 
             if (!bot.isSim()) {
-                // TODO initial calibration
+                // Facing NORTH
+                turnBotDirection(AgentSettings.Direction.WEST);
+                moveBot(Actions.ALIGN_FRONT);
+                turnBotDirection(AgentSettings.Direction.SOUTH);
+                moveBot(Actions.ALIGN_FRONT);
+                turnBotDirection(AgentSettings.Direction.EAST);
             }
 
             while (true) {
@@ -63,6 +68,7 @@ public class ImageRegExp extends ExplorationAlgo {
         explorationLoop(bot.getAgtY(), bot.getAgtX());
         System.out.println("Test image start");
         imageExploration();
+        goHome();
         System.out.println("Test image end");
         exploredArenaMap.repaint();
     }
@@ -77,6 +83,8 @@ public class ImageRegExp extends ExplorationAlgo {
 
         long elapsedTime = 0;
         do {
+            NetworkMgr.getInstance().sendMsg("Z", NetworkMgr.INSTRUCTIONS);
+            senseAndRepaint();
             nextMove();
             System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
 

@@ -4,27 +4,39 @@ import java.awt.*;
 
 public class MsgParsingUtils {
     public static String parseFastestPathString(String msg) {
-        char temp_char;
-        char prev;
-        int count = 0;
-        String fpMsg = new String();
-
-        prev = msg.charAt(0);
-        for(int i = 0, n = msg.length() ; i < n ; i = i + 3) {
-            temp_char = msg.charAt(i);
-            if (temp_char == prev && count <= 8) {
-                count += 1;
-            } else {
-                fpMsg += prev;
-                fpMsg += String.valueOf(count);
-                count = 1;
+        String new_msg = "";
+        int count = 1;
+        msg = msg.replace("1|", "");
+        char current_dir = msg.charAt(0);
+        System.out.println(msg);
+        for(int i=1; i<=msg.length(); i++){
+            if(i == msg.length()){
+                new_msg = new_msg + current_dir +  String.valueOf(count);
+                break;
             }
-            prev = temp_char;
-        }
-        fpMsg += prev;
-        fpMsg += String.valueOf(count);
 
-        return fpMsg;
+            if(count == 9){
+                new_msg = new_msg + current_dir + String.valueOf(count);
+                count = 0;
+            }
+
+            if(msg.charAt(i) == current_dir){
+                count = count + 1;
+            }
+            else{
+                if (count == 0){
+                    count = count + 1;
+                    new_msg = new_msg + msg.charAt(i) + String.valueOf(count);
+                } else {
+                    new_msg = new_msg + current_dir + String.valueOf(count);
+                    current_dir = msg.charAt(i);
+                    count = 1;
+                }
+            }
+
+        }
+
+        return new_msg;
     }
 
     public static String parsePictureMsg(Point leftObs, Point middleObs, Point rightObs) {

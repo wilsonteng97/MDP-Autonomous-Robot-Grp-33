@@ -56,21 +56,13 @@ abstract public class ExplorationAlgo {
         if (!bot.isSim()) {
             System.out.println("Starting calibration...");
 
-//            NetworkMgr.getInstance().receiveMsg();
-
-//            // TODO initial calibration
             if (!bot.isSim()) {
-                // Facing the back
-//                bot.takeAction(Actions.BACKWARD, 0, exploredArenaMap, realArenaMap);
-//                NetworkMgr.getInstance().receiveMsg();
-//                bot.takeAction(Actions.ALIGN_FRONT, 0, exploredArenaMap, realArenaMap);
-//                NetworkMgr.getInstance().receiveMsg();
-//                bot.takeAction(Actions.FACE_LEFT);
-//                NetworkMgr.getInstance().receiveMsg();
-//                bot.takeAction(Actions.ALIGN_FRONT, 0, exploredArenaMap, realArenaMap);
-//                NetworkMgr.getInstance().receiveMsg();
-//                bot.takeAction(Actions.FACE_LEFT);
-//                NetworkMgr.getInstance().receiveMsg();
+                // Facing NORTH
+                turnBotDirection(Direction.WEST);
+                moveBot(Actions.ALIGN_FRONT);
+                turnBotDirection(Direction.SOUTH);
+                moveBot(Actions.ALIGN_FRONT);
+                turnBotDirection(Direction.EAST);
             }
 
             while (true) {
@@ -114,7 +106,8 @@ abstract public class ExplorationAlgo {
 
         long elapsedTime = 0;
         do {
-//            senseAndRepaint();
+            NetworkMgr.getInstance().sendMsg("Z", NetworkMgr.INSTRUCTIONS);
+            senseAndRepaint();
             nextMove();
             System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
 

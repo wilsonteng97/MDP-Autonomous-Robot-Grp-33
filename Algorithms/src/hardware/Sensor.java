@@ -186,6 +186,7 @@ public class Sensor {
                     explorationArenaMap.resetVirtualWalls(row, col);
                     explorationArenaMap.setVirtualWallIfBorder(row, col);    // make sure never reset border
                 } else {
+                    explorationArenaMap.setVirtualWallIfBorder(row, col);    // make sure never reset border
                     break;
                 }
             }
