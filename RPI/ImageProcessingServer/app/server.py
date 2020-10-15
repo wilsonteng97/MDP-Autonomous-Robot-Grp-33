@@ -23,6 +23,7 @@ from pyimagesearch import config
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.models import load_model
+import timeit
 
 IMAGE_ENCODING = '.png'
 STOPPING_IMAGE = 'stop_image_processing.png'
@@ -31,16 +32,16 @@ IMAGE_WIDTH = 500  # 400
 IMAGE_HEIGHT = 1080  # 225
 
 RAW_IMAGE_PREFIX = 'frame'
+PROCESSED_IMAGE_IDS = []
 PROCESSED_IMAGE_PREFIX = 'processed'
-
 sys.path.append("..")
 cwd_path = os.getcwd()
 
-
+IMAGE_COUNT = 0
 class ImageProcessingServer:
     def __init__(self):
         self.image_hub = imagezmq.CustomImageHub()
-        
+
         # load the our fine-tuned model and label binarizer from disk
         print("[INFO] loading model and label binarizer...")
         self.model = load_model(config.MODEL_PATH)
@@ -52,6 +53,7 @@ class ImageProcessingServer:
             print('Waiting for image from RPi...')
             cdt,frame = self.image_hub.recv_image()
             print('Connected and received frame at time: ' + str(datetime.now()))
+            IMAGE_COUNT += 1
             frame = imutils.resize(frame, width=IMAGE_WIDTH)
 
             # form image file path for saving
@@ -64,12 +66,14 @@ class ImageProcessingServer:
             cdt_list = list(cdt.split(":"))
             cut_width = 3
             cut_height = 3
-            reply = self.detect_image(self.model,frame,raw_image_name,cut_width,cut_height,cdt_list)	
+            start_time = timeit.default_timer()
+            reply = self.detect_image(self.model,frame,raw_image_name,cut_width,cut_height,cdt_list)
+            print("Time to process " + IMAGE_COUNT  + ": " + timeit.default_timer() - start_time)
             if not reply:
                 self.image_hub.send_reply("None")
             else:
                 self.image_hub.send_reply(str(reply))
-            
+
             # to add in when image sending ends
             # self.stitch_images()
 
@@ -118,7 +122,7 @@ class ImageProcessingServer:
             # update our proposals and bounding boxes lists
             proposals.append(roi)
             boxes.append((x, y, x_2, y_2))
-            
+
         # convert the proposals and bounding boxes into NumPy arrays
         proposals = np.array(proposals, dtype="float32")
         boxes = np.array(boxes, dtype="float32")
@@ -185,7 +189,9 @@ class ImageProcessingServer:
             #             break
             cv2.putText(image, text, (startX, y),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 2)
-            reply_list.append(text)
+            if labels[i] not in PROCESSED_IMAGE_IDS:
+                reply_list.append(text)
+                PROCESSED_IMAGE_IDS.append(labels[i])
         if len(reply_list)!=0:
             processed_image_path = 'processed_images/' + raw_image_name[:raw_image_name.rfind(".")] + "_processed" + IMAGE_ENCODING
             save_success = cv2.imwrite(processed_image_path, image)
@@ -206,7 +212,7 @@ class ImageProcessingServer:
         scaled_img_height = ceil(img_height*sf)
 
         number_of_rows = ceil(len(images)/images_per_row)
-        frame_height = ceil(sf*img_height*number_of_rows) 
+        frame_height = ceil(sf*img_height*number_of_rows)
 
         new_im = Image.new('RGB', (frame_width, frame_height))
 
