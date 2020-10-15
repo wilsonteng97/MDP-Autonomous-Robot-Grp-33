@@ -208,10 +208,10 @@ public class Simulator {
                     Agent fakeBot = new Agent(agt.getAgtRow(), agt.getAgtCol(), true);
                     FastestPathAlgo toWaypoint, toGoal ;
                     toWaypoint = new AStarHeuristicSearch(explorationArenaMap, fakeBot);
-                    startToWaypoint = parseFastestPathString(toWaypoint.runFastestPath(waypointY, waypointX));
+                    startToWaypoint = toWaypoint.runFastestPath(waypointY, waypointX);
 
                     toGoal = new AStarHeuristicSearch(explorationArenaMap, fakeBot);
-                    waypointToGoal = parseFastestPathString(toGoal.runFastestPath(MapSettings.GOAL_ROW, MapSettings.GOAL_COL));
+                    waypointToGoal = toGoal.runFastestPath(MapSettings.GOAL_ROW, MapSettings.GOAL_COL);
 
                     // Transmit signal to get Agent to start. Initiate handshake signals.
                     while (true) {
@@ -220,7 +220,7 @@ public class Simulator {
                         if (msg.equals(NetworkMgr.FP_START)) break;
                     }
 
-                    NetworkMgr.getInstance().sendMsg("K" + startToWaypoint + waypointToGoal + "|", NetworkMgr.INSTRUCTIONS);
+                    NetworkMgr.getInstance().sendMsg("K" + parseFastestPathString(startToWaypoint + waypointToGoal) + "|", NetworkMgr.INSTRUCTIONS);
                 } else {
                     explorationArenaMap.repaint();
                     readWaypointFromStdin();
