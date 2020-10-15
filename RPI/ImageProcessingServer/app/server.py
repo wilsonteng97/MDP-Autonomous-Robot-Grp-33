@@ -37,7 +37,6 @@ PROCESSED_IMAGE_PREFIX = 'processed'
 sys.path.append("..")
 cwd_path = os.getcwd()
 
-IMAGE_COUNT = 0
 class ImageProcessingServer:
     def __init__(self):
         self.image_hub = imagezmq.CustomImageHub()
@@ -53,7 +52,7 @@ class ImageProcessingServer:
             print('Waiting for image from RPi...')
             cdt,frame = self.image_hub.recv_image()
             print('Connected and received frame at time: ' + str(datetime.now()))
-            IMAGE_COUNT += 1
+
             frame = imutils.resize(frame, width=IMAGE_WIDTH)
 
             # form image file path for saving
@@ -68,7 +67,7 @@ class ImageProcessingServer:
             cut_height = 3
             start_time = timeit.default_timer()
             reply = self.detect_image(self.model,frame,raw_image_name,cut_width,cut_height,cdt_list)
-            print("Time to process " + IMAGE_COUNT  + ": " + timeit.default_timer() - start_time)
+            print("Time to process: ", timeit.default_timer() - start_time)
             if not reply:
                 self.image_hub.send_reply("None")
             else:
