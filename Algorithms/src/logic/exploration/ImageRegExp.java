@@ -363,17 +363,16 @@ public class ImageRegExp extends ExplorationAlgo {
         ArrayList<ObsSurface> tempSurfaces;
         ArrayList<ObsSurface> tempObsSurfaceList = new ArrayList<ObsSurface>();
 
-        // check 3, then 2 blocks away from currentCameraMiddleSurface, same dir surface
+        // check 3, then 2 blocks away from currentCameraMiddleSurface in same dir as agent
+        int i = 0;
         ObsSurface currentCameraMiddleSurface = bot.getCameraMiddleSurface();
         LOGGER.info("currentCameraMiddleSurface " + currentCameraMiddleSurface.toString());
         for (int offset = 3; offset >= 2; offset--) {
-            tempSurfaces = currentCameraMiddleSurface.getSideSurfaces(offset);
-            LOGGER.info("tempSurfaces | " + offset + " " + tempSurfaces.toString());
-            for (ObsSurface os : tempSurfaces) {
-                if (notYetTaken.containsKey(os.toString())) {
-                    LOGGER.info("=============== [side surfaces | " + "offset = " + offset + "] For " + loc + "\n" + notYetTaken + "\nos return " + os + "\n===============");
-                    return os;
-                }
+            tempSurface = currentCameraMiddleSurface.getSideSurfaces(offset, bot.getAgtDir()).get(i);
+            LOGGER.info("tempSurfaces | " + offset + " " + tempSurface.toString());
+            if (notYetTaken.containsKey(tempSurface.toString())) {
+                LOGGER.info("=============== [side surfaces | " + "offset = " + offset + "] For " + loc + "\n" + notYetTaken + "\nos return " + tempSurface + "\n===============");
+                return tempSurface;
             }
         }
 

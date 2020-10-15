@@ -49,7 +49,7 @@ public class ObsSurface {
         this.pos = new Point(col, row);
     }
 
-    public ArrayList<ObsSurface> getSideSurfaces(int offset) {
+    public ArrayList<ObsSurface> getSideSurfaces(int offset, AgentSettings.Direction agtDir) {
         Point p1; Point p2;
         ArrayList<ObsSurface> obsSurfaces = new ArrayList<ObsSurface>();
 
@@ -68,8 +68,18 @@ public class ObsSurface {
                 throw new IllegalStateException("Unexpected value: " + surface);
         }
 
-        obsSurfaces.add(new ObsSurface(p1, surface));
-        obsSurfaces.add(new ObsSurface(p2, surface));
+        switch (agtDir) {
+            case NORTH:
+            case WEST:
+                obsSurfaces.add(new ObsSurface(p1, surface));
+                obsSurfaces.add(new ObsSurface(p2, surface));
+                break;
+            case SOUTH:
+            case EAST:
+                obsSurfaces.add(new ObsSurface(p2, surface));
+                obsSurfaces.add(new ObsSurface(p1, surface));
+                break;
+        }
 
         return obsSurfaces;
     }
