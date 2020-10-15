@@ -88,7 +88,8 @@ class ImageProcessingServer:
         # print("[INFO] running selective search...")
         ss = cv2.ximgproc.segmentation.createSelectiveSearchSegmentation()
         ss.setBaseImage(image)
-        ss.switchToSelectiveSearchFast()
+        # ss.switchToSelectiveSearchFast()
+        ss.switchToSingleStrategy()
         rects = ss.process()
 
         # initialize the list of region proposals that we'll be classifying

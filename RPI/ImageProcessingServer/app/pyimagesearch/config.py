@@ -19,7 +19,7 @@ OUTPUT_PATH = "images"
 # define the number of max proposals used when running selective
 # search for (1) gathering training data and (2) performing inference
 MAX_PROPOSALS = 2000
-MAX_PROPOSALS_INFER = 100
+MAX_PROPOSALS_INFER = 150
 
 # define the maximum number of positive and negative images to be
 # generated from each image
