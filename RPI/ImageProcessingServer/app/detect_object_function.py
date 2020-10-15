@@ -68,7 +68,7 @@ class ImageDetector:
 		# classify each of the proposal ROIs using fine-tuned model
 		print("[INFO] classifying proposals...")
 		proba = model.predict(proposals)
-		score = model.score(proposals)
+		# score = model.score(proposals)
 
 		# find the index of all predictions that are positive for the classes
 		print("[INFO] applying NMS...")
@@ -78,7 +78,7 @@ class ImageDetector:
 		# label probabilities associated with the class
 		boxes = boxes[idxs]
 		proba = proba[idxs][:, :15]
-		scores = score[idxs][:, :15]
+		# scores = score[idxs][:, :15]
 
 		for i in range(len(boxes)):
 			boxes[i][0]=boxes[i][0]/image.shape[1]
@@ -90,12 +90,12 @@ class ImageDetector:
 			for j in range(15):
 				if proba[i][j]>config.MIN_PROBA:
 					labels[i]=j+1
-		# scores = [0]*len(boxes)
-		# for i in range(len(boxes)):
-		# 	for j in range(15):
-		# 		if proba[i][j]>config.MIN_PROBA:
-		# 			if proba[i][j] > scores[i]:
-		# 				scores[i] = proba[i][j]
+		scores = [0]*len(boxes)
+		for i in range(len(boxes)):
+			for j in range(15):
+				if proba[i][j]>config.MIN_PROBA:
+					if proba[i][j] > scores[i]:
+						scores[i] = proba[i][j]
 		boxes_list = [boxes]
 		scores_list = [scores]
 		labels_list = [labels]
