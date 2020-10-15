@@ -32,6 +32,8 @@ void loop() {
         value=takeInt();
         for (int k = 0; k < value; k++) {
           turnLeft();
+          delay(10);
+          alignRight();
         }
         delay(10);
         returnSensorReading_Raw();
@@ -40,6 +42,8 @@ void loop() {
         value=takeInt();
         for (int k = 0; k < value; k++) {
           turnRight();
+          delay(10);
+          alignRight();
         }
         delay(10);
         returnSensorReading_Raw();

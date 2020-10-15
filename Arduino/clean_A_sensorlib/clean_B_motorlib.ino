@@ -15,14 +15,14 @@ const int TURN_RPM = 80;
 const int ROTATE_RPM = 60;
 
 //Distance to cover in ticks
-const int TURN_TICKS_L = 810*0.99;
-const int TURN_TICKS_R = 811*0.98;
-const int TICKS[10] = {577, 1155, 1760, 2380, 2985, 3615, 4195, 4775, 5370};
+const int TURN_TICKS_L = 790;
+const int TURN_TICKS_R = 790;
+const int TICKS[10] = {558, 1120, 1710, 2310, 2915, 3515, 4155, 4735, 5350};
 
 //PID tunings
-const double kp = 6, ki = 0.0, kd = 0.002; // Arena 1 STEP
+const double kp = 20, ki = 0.0, kd = 0.01; // Arena 1 STEP
 const double rtKp = 3, rtKi = 0.0, rtKd = 0.002; // Arena 1 TURN RIGHT
-const double fKp = 3, fKi = 0.0, fKd = 0.01; // Arena 1 FAST
+const double fKp = 10, fKi = 0.0, fKd = 0.0; // Arena 1 FAST
 
 int MOVE_FAST_SPEED_L = calculateSpeedL(FAST_RPM);
 int MOVE_MAX_SPEED_L = calculateSpeedL(MAX_RPM);
@@ -78,28 +78,43 @@ void moveForward(int distance) {
   distance = cmToTicks(distance);
   double currentSpeedL = 0;
   double currentSpeedR = 0;
-  if (distance < 1155 ) {
+  if (distance < TICKS[1]) {
     myPID.SetTunings(kp, ki, kd);
     currentSpeedL = MOVE_MIN_SPEED_L;
     currentSpeedR = MOVE_MIN_SPEED_R;
+    md.setSpeeds(-calculateSpeedL(10), -calculateSpeedR(10));
+    delay(10);
+    md.setSpeeds(-calculateSpeedL(20), -calculateSpeedR(20));
+    delay(10);
+    md.setSpeeds(-calculateSpeedL(30), -calculateSpeedR(30));
+    delay(10);
+    md.setSpeeds(-calculateSpeedL(40), -calculateSpeedR(40));
+    delay(10);
+    md.setSpeeds(-calculateSpeedL(50), -calculateSpeedR(50));
+    delay(10);
+  //while (tick_L <= distance || tick_R <= distance) {
+    md.setSpeeds(-calculateSpeedL(75), -calculateSpeedR(75));
+    delay(10);
   } else {
     myPID.SetTunings(fKp, fKi, fKd);
     currentSpeedL = MOVE_MAX_SPEED_L;
     currentSpeedR = MOVE_MAX_SPEED_R;
+    md.setSpeeds(-calculateSpeedL(10), -calculateSpeedR(10));
+    delay(10);
+    md.setSpeeds(-calculateSpeedL(20), -calculateSpeedR(20));
+    delay(10);
+     md.setSpeeds(-calculateSpeedL(30), -calculateSpeedR(30));
+    delay(10);
+    md.setSpeeds(-calculateSpeedL(40), -calculateSpeedR(40));
+    delay(10);
+    md.setSpeeds(-calculateSpeedL(50), -calculateSpeedR(50));
+    delay(50);
+    //while (tick_L <= distance || tick_R <= distance) {
+    md.setSpeeds(-calculateSpeedL(75), -calculateSpeedR(75));
+    delay(50);
+    md.setSpeeds(-calculateSpeedL(100), -calculateSpeedR(100));
+    delay(50); 
   }
-  
-  md.setSpeeds(-calculateSpeedL(25), -calculateSpeedR(25));
-  delay(10);
-  md.setSpeeds(-calculateSpeedL(50), -calculateSpeedR(50));
-  delay(10);
-   md.setSpeeds(-calculateSpeedL(75), -calculateSpeedR(75));
-  delay(10);
-  md.setSpeeds(-calculateSpeedL(100), -calculateSpeedR(100));
-  delay(10);
-  md.setSpeeds(-calculateSpeedL(125), -calculateSpeedR(125));
-  delay(10);
-  md.setSpeeds(-calculateSpeedL(150), -calculateSpeedR(150));
-  delay(10);
   
   int last_tick_L = 0;
   while (tick_L <= distance || tick_R <= distance) {
@@ -107,10 +122,16 @@ void moveForward(int distance) {
     //Serial.println(tick_L - tick_R);
     //delay(5);
     if (myPID.Compute() || tick_L == last_tick_L) {
-      md.setSpeeds(-1 * 0.99 * (currentSpeedL - speed_O), -(currentSpeedR + speed_O)); 
+      md.setSpeeds(-(currentSpeedL - speed_O), -(currentSpeedR + speed_O)); 
     }
   }
-  initializeMotor_End();
+  if(distance<1155){
+    initializeMotor_End();
+  }
+  else{
+    initializeFastMotor_End();
+  }
+    
 }
 
 void moveBackwards(int distance) {
@@ -142,7 +163,7 @@ void moveBackwards(int distance) {
     //Serial.println(tick_L - tick_R);
     //delay(5);
     if (myPID.Compute() || tick_L == last_tick_L) {
-      md.setSpeeds(0.99 * (currentSpeedL - speed_O), (currentSpeedR + speed_O)); 
+      md.setSpeeds((currentSpeedL - speed_O), (currentSpeedR + speed_O)); 
     }
   }
   initializeMotor_End();
@@ -291,9 +312,9 @@ void turnRight() {
     //Serial.println(tick_L - tick_R);
     //delay(5);
     if (myPID.Compute())
-      md.setSpeeds(-(currentSpeedL - speed_O), currentSpeedR);
+      md.setSpeeds(-(currentSpeedL - speed_O), (currentSpeedR + speed_O));
   }
-  initializeMotor_End();
+  //initializeMotor_End();
   initializeLeftTurnEnd();
 }
 
@@ -309,12 +330,12 @@ void turnLeft() {
   
   while (tick_L < (TURN_TICKS_L) || tick_R < (TURN_TICKS_L)) {
 
-    //Serial.println(tick_L - tick_R);
-    //delay(5);
+   // Serial.println(tick_L - tick_R);
+   // delay(5);
     if (myPID.Compute())
-      md.setSpeeds((currentSpeedL - speed_O), -(currentSpeedR));
+      md.setSpeeds((currentSpeedL - speed_O), -(currentSpeedR + speed_O));
   }
-  initializeMotor_End();
+  //initializeMotor_End();
   initializeRightTurnEnd();
 }
 
@@ -322,7 +343,7 @@ void rotateLeft(int distance) {
   initializeTick();
   initializeMotor_Start();
 
-  myPID.SetTunings(kp, ki, kd);
+  myPID.SetTunings(rtKp, rtKi, rtKd);
   
   double currentSpeed = ROTATE_MAX_SPEED;
   double offset = 0;
@@ -339,7 +360,7 @@ void rotateRight(int distance) {
   initializeTick();
   initializeMotor_Start();
 
-   myPID.SetTunings(kp, ki, kd);
+   myPID.SetTunings(rtKp, rtKi, rtKd);
   
   double currentSpeed = ROTATE_MAX_SPEED;
   double offset = 0;
@@ -433,12 +454,20 @@ int calculateSpeedR(double rpm) {
 void initializeLeftTurnEnd() {
   //  rotateRight(8);
   //  rotateLeft(6);
+  md.setSpeeds(0, 0);
+  md.setBrakes(400, 400);
+  
+  delay(5);
 }
 
 
 void initializeRightTurnEnd() {
-  //  rotateLeft(8);
-  //  rotateRight(6);
+    //rotateLeft(8);
+    //rotateRight(6);
+  md.setSpeeds(0, 0);
+  md.setBrakes(400, 400);
+  
+  delay(5);
 }
 
 double getMin(double f1, double f2, double f3) {
@@ -479,25 +508,17 @@ void initializeMotor_Start() {
 }
 
 void initializeMotor_End() {
-
-  /*md.setSpeeds(-calculateSpeedL(150), -calculateSpeedR(150));
-  delay(10);
-  md.setSpeeds(-calculateSpeedL(125), -calculateSpeedR(125));
-  delay(10);
-  md.setSpeeds(-calculateSpeedL(100), -calculateSpeedR(100));
-  delay(10);
-  md.setSpeeds(-calculateSpeedL(75), -calculateSpeedR(75));
-  delay(10);
-  md.setSpeeds(-calculateSpeedL(50), -calculateSpeedR(50));
-  delay(10);
-  md.setSpeeds(-calculateSpeedL(25), -calculateSpeedR(25));
-  delay(10);*/
-
-
-  
   
   md.setSpeeds(0, 0);
   md.setBrakes(400, 380);
+  
+  delay(5);
+}
+
+void initializeFastMotor_End() {
+  
+  md.setSpeeds(0, 0);
+  md.setBrakes(400, 400);
   
   delay(5);
 }

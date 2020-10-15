@@ -16,8 +16,8 @@ double frontIR1_Diffs[] = {18.00, 30.00, 39.00};
 double frontIR2_Diffs[] = {14.00, 26.00, 34.00};//how it works is that for a certain range like 5-15 cm obstacle is considered as one block away
 double frontIR3_Diffs[] = {18.00, 32.00, 39.90};//15-25cm is 2 blocks away etc
 
-double rightIR1_Diffs[] = {17.50, 26.00 ,36.70};
-double rightIR2_Diffs[] = {17.00, 26.50 ,34.50};
+double rightIR1_Diffs[] = {15.50, 26.00 ,36.70};
+double rightIR2_Diffs[] = {15.00, 28.50 ,34.50};
 
 double leftIR1_Diffs[] = {20.50, 29.20, 39.00, 50.00, 60.50};
 
