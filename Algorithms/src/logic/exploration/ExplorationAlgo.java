@@ -494,9 +494,6 @@ abstract public class ExplorationAlgo {
                 moveBot(Actions.ALIGN_FRONT);
                 moveBot(Actions.ALIGN_RIGHT);
             }
-            else if (canAlignFront(bot.getAgtDir())) {
-                moveBot(Actions.ALIGN_FRONT);
-            }
         }
 
         //        System.out.println("[Agent Dir] " + bot.getAgtDir());
