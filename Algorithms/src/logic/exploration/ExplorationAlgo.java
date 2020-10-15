@@ -336,6 +336,12 @@ abstract public class ExplorationAlgo {
     }
 
     protected void goToPoint(Point coord) {
+        System.out.println(coord);
+        System.out.println(bot.getAgtPos());
+        if (coord.x == bot.getAgtX() && coord.y == bot.getAgtY()) {
+            System.out.println("[goToPoint()] Same position, fastest path skipped.");
+            return;
+        }
         AStarHeuristicSearch goToPoint = new AStarHeuristicSearch(exploredArenaMap, bot);
         String mergedOutputString = parseFastestPathString(goToPoint.runFastestPath(coord.y, coord.x));;
 

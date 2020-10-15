@@ -360,21 +360,41 @@ public class ImageRegExp extends ExplorationAlgo {
         Point tempObsPoint = null;
         int tempX; int tempY;
         ObsSurface tempSurface;
+        AgentSettings.Direction tempDir;
         ArrayList<ObsSurface> tempSurfaces;
         ArrayList<ObsSurface> tempObsSurfaceList = new ArrayList<ObsSurface>();
-
-        // check 3, then 2 blocks away from currentCameraMiddleSurface in same dir as agent
-        int i = 0;
         ObsSurface currentCameraMiddleSurface = bot.getCameraMiddleSurface();
         LOGGER.info("currentCameraMiddleSurface " + currentCameraMiddleSurface.toString());
+
+        // check if current surfaces facing camera have different directions (but not opposite).
+        tempSurface = currentCameraMiddleSurface.getSideSurfaces(1, bot.getAgtDir()).get(1);
+        tempDir = tempSurface.getSurface();
+
+        tempSurface.setSurface(antiClockwise90(tempDir));
+        LOGGER.info("tempSurface | " + 1 + " " + tempSurface.toString());
+        if (notYetTaken.containsKey(tempSurface.toString())) {
+            LOGGER.info("=============== [side surfaces | " + "offset = " + 1 + "] For " + loc + "\n" + notYetTaken + "\nos return " + tempSurface + "\n===============");
+            return tempSurface;
+        }
+
+        tempSurface.setSurface(reverse(tempDir));
+        LOGGER.info("tempSurface | " + 1 + " " + tempSurface.toString());
+        if (notYetTaken.containsKey(tempSurface.toString())) {
+            LOGGER.info("=============== [side surfaces | " + "offset = " + 1 + "] For " + loc + "\n" + notYetTaken + "\nos return " + tempSurface + "\n===============");
+            return tempSurface;
+        }
+
+        // check 3, then 2 blocks away from currentCameraMiddleSurface in same dir as agent
         for (int offset = 3; offset >= 2; offset--) {
-            tempSurface = currentCameraMiddleSurface.getSideSurfaces(offset, bot.getAgtDir()).get(i);
+            tempSurface = currentCameraMiddleSurface.getSideSurfaces(offset, bot.getAgtDir()).get(0);
             LOGGER.info("tempSurfaces | " + offset + " " + tempSurface.toString());
             if (notYetTaken.containsKey(tempSurface.toString())) {
                 LOGGER.info("=============== [side surfaces | " + "offset = " + offset + "] For " + loc + "\n" + notYetTaken + "\nos return " + tempSurface + "\n===============");
                 return tempSurface;
             }
         }
+
+
 
         return absoluteNearestSurface(loc, notYetTaken);
     }
