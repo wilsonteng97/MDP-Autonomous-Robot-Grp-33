@@ -57,7 +57,6 @@ abstract public class ExplorationAlgo {
         if (!bot.isSim()) {
             System.out.println("Starting calibration...");
 
-//            // TODO initial calibration
             if (!bot.isSim()) {
                 // Facing NORTH
                 turnBotDirection(Direction.WEST);
