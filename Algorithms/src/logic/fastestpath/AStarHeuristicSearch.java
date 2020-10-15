@@ -129,7 +129,7 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
      */
     @Override
     public String runFastestPath(int goalRow, int goalCol) {
-        System.out.println("Calculating fastest path from (" + current.getRow() + ", " + current.getCol() + ") to goal (" + goalRow + ", " + goalCol + ")...");
+        System.out.println("Calculating fastest path from (" + current.getX() + ", " + current.getY() + ") to goal (" + goalCol + ", " + goalRow + ")...");
 
         Stack<Cell> path;
         do {

@@ -83,7 +83,7 @@ public class ImageRegExp extends ExplorationAlgo {
 
         long elapsedTime = 0;
         do {
-            NetworkMgr.getInstance().sendMsg("Z", NetworkMgr.INSTRUCTIONS);
+            if (!bot.isSim()) NetworkMgr.getInstance().sendMsg("Z", NetworkMgr.INSTRUCTIONS);
             senseAndRepaint();
             nextMove();
             System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
