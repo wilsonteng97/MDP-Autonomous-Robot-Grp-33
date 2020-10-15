@@ -75,6 +75,7 @@ public class Map extends JPanel {
     }
     public void resetVirtualWalls(int row, int col) {
         grid[row][col].setObstacle(false);
+        grid[row][col].setVirtualWall(false);
         setVirtualWallIfBorder(row, col);    // make sure never reset border
         if (row > 1) {
             // never set row 0
