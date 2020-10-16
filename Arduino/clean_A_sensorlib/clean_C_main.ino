@@ -66,8 +66,7 @@ void loop() {
         returnSensorReading_Raw();
         break;
       case 'U':
-        md.setSpeeds(0,0);
-        md.setBrakes(400,400);
+        returnSensorReading_Debug();
         break;
     }    
   }
@@ -110,5 +109,27 @@ void returnSensorReading_Raw() {
   Serial.print("|");
   getRightIR1();
   Serial.println(getRightIR1_Block());  
+  Serial.flush();
+}
+
+void returnSensorReading_Debug() {
+  Serial.print(getFrontIR1());
+//  Serial.print(getFrontIR1_Block());
+  Serial.print("|");
+  Serial.print(getFrontIR2());
+//  Serial.print(getFrontIR2_Block());
+  Serial.print("|");
+  Serial.print(getFrontIR3());
+//  Serial.print(getFrontIR3_Block());
+  Serial.print("|");
+  Serial.print(getLeftIR1());
+  Serial.print("|");
+  Serial.print(getLeftIR1_Block());
+  Serial.print("|");
+  Serial.print(getRightIR2());
+//  Serial.print(getRightIR2_Block());
+  Serial.print("|");
+  Serial.println(getRightIR1());
+//  Serial.println(getRightIR1_Block());  
   Serial.flush();
 }

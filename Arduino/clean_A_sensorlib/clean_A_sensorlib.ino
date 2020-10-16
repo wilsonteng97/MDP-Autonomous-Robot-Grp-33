@@ -12,14 +12,14 @@ RunningMedian rightIR2_Median = RunningMedian(NUM_SAMPLES_MEDIAN);
 RunningMedian leftIR_1_Median = RunningMedian(NUM_SAMPLES_MEDIAN);
 
 
-double frontIR1_Diffs[] = {18.00, 30.00, 39.00};
-double frontIR2_Diffs[] = {14.00, 26.00, 34.00};//how it works is that for a certain range like 5-15 cm obstacle is considered as one block away
-double frontIR3_Diffs[] = {18.00, 32.00, 39.90};//15-25cm is 2 blocks away etc
+double frontIR1_Diffs[] = {15.00, 25.00, 32.50};
+double frontIR2_Diffs[] = {12.00, 20.50, 32.00};//how it works is that for a certain range like 5-15 cm obstacle is considered as one block away
+double frontIR3_Diffs[] = {15.00, 25.40, 37.00};//15-25cm is 2 blocks away etc
 
-double rightIR1_Diffs[] = {15.50, 26.00 ,36.70};
-double rightIR2_Diffs[] = {15.00, 28.50 ,34.50};
+double rightIR1_Diffs[] = {15.70, 25.40 ,33.70};
+double rightIR2_Diffs[] = {15.80, 25.30 ,33.50};
 
-double leftIR1_Diffs[] = {20.50, 29.20, 39.00, 50.00, 60.50};
+double leftIR1_Diffs[] = {19.00, 27.30, 35.00, 43.00, 52.00};
 
 double frontIR1_Value = 0, frontIR2_Value = 0, frontIR3_Value = 0;
 double rightIR1_Value = 0, rightIR2_Value = 0, leftIR1_Value = 0;
@@ -148,7 +148,7 @@ void readFrontSensor_2() {
 
 void readFrontSensor_3() {
   double irDistance = 0;
-  if (analogRead(A0)>331)
+  if (analogRead(A0)>260)
   {
     irDistance=5599.1/analogRead(A0) - 1.8765;//Front right S4
   }

@@ -15,8 +15,8 @@ const int TURN_RPM = 80;
 const int ROTATE_RPM = 60;
 
 //Distance to cover in ticks
-const int TURN_TICKS_L = 790;
-const int TURN_TICKS_R = 790;
+const int TURN_TICKS_L = 792;
+const int TURN_TICKS_R = 788;
 const int TICKS[10] = {558, 1120, 1710, 2310, 2915, 3515, 4155, 4735, 5350};
 
 //PID tunings
@@ -377,7 +377,7 @@ void alignRight() {
   delay(2);
   double diff = getRightIR1() - getRightIR2();
   int rotated = 0;
-  while (abs(diff) >= 0.1 && rotated < 20 && getRightIR1_Block() == getRightIR2_Block() && getRightIR1_Block()< 3) {
+  while (abs(diff) >= 0.1 && rotated < 20 && getRightIR1_Block() == getRightIR2_Block() && getRightIR1_Block()< 2) {
     rotated++;
     if (diff > 0) {
       rotateRight(abs(diff * 5));
@@ -417,7 +417,7 @@ void alignFront() {
     }
   double diff = getFrontIR1() - getFrontIR3();
   int rotated = 0;
-  while (abs(diff) >= 0.1 && rotated < 20 && getFrontIR1_Block() == getFrontIR3_Block() && getFrontIR1_Block()< 3) {
+  while (abs(diff) >= 0.1 && rotated < 20 && getFrontIR1_Block() == getFrontIR3_Block() && getFrontIR1_Block()< 2) {
     rotated++;
     if (diff > 0) {
       rotateLeft(abs(diff * 5));
