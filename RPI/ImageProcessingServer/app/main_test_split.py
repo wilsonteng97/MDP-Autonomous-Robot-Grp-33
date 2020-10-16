@@ -21,13 +21,14 @@ def init():
 		print("model loaded at", print(time.time()-start_time))
 #		image1 = cv2.imread('raw-images/seven_06.png')
 #		image2 = cv2.imread('raw-images/out.jpg')
-		image1 = cv2.imread('raw-images\id_5 (Go).jpg')
-		image2 = cv2.imread('raw-images\id_6 (6).jpg')
+		image1 = cv2.imread("processed_images/-1-1-1-1819_processed.png")
+		# image2 = cv2.imread('raw-images\id_6 (6).jpg')
 		detect_time = time.time()
-		reply = imageDetector.start(model, image1, "seven_06.png",3,1)
+		cdt_list =  ["-1","-1","-1","-1","18","19"]
+		reply = imageDetector.start(model, image1, "-1-1-1-1819_processed_new.png",3,1,cdt_list)
 		print("image1 and cdts: ", reply, ", time done: ",time.time()-detect_time)
-		reply2 = imageDetector.start(model, image2, "out.jpg",5,3)
-		print("image2 and cdts: ", reply, ", time done: ",time.time()-detect_time)
+		# reply2 = imageDetector.start(model, image2, "out.jpg",5,3)
+		# print("image2 and cdts: ", reply, ", time done: ",time.time()-detect_time)
 
 	except KeyboardInterrupt:
 		# imageSplitter.end()

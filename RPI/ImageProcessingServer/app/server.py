@@ -176,7 +176,7 @@ class ImageProcessingServer:
                 w = w+1
                 section_width = float(image.shape[1])/cut_width*w
                 if startX<section_width:
-                    if (box_width/2)<(section_width - startX) and cdt_list[2*w-1]!=-1:
+                    if (box_width/2)<(section_width - startX) and cdt_list[2*w-1]!="-1":
                         text = text + ", (" + cdt_list[2*w-2] + ", " + cdt_list[2*w-1] + ")"
                         break
             # for h in range(cut_height):

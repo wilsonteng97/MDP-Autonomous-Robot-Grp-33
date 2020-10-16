@@ -17,7 +17,7 @@ import os
 IMAGE_ENCODING = '.png'
 
 class ImageDetector:
-	def start(self, model,image,raw_image_name,cut_width,cut_height):
+	def start(self, model,image,raw_image_name,cut_width,cut_height,cdt_list):
 		# # load the our fine-tuned model and label binarizer from disk
 		# print("[INFO] loading model and label binarizer...")
 		# model = load_model(config.MODEL_PATH)
@@ -28,8 +28,15 @@ class ImageDetector:
 		# image = imutils.rotate(image, 180)
 		# image = cv2.Canny(image,100,200)
 
+		brightness = np.average(np.linalg.norm(image, axis=2)) / np.sqrt(3)
+		while brightness > 125:
+			hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+			hsv[...,2] = hsv[...,2]*0.9
+			image = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
+			brightness = np.average(np.linalg.norm(image, axis=2)) / np.sqrt(3)
+
 		# run selective search on the image to generate bounding box proposal regions
-		print("[INFO] running selective search...")
+		# print("[INFO] running selective search...")
 		ss = cv2.ximgproc.segmentation.createSelectiveSearchSegmentation()
 		ss.setBaseImage(image)
 		# ss.switchToSelectiveSearchFast()
@@ -50,46 +57,42 @@ class ImageDetector:
 			roi = image[y:y + h, x:x + w]
 			roi = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
 			roi = cv2.resize(roi, config.INPUT_DIMS,
-				interpolation=cv2.INTER_CUBIC)
+			    interpolation=cv2.INTER_CUBIC)
 			# further preprocess by the ROI
 			roi = img_to_array(roi)
 			roi = preprocess_input(roi)
+			x_2 = (x+w)/image.shape[1]
+			y_2 = (y+h)/image.shape[0]
+			x = x/image.shape[1]
+			y = y/image.shape[0]
 
 			# update our proposals and bounding boxes lists
 			proposals.append(roi)
-			boxes.append((x, y, x + w, y + h))
-			
-			
+			boxes.append((x, y, x_2, y_2))
+
 		# convert the proposals and bounding boxes into NumPy arrays
 		proposals = np.array(proposals, dtype="float32")
 		boxes = np.array(boxes, dtype="float32")
-		print("[INFO] proposal shape: {}".format(proposals.shape))
+		# print("[INFO] proposal shape: {}".format(proposals.shape))
 
 		# classify each of the proposal ROIs using fine-tuned model
-		print("[INFO] classifying proposals...")
+		# print("[INFO] classifying proposals...")
 		proba = model.predict(proposals)
-		# score = model.score(proposals)
 
 		# find the index of all predictions that are positive for the classes
-		print("[INFO] applying NMS...")
+		# print("[INFO] applying NMS...")
 		idxs = np.where(proba[:,:15]>config.MIN_PROBA)[0]
 
 		# use the indexes to extract all bounding boxes and associated class
 		# label probabilities associated with the class
 		boxes = boxes[idxs]
 		proba = proba[idxs][:, :15]
-		# scores = score[idxs][:, :15]
 
-		for i in range(len(boxes)):
-			boxes[i][0]=boxes[i][0]/image.shape[1]
-			boxes[i][1]=boxes[i][1]/image.shape[0]
-			boxes[i][2]=boxes[i][2]/image.shape[1]
-			boxes[i][3]=boxes[i][3]/image.shape[0]
 		labels = [0]*len(boxes)
 		for i in range(len(boxes)):
-			for j in range(15):
-				if proba[i][j]>config.MIN_PROBA:
-					labels[i]=j+1
+		    for j in range(15):
+		        if proba[i][j]>config.MIN_PROBA:
+		            labels[i]=j+1
 		scores = [0]*len(boxes)
 		for i in range(len(boxes)):
 			for j in range(15):
@@ -112,39 +115,32 @@ class ImageDetector:
 			# draw the bounding box, label, and probability on the image
 			(startX, startY, endX, endY) = boxes[i]
 			cv2.rectangle(image, (startX, startY), (endX, endY),
-				(0, 255, 0), 2)
+			    (0, 255, 0), 2)
 			y = startY - 10 if startY - 10 > 10 else startY + 10
 			text = str(labels[i])
 			box_width = abs(startX-endX)
 			box_height = abs(startY-endY)
 			for w in range(cut_width):
-				w = w+1
-				section_width = float(image.shape[1])/cut_width*w
-				# print(section_width)
-				if startX<section_width:
-					if (box_width/2)<(section_width - startX):
-						text = text + ", (" + str(w) + ", "
-						break
-			for h in range(cut_height):
-				h = h+1
-				section_height = float(image.shape[0])/cut_height*h
-				# print(section_height)
-				if startY<section_height:
-					if (box_height/2)<(section_height - startY):
-						text = text + str(h) + ")"
-						break
+			    w = w+1
+			    section_width = float(image.shape[1])/cut_width*w
+			    if startX<section_width:
+			        if (box_width/2)<(section_width - startX) and cdt_list[2*w-1]!="-1":
+			            text = text + ", (" + cdt_list[2*w-2] + ", " + cdt_list[2*w-1] + ")"
+			            break
+			# for h in range(cut_height):
+			#     h = h+1
+			#     section_height = float(image.shape[0])/cut_height*h
+			#     if startY<section_height:
+			#         if (box_height/2)<(section_height - startY):
+			#             text = text + cdt_list[1] + ")"
+			#             break
 			cv2.putText(image, text, (startX, y),
-				cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 2)
-			reply_list.append(text)
-		# save output image
-		# processed_image_path = 'processed_images' + raw_image_name[raw_image_name.rfind("/"):raw_image_name.rfind(".")] + "_processed" + IMAGE_ENCODING
-		# print(processed_image_path)
-		processed_image_path = 'processed_images/' + raw_image_name[:raw_image_name.rfind(".")] + "_processed" + IMAGE_ENCODING
-		# save processed image
-		save_success = cv2.imwrite(processed_image_path, image)
-		print('save image successful?', save_success)
-
-		#get label_id
-		# image_id = str(labels[0])
+			    cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 2)
+			if labels[i] not in PROCESSED_IMAGE_IDS:
+			    reply_list.append(text)
+			    PROCESSED_IMAGE_IDS.append(labels[i])
+		if len(reply_list)!=0:
+		    processed_image_path = 'processed_images/' + raw_image_name[:raw_image_name.rfind(".")] + "_processed" + IMAGE_ENCODING
+		    save_success = cv2.imwrite(processed_image_path, image)
+		    # print('save image successful?', save_success)
 		return reply_list
-
