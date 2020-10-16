@@ -113,23 +113,24 @@ void returnSensorReading_Raw() {
 }
 
 void returnSensorReading_Debug() {
-  Serial.print(getFrontIR1());
-//  Serial.print(getFrontIR1_Block());
-  Serial.print("|");
-  Serial.print(getFrontIR2());
-//  Serial.print(getFrontIR2_Block());
-  Serial.print("|");
-  Serial.print(getFrontIR3());
-//  Serial.print(getFrontIR3_Block());
-  Serial.print("|");
-  Serial.print(getLeftIR1());
-  Serial.print("|");
-  Serial.print(getLeftIR1_Block());
-  Serial.print("|");
-  Serial.print(getRightIR2());
-//  Serial.print(getRightIR2_Block());
-  Serial.print("|");
-  Serial.println(getRightIR1());
+//  Serial.print(getFrontIR1());
+////  Serial.print(getFrontIR1_Block());
+//  Serial.print("|");
+//  Serial.print(getFrontIR2());
+////  Serial.print(getFrontIR2_Block());
+//  Serial.print("|");
+//  Serial.print(getFrontIR3());
+////  Serial.print(getFrontIR3_Block());
+//  Serial.print("|");
+//  Serial.print(getLeftIR1());
+//  Serial.print("|");
+//  Serial.print(getLeftIR1_Block());
+//  Serial.print("|");
+//  Serial.print(getRightIR2());
+////  Serial.print(getRightIR2_Block());
+//  Serial.print("|");
+//  Serial.println(getRightIR1());
+  
 //  Serial.println(getRightIR1_Block());  
   Serial.flush();
 }

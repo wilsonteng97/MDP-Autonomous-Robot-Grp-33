@@ -14,12 +14,12 @@ RunningMedian leftIR_1_Median = RunningMedian(NUM_SAMPLES_MEDIAN);
 
 double frontIR1_Diffs[] = {15.00, 25.00, 32.50};
 double frontIR2_Diffs[] = {12.00, 20.50, 32.00};//how it works is that for a certain range like 5-15 cm obstacle is considered as one block away
-double frontIR3_Diffs[] = {15.00, 25.40, 37.00};//15-25cm is 2 blocks away etc
+double frontIR3_Diffs[] = {15.00, 25.40, 36.00};//15-25cm is 2 blocks away etc
 
-double rightIR1_Diffs[] = {15.70, 25.40 ,33.70};
-double rightIR2_Diffs[] = {15.80, 25.30 ,33.50};
+double rightIR1_Diffs[] = {15.70, 25.40 ,32.70};
+double rightIR2_Diffs[] = {15.80, 23.00 ,27.50};
 
-double leftIR1_Diffs[] = {19.00, 27.30, 35.00, 43.00, 52.00};
+double leftIR1_Diffs[] = {19.00, 27.30, 35.00, 45.00, 52.50};
 
 double frontIR1_Value = 0, frontIR2_Value = 0, frontIR3_Value = 0;
 double rightIR1_Value = 0, rightIR2_Value = 0, leftIR1_Value = 0;
