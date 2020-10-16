@@ -176,9 +176,13 @@ class ImageProcessingServer:
                 w = w+1
                 section_width = float(image.shape[1])/cut_width*w
                 if startX<section_width:
-                    if (box_width/2)<(section_width - startX) and cdt_list[2*w-1]!="-1":
-                        text = text + ", (" + cdt_list[2*w-2] + ", " + cdt_list[2*w-1] + ")"
-                        break
+                    if (box_width/2)<(section_width - startX):
+                        if cdt_list[2*w-1]=="-1":
+                            text = ""
+                            break
+                        else:
+                            text = text + ", (" + cdt_list[2*w-2] + ", " + cdt_list[2*w-1] + ")"
+                            break
             # for h in range(cut_height):
             #     h = h+1
             #     section_height = float(image.shape[0])/cut_height*h
@@ -186,11 +190,12 @@ class ImageProcessingServer:
             #         if (box_height/2)<(section_height - startY):
             #             text = text + cdt_list[1] + ")"
             #             break
-            cv2.putText(image, text, (startX, y),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 2)
-            if labels[i] not in PROCESSED_IMAGE_IDS:
-                reply_list.append(text)
-                PROCESSED_IMAGE_IDS.append(labels[i])
+            if len(text)!=0:
+                cv2.putText(image, text, (startX, y),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 2)
+                if labels[i] not in PROCESSED_IMAGE_IDS:
+                    reply_list.append(text)
+                    PROCESSED_IMAGE_IDS.append(labels[i])
         if len(reply_list)!=0:
             processed_image_path = 'processed_images/' + raw_image_name[:raw_image_name.rfind(".")] + "_processed" + IMAGE_ENCODING
             save_success = cv2.imwrite(processed_image_path, image)
