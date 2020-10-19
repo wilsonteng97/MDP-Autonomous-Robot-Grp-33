@@ -117,6 +117,24 @@ public class ArenaMap extends JPanel {
         }
     }
 
+    public void removeAllVirtualWalls() {
+        for (int row = 0; row < MapSettings.MAP_ROWS; row++) {
+            for (int col = 0; col < MapSettings.MAP_COLS; col++) {
+                this.getCell(row, col).setVirtualWall(false);
+            }
+        }
+    }
+
+    public void resetAllVirtualWalls() {
+        this.removeAllVirtualWalls();
+        for (int row = 0; row < MapSettings.MAP_ROWS; row++) {
+            for (int col = 0; col < MapSettings.MAP_COLS; col++) {
+                setVirtualWallIfBorder(row, col);       // make sure never reset border
+                createVirtualWalls(row, col);
+            }
+        }
+    }
+
     /**
      * Grid Methods
      */
