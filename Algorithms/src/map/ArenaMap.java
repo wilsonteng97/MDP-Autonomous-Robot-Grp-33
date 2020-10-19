@@ -80,7 +80,7 @@ public class ArenaMap extends JPanel {
         setVirtualWallIfBorder(row, col);    // make sure never reset border
         if (row > 1) {
             // never set row 0
-            grid[row - 1][col].setVirtualWall(false);            // bottom cell
+            grid[row - 1][col].setVirtualWall(false);            // bottom center cell
             setVirtualWallIfBorder(row - 1, col);
             if (col < MapSettings.MAP_COLS - 2) {
                 grid[row - 1][col + 1].setVirtualWall(false);    // bottom-right cell
@@ -114,6 +114,24 @@ public class ArenaMap extends JPanel {
         if (col < MapSettings.MAP_COLS - 2) {
             grid[row][col + 1].setVirtualWall(false);            // right cell
             setVirtualWallIfBorder(row, col + 1);
+        }
+
+        // write back the reset virtualWall Cells that are within range of nearby obstacles
+        setBackSurroundingObsVirtualWalls(row, col);
+    }
+
+    /**
+     * the previous resetVirtualWall method will overwrite virtual walls of adjacent obstacle cells that are explored,
+     * this method will set virtual walls of adjacent obstacle cells back
+     * @param row row of the overwritten obstacle cell
+     * @param col col of the overwritten obstacle cell
+     */
+    private void setBackSurroundingObsVirtualWalls(int row, int col) {
+        for (int i = row - 2; i <= row + 2; i++) {
+            for (int j = col - 2; j <= col + 2; j++) {
+                if (i == row && j == col) continue;
+                if (checkValidCell(i, j) && checkExploredCell(i, j) && isObstacleCell(i, j)) createVirtualWalls(i, j);
+            }
         }
     }
 
@@ -189,6 +207,9 @@ public class ArenaMap extends JPanel {
 
     public boolean checkValidCell(int row, int col) {
         return row >= 0 && col >= 0 && row < MapSettings.MAP_ROWS && col < MapSettings.MAP_COLS;
+    }
+    public boolean checkExploredCell(int row, int col) {
+        return grid[row][col].isExplored();
     }
     public boolean isObstacleCell(int row, int col) {
         return grid[row][col].isObstacle();
