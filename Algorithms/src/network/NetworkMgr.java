@@ -109,13 +109,10 @@ public class NetworkMgr {
             System.out.println("[sendMsg()] Sending Message...");
             String outputMsg = msg;
             // FIXME finalize message format here
-//            if (msgType == INSTRUCTIONS) {
-//                outputMsg = msg;
-//            } else if (msgType == MAP_STRINGS) {
-//                outputMsg = MAP_STRINGS + msg;
-//            } else {
-//                    outputMsg = msg;
-//            }
+
+            if (msgType.equals(MAP_STRINGS)) {
+                outputMsg = MAP_STRINGS + msg;
+            }
 
 //            if (msg == null) {
 //                outputMsg = msgType + "\n";

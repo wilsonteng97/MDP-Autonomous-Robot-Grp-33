@@ -1,0 +1,2 @@
+INDEX VERSION 1.131+C:\Users\Admin\Desktop\MDP-Autonomous-Robot-Grp-33\.metadata\.plugins\org.eclipse.jdt.core
+1275866231.index
