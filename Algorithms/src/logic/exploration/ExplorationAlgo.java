@@ -84,6 +84,8 @@ abstract public class ExplorationAlgo {
         System.out.println();
 
         explorationLoop(bot.getAgtY(), bot.getAgtX());
+        alignBeforeFastestPath();
+        if (!bot.isSim()) NetworkMgr.getInstance().sendMsg("EF|", NetworkMgr.INSTRUCTIONS);
 
 //        if (!bot.isSim()) {
 //            NetworkMgr.getInstance().sendMsg(null, NetworkMgr.BOT_START);
@@ -293,16 +295,19 @@ abstract public class ExplorationAlgo {
     }
 
     /**
-     * Send the bot to START and points the bot northwards
+     * Send the bot to START
      */
     protected void goHome() {
         if (!bot.hasEnteredGoal() && coverageLimit == 300 && timeLimit == 3600) {
             AStarHeuristicSearch goToGoal = new AStarHeuristicSearch(exploredArenaMap, bot);
-            goToGoal.runFastestPath(AgentSettings.GOAL_ROW, AgentSettings.GOAL_COL);
+            String actionString = goToGoal.runFastestPath(AgentSettings.GOAL_ROW, AgentSettings.GOAL_COL);
+
+            if (!bot.isSim()) NetworkMgr.getInstance().sendMsg("K" + actionString, NetworkMgr.INSTRUCTIONS);
         }
 
         AStarHeuristicSearch returnToStart = new AStarHeuristicSearch(exploredArenaMap, bot);
-        returnToStart.runFastestPath(AgentSettings.START_ROW, AgentSettings.START_COL);
+        String actionString = returnToStart.runFastestPath(AgentSettings.START_ROW, AgentSettings.START_COL);
+        if (!bot.isSim()) NetworkMgr.getInstance().sendMsg("K" + actionString, NetworkMgr.INSTRUCTIONS);
 
         System.out.println("Exploration complete!");
         areaExplored = calculateAreaExplored();
@@ -310,7 +315,6 @@ abstract public class ExplorationAlgo {
         System.out.println(", " + areaExplored + " Cells");
         System.out.println((getElapsedTime()) / 1000 + " Seconds");
 
-        alignBeforeFastestPath();
     }
 
     void alignBeforeFastestPath() {

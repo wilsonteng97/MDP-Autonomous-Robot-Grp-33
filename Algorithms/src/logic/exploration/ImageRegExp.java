@@ -69,6 +69,9 @@ public class ImageRegExp extends ExplorationAlgo {
         System.out.println();
 
         explorationLoop(bot.getAgtY(), bot.getAgtX());
+        alignBeforeFastestPath();
+        if (!bot.isSim()) NetworkMgr.getInstance().sendMsg("EF|", NetworkMgr.INSTRUCTIONS);
+
 //        imageExploration();
 //        goToPoint(new Point(MapSettings.START_COL, MapSettings.START_ROW));
 //        alignBeforeFastestPath();
@@ -174,7 +177,6 @@ public class ImageRegExp extends ExplorationAlgo {
             goHome();
         }
         System.out.println("Exploration Completed!");
-
     }
 
     public void imageExploration() {

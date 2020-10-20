@@ -110,7 +110,7 @@ public class NetworkMgr {
             String outputMsg = msg;
             // FIXME finalize message format here
 
-            if (msgType == MAP_STRINGS) {
+            if (msgType.equals(MAP_STRINGS)) {
                 outputMsg = MAP_STRINGS + msg;
             }
 
