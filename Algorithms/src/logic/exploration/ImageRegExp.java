@@ -199,7 +199,7 @@ public class ImageRegExp extends ExplorationAlgo {
         boolean success;
         ArrayList<ObsSurface> surfTaken;
         System.out.println("before nearestObsSurface");
-        scanner.nextLine();
+//        scanner.nextLine();
         ObsSurface nearestObstacle = nearestObsSurface(bot.getAgtPos(), notYetTaken);
         LOGGER.info("nearestObstacle after " + nearestObstacle);
         Cell nearestCell = findSurfaceSurroundingReachable(nearestObstacle.getRow(), nearestObstacle.getCol(), nearestObstacle.getSurface());
@@ -211,7 +211,7 @@ public class ImageRegExp extends ExplorationAlgo {
         }
         removeFromNotYetTaken(nearestObstacle);
         System.out.println("after nearestObsSurface");
-        scanner.nextLine();
+//        scanner.nextLine();
     }
 
     private boolean goToPointTakePicture(Point loc, ObsSurface obsSurface) {
@@ -237,9 +237,7 @@ public class ImageRegExp extends ExplorationAlgo {
             turnBotDirectionWithoutSense(desiredDir);
         }
         System.out.println("desired dir after " + bot.getAgtDir());
-//        obsList = imageRecognitionRight(exploredArenaMap, true);
         obsList = imageRecognitionRight(exploredArenaMap, false);
-
 //        scanner.nextLine();
 
         return true;
