@@ -84,8 +84,9 @@ abstract public class ExplorationAlgo {
         System.out.println();
 
         explorationLoop(bot.getAgtY(), bot.getAgtX());
-        alignBeforeFastestPath();
         if (!bot.isSim()) NetworkMgr.getInstance().sendMsg("EF|", NetworkMgr.INSTRUCTIONS);
+        alignBeforeFastestPath();
+
 
 //        if (!bot.isSim()) {
 //            NetworkMgr.getInstance().sendMsg(null, NetworkMgr.BOT_START);
