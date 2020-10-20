@@ -69,9 +69,9 @@ public class ImageRegExp extends ExplorationAlgo {
         explorationLoop(bot.getAgtY(), bot.getAgtX());
         System.out.println("Test image start");
         imageExploration();
-        System.out.println("Test image end, going home now");
+        System.out.println("Test image end | going home now");
         goHome();
-        System.out.println("goHome() end, aligning for FP now");
+        System.out.println("Test image end | goHome() end, aligning for FP now");
         alignBeforeFastestPath();
         System.out.println("FP end");
         exploredArenaMap.repaint();
@@ -298,7 +298,9 @@ public class ImageRegExp extends ExplorationAlgo {
         notYetTaken = getAllPossibleObsSurfaces();
         for (String tempObsSurfaceStr : bot.getSurfaceTaken().keySet()) {
             if (!notYetTaken.containsKey(tempObsSurfaceStr)) {
-                LOGGER.warning("Surface taken not in all possible surfaces. Please check. \n\n\n");
+                System.out.println("========================================");
+                LOGGER.warning("Surface taken not in all possible surfaces. Please check. " + tempObsSurfaceStr);
+                System.out.println("========================================");
             }
             else {
                 notYetTaken.remove(tempObsSurfaceStr);
