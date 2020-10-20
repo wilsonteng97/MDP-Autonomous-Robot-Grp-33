@@ -16,8 +16,10 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+import static hardware.AgentSettings.Actions.ALIGN_RIGHT;
 import static hardware.AgentSettings.Direction.*;
 import static hardware.AgentSettings.Direction.SOUTH;
+import static network.NetworkMgr.INSTRUCTIONS;
 import static utils.MsgParsingUtils.parseFastestPathString;
 import static utils.MsgParsingUtils.parsePictureMsg;
 import static utils.SimulatorSettings.GOHOMESLOW_SLEEP;
@@ -68,6 +70,7 @@ public class ImageRegExp extends ExplorationAlgo {
 
         explorationLoop(bot.getAgtY(), bot.getAgtX());
         System.out.println("Test image start");
+//        scanner.nextLine();
         imageExploration();
         LOGGER.info("Test image end | going home now");
 //        scanner.nextLine();
@@ -90,7 +93,7 @@ public class ImageRegExp extends ExplorationAlgo {
 
         long elapsedTime = 0;
         do {
-            if (!bot.isSim()) NetworkMgr.getInstance().sendMsg("Z", NetworkMgr.INSTRUCTIONS);
+            if (!bot.isSim()) NetworkMgr.getInstance().sendMsg("Z", INSTRUCTIONS);
             senseAndRepaint();
             nextMove();
             System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
@@ -241,6 +244,7 @@ public class ImageRegExp extends ExplorationAlgo {
         }
         System.out.println("desired dir after " + bot.getAgtDir());
         obsList = imageRecognitionRight(exploredArenaMap, false);
+        NetworkMgr.getInstance().sendMsg(Actions.print(ALIGN_RIGHT), INSTRUCTIONS);
 //        scanner.nextLine();
 
         return true;
@@ -492,7 +496,7 @@ public class ImageRegExp extends ExplorationAlgo {
 
         if (!bot.isSim()) {
             NetworkMgr comm = NetworkMgr.getInstance();
-            comm.sendMsg(msg, NetworkMgr.INSTRUCTIONS);
+            comm.sendMsg(msg, INSTRUCTIONS);
         }
         System.out.println("Taking image: " + msg);
     }
