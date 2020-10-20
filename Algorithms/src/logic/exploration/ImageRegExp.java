@@ -69,11 +69,14 @@ public class ImageRegExp extends ExplorationAlgo {
         explorationLoop(bot.getAgtY(), bot.getAgtX());
         System.out.println("Test image start");
         imageExploration();
-        System.out.println("Test image end | going home now");
+        LOGGER.info("Test image end | going home now");
+//        scanner.nextLine();
         goHome();
-        System.out.println("Test image end | goHome() end, aligning for FP now");
+        LOGGER.info("Test image end | goHome() end, aligning for FP now");
+//        scanner.nextLine();
         alignBeforeFastestPath();
-        System.out.println("FP end");
+        LOGGER.info("FP alignment end");
+//        scanner.nextLine();
         exploredArenaMap.repaint();
     }
 
