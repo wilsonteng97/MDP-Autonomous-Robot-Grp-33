@@ -297,11 +297,11 @@ abstract public class ExplorationAlgo {
      */
     protected void goHome() {
         if (!bot.hasEnteredGoal() && coverageLimit == 300 && timeLimit == 3600) {
-            AStarHeuristicSearch goToGoal = new AStarHeuristicSearch(exploredArenaMap, bot, realArenaMap);
+            AStarHeuristicSearch goToGoal = new AStarHeuristicSearch(exploredArenaMap, bot);
             goToGoal.runFastestPath(AgentSettings.GOAL_ROW, AgentSettings.GOAL_COL);
         }
 
-        AStarHeuristicSearch returnToStart = new AStarHeuristicSearch(exploredArenaMap, bot, realArenaMap);
+        AStarHeuristicSearch returnToStart = new AStarHeuristicSearch(exploredArenaMap, bot);
         returnToStart.runFastestPath(AgentSettings.START_ROW, AgentSettings.START_COL);
 
         System.out.println("Exploration complete!");

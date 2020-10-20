@@ -69,17 +69,9 @@ public class ImageRegExp extends ExplorationAlgo {
         System.out.println();
 
         explorationLoop(bot.getAgtY(), bot.getAgtX());
-        System.out.println("Test image start");
-//        scanner.nextLine();
-        imageExploration();
-        LOGGER.info("Test image end | going home now");
-//        scanner.nextLine();
-        goHome();
-        LOGGER.info("Test image end | goHome() end, aligning for FP now");
-//        scanner.nextLine();
-        alignBeforeFastestPath();
-        LOGGER.info("FP alignment end");
-//        scanner.nextLine();
+//        imageExploration();
+//        goToPoint(new Point(MapSettings.START_COL, MapSettings.START_ROW));
+//        alignBeforeFastestPath();
         exploredArenaMap.repaint();
     }
 
@@ -182,6 +174,7 @@ public class ImageRegExp extends ExplorationAlgo {
             goHome();
         }
         System.out.println("Exploration Completed!");
+
     }
 
     public void imageExploration() {
@@ -196,6 +189,7 @@ public class ImageRegExp extends ExplorationAlgo {
             System.out.println("imageLoop start " + notYetTaken.size() + ":\n" + notYetTaken);
             imageLoop();
             System.out.println("imageLoop end " + notYetTaken.size() + ":\n" + notYetTaken);
+            scanner.nextLine();
         }
 
         goHome();
@@ -466,6 +460,7 @@ public class ImageRegExp extends ExplorationAlgo {
             // neighbour cell of that surface
             tempPos = getNeighbour(obstacle.getPos(), obstacle.getSurface());
             tempDist = loc.distance(tempPos);
+            if (checkIfObstacleInBtw(loc, tempPos, exploredArenaMap)) tempDist += 20;
             if (tempDist < dist) {
                 dist = tempDist;
                 nearest = obstacle;
@@ -473,6 +468,34 @@ public class ImageRegExp extends ExplorationAlgo {
         }
         LOGGER.info("-------------- [absoluteNearestSurface] For " + loc + "\n" + notYetTaken + "\n--------------");
         return nearest;
+    }
+
+    public boolean checkIfObstacleInBtw(Point start, Point end, ArenaMap map) {
+        boolean canCheck = false;
+        boolean checkX = start.getX() == end.getX();
+        boolean checkY = start.getY() == end.getY();
+
+
+        if ((checkX) || (checkY)) {
+            canCheck = true;
+        }
+        if (canCheck) {
+            if (checkX) {
+                int tempX = start.x;
+                for (int i = start.y;  i <= end.y; i++) {
+                    if (map.getCell(i, tempX).isObstacle()) return true;
+                }
+            }
+
+            if (checkY) {
+                int tempY = start.y;
+                for (int i = start.x;  i <= end.x; i++) {
+                    if (map.getCell(tempY, i).isObstacle()) return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public Point getNeighbour(Point pos, AgentSettings.Direction surfaceDir) {
