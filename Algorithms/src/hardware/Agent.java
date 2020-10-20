@@ -233,6 +233,34 @@ public class Agent {
         return agtDir;
     }
 
+    public AgentSettings.Direction takeActionNotSent(AgentSettings.Actions action, int steps, ArenaMap explorationArenaMap, ArenaMap arenaMap) {
+        switch (action) {
+            case FORWARD:
+            case BACKWARD:
+            case MOVE_LEFT:
+            case MOVE_RIGHT:
+                agtDir = move(action, steps, explorationArenaMap, arenaMap);
+                break;
+
+            case FACE_LEFT:
+            case FACE_RIGHT:
+            case FACE_REVERSE:
+                agtDir = changeDir(action, explorationArenaMap, arenaMap);
+                break;
+
+            case ALIGN_FRONT:
+            case ALIGN_RIGHT:
+            case CALIBRATE:
+                agtDir = calibrate(action, explorationArenaMap, arenaMap);
+                break;
+
+            case ERROR:
+            default:
+                break;
+        }
+        return agtDir;
+    }
+
     public AgentSettings.Direction takeAction(AgentSettings.Actions action, int steps, ArenaMap explorationArenaMap, ArenaMap arenaMap) {
         switch (action) {
             case FORWARD:

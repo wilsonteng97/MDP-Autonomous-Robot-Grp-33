@@ -288,6 +288,20 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
         }
         else {
             // TODO real bot
+            System.out.println("[ASTAR] in Image Rec mode");
+            for (Actions x : movements) {
+                if (x == Actions.FORWARD) {
+                    if (!canMoveForward()) {
+                        System.out.println("Early termination of fastest path execution.");
+                        return "T";
+                    }
+                }
+
+                bot.takeActionNotSent(x, 1, exploredArenaMap, realArenaMap);
+                this.exploredArenaMap.repaint();
+            }
+
+
 //            int fCount = 0;
 //            for (Actions x : movements) {
 //                if (x == Actions.FORWARD) {
@@ -314,7 +328,6 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
 //                exploredArenaMap.repaint();
 //            }
 //            NetworkMgr.getInstance().sendMsg(outputString + "", NetworkMgr.INSTRUCTIONS);
-
         }
 
         System.out.println("\nMovements: " + outputString.toString());

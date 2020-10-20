@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 
 import static hardware.AgentSettings.Direction.*;
 import static hardware.AgentSettings.Direction.SOUTH;
+import static utils.MsgParsingUtils.parseFastestPathString;
 import static utils.MsgParsingUtils.parsePictureMsg;
 import static utils.SimulatorSettings.GOHOMESLOW_SLEEP;
 import static utils.SimulatorSettings.SIM;
@@ -67,7 +68,7 @@ public class ImageRegExp extends ExplorationAlgo {
 
         explorationLoop(bot.getAgtY(), bot.getAgtX());
         System.out.println("Test image start");
-//        imageExploration();
+        imageExploration();
         goHome();
         System.out.println("Test image end");
         exploredArenaMap.repaint();
@@ -221,31 +222,62 @@ public class ImageRegExp extends ExplorationAlgo {
 //        obsList = imageRecognitionRight(exploredArenaMap);
 //        System.out.println("imageRecognitionRight after");
 
-        System.out.println("desired dir before");
 //        scanner.nextLine();
 
 
         AgentSettings.Direction desiredDir = AgentSettings.Direction.antiClockwise90(obsSurface.getSurface());
         if (desiredDir == bot.getAgtDir()) {
-            LOGGER.info("desiredDir" + bot.getAgtDir());
+            LOGGER.info("desiredDir before | no change" + bot.getAgtDir());
         } else {
-            LOGGER.info("Not desiredDir " + bot.getAgtDir());
-            turnBotDirection(desiredDir);
+            LOGGER.info("Not desiredDir before " + bot.getAgtDir());
+            LOGGER.info("desiredDir" + desiredDir);
+            turnBotDirectionWithoutSense(desiredDir);
         }
-        obsList = imageRecognitionRight(exploredArenaMap);
-
         System.out.println("desired dir after " + bot.getAgtDir());
+//        obsList = imageRecognitionRight(exploredArenaMap, true);
+        obsList = imageRecognitionRight(exploredArenaMap, false);
+
 //        scanner.nextLine();
 
         return true;
     }
 
-    private LinkedHashMap<String, Point> imageRecognitionRight(ArenaMap exploredArenaMap) {
+    /**
+     * Turns the robot to the required direction.
+     */
+    protected void turnBotDirectionWithoutSense(AgentSettings.Direction targetDir) {
+        int numOfTurn = Math.abs(bot.getAgtDir().ordinal() - targetDir.ordinal()) / 2;
+        if (numOfTurn > 2) numOfTurn = numOfTurn % 2;
+
+        if (numOfTurn == 1) {
+            if (AgentSettings.Direction.clockwise90(bot.getAgtDir()) == targetDir) {
+                bot.takeAction(Actions.FACE_RIGHT, 0, exploredArenaMap, realArenaMap);
+//                senseAndRepaint();
+            } else {
+                bot.takeAction(Actions.FACE_LEFT, 0, exploredArenaMap, realArenaMap);
+//                senseAndRepaint();
+            }
+        } else if (numOfTurn == 2) {
+            bot.takeAction(Actions.FACE_RIGHT, 0, exploredArenaMap, realArenaMap);
+//            senseAndRepaint();
+            bot.takeAction(Actions.FACE_RIGHT, 0, exploredArenaMap, realArenaMap);
+//            senseAndRepaint();
+        }
+
+    }
+
+    private LinkedHashMap<String, Point> imageRecognitionRight(ArenaMap exploredArenaMap, boolean debug) {
         ArrayList<ObsSurface> surfTaken = bot.returnSurfacesTakenRight(exploredArenaMap);
         updateNotYetTaken(surfTaken);
         LinkedHashMap<String, Point> obsList = bot.returnObsRight(exploredArenaMap);
 //        senseAndRepaint();
-        repaintWithoutSense();
+        if (debug) {
+            System.out.println("Before repaintWithoutSense");
+            scanner.nextLine();
+            repaintWithoutSense();
+            scanner.nextLine();
+            System.out.println("After repaintWithoutSense");
+        }
         takePicture(obsList.getOrDefault("L", null),
                     obsList.getOrDefault("M", null),
                     obsList.getOrDefault("R", null));
@@ -469,31 +501,31 @@ public class ImageRegExp extends ExplorationAlgo {
         if (lookRight()) {
 //            System.out.println("[DEBUG] Right Clear");
             moveBot(Actions.FACE_RIGHT);
-            obsList = imageRecognitionRight(exploredArenaMap);
+            obsList = imageRecognitionRight(exploredArenaMap, false);
             if (lookForward()) {
 //                System.out.println("  ->[DEBUG]Forward Clear");
                 moveBot(Actions.FORWARD);
-                obsList = imageRecognitionRight(exploredArenaMap);
+                obsList = imageRecognitionRight(exploredArenaMap, false);
             }
         } else if (lookForward()) {
 //            System.out.println("[DEBUG]Forward Clear");
             moveBot(Actions.FORWARD);
-            obsList = imageRecognitionRight(exploredArenaMap);
+            obsList = imageRecognitionRight(exploredArenaMap, false);
         } else if (lookLeft()) {
 //            System.out.println("[DEBUG]Left Clear");
             moveBot(Actions.FACE_LEFT);
-            obsList = imageRecognitionRight(exploredArenaMap);
+            obsList = imageRecognitionRight(exploredArenaMap, false);
             if (lookForward()) {
 //                System.out.println("  ->[DEBUG]Forward Clear");
                 moveBot(Actions.FORWARD);
-                obsList = imageRecognitionRight(exploredArenaMap);
+                obsList = imageRecognitionRight(exploredArenaMap, false);
             }
         } else {
 //            System.out.println("[DEBUG]Reverse Direction");
             moveBot(Actions.FACE_LEFT);
-            obsList = imageRecognitionRight(exploredArenaMap);
+            obsList = imageRecognitionRight(exploredArenaMap, false);
             moveBot(Actions.FACE_LEFT);
-            obsList = imageRecognitionRight(exploredArenaMap);
+            obsList = imageRecognitionRight(exploredArenaMap, false);
         }
         System.out.println("New Bot Direction: " + bot.getAgtDir());
 
