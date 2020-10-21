@@ -107,28 +107,28 @@ public class ImageRegExp extends ExplorationAlgo {
                 hasTakenBotBorder = true;
             }
             // right border: Turn to face SOUTH and take picture
-            else if (!hasTakenRightBorder && bot.getAgtCol() >= 12 && (bot.getAgtRow() >= 9 && bot.getAgtRow() <= 10)) {
+            else if (hasTakenBotBorder && !hasTakenRightBorder && bot.getAgtCol() >= 12 && (bot.getAgtRow() >= 9 && bot.getAgtRow() <= 10)) {
                 turnAndTakePicture(SOUTH);
                 hasTakenRightBorder = true;
-            } else if (!hasTakenRightBorder && bot.getAgtRow() > 10) {
+            } else if (hasTakenBotBorder && !hasTakenRightBorder && bot.getAgtRow() > 10) {
                 // went across the middle point but hasn't take picture
                 turnAndTakePicture(SOUTH);
                 hasTakenRightBorder = true;
             }
             // top border: Turn to face EAST and take picture
-            else if (!hasTakenTopBorder && bot.getAgtRow() >= 16 && (bot.getAgtCol() >= 6 && bot.getAgtCol() <= 8)) {
+            else if (hasTakenBotBorder && hasTakenRightBorder && !hasTakenTopBorder && bot.getAgtRow() >= 16 && (bot.getAgtCol() >= 6 && bot.getAgtCol() <= 8)) {
                 turnAndTakePicture(EAST);
                 hasTakenTopBorder = true;
-            } else if (!hasTakenTopBorder && bot.getAgtCol() < 6) {
+            } else if (hasTakenBotBorder && hasTakenRightBorder && !hasTakenTopBorder && bot.getAgtCol() < 6) {
                 // went across middle point but hasn't take picture
                 turnAndTakePicture(EAST);
                 hasTakenTopBorder = true;
             }
             // left border: Turn to face NORTH and take picture
-            else if (!hasTakenLeftBorder && bot.getAgtCol() <= 2 && (bot.getAgtRow() >= 9 && bot.getAgtRow() <= 10)) {
+            else if (hasTakenBotBorder && hasTakenRightBorder && hasTakenTopBorder && !hasTakenLeftBorder && bot.getAgtCol() <= 2 && (bot.getAgtRow() >= 9 && bot.getAgtRow() <= 10)) {
                 turnAndTakePicture(NORTH);
                 hasTakenLeftBorder = true;
-            } else if (!hasTakenLeftBorder && bot.getAgtRow() < 9) {
+            } else if (hasTakenBotBorder && hasTakenRightBorder && hasTakenTopBorder && !hasTakenLeftBorder && bot.getAgtRow() < 9) {
                 // went across the middle point but hasn't take picture
                 turnAndTakePicture(NORTH);
                 hasTakenLeftBorder = true;
@@ -564,6 +564,7 @@ public class ImageRegExp extends ExplorationAlgo {
      * Turn bot to a certain direction, taken picture, turn back
      */
     private void turnAndTakePicture(AgentSettings.Direction targetDir) {
+        System.out.println("Turn to face " + targetDir + " to take picture");
         AgentSettings.Direction curDir = bot.getAgtDir();
         turnBotDirectionWithoutSense(targetDir);
         imageRecognitionRight(exploredArenaMap, false);
