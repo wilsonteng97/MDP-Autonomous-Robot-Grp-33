@@ -119,8 +119,8 @@ void moveForward(int distance) {
   int last_tick_L = 0;
   while (tick_L <= distance || tick_R <= distance) {
     //PID TESTING
-    Serial.println(tick_L - tick_R);
-      delay(5);
+//    Serial.println(tick_L - tick_R);
+//      delay(5);
     if (myPID.Compute() || tick_L == last_tick_L) {
       md.setSpeeds(-(currentSpeedL - speed_O), -(currentSpeedR + speed_O)); 
     }

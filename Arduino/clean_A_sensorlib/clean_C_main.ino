@@ -24,9 +24,9 @@ void loop() {
         value=takeInt();
         moveForward(value * 10);
         delay(10);
-        returnSensorReading_Raw();
         alignRight();
         delay(10);
+        returnSensorReading_Raw();
         break;
       case 'A':
         value=takeInt();
@@ -56,10 +56,12 @@ void loop() {
         break;
       case 'V':
         alignFront();
+        delay(10);
         returnSensorReading_Raw();
         break;
       case 'B':
         alignRight();
+        delay(10);
         returnSensorReading_Raw();
         break;
       case 'Z':
