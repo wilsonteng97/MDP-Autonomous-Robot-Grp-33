@@ -179,10 +179,7 @@ public class Sensor {
             // Override previous obstacle value if front and right sensors detect no obstacle.
             // Override previous obstacle value if long-range sensor detects no obstacle in distance 5
             if (explorationArenaMap.getCell(row, col).isObstacle()) {
-                if (id.equals("SR1") || id.equals("SR2") || id.equals("SR3") || id.equals("SR4") || id.equals("SR5")) {
-                    explorationArenaMap.resetVirtualWalls(row, col);
-                    explorationArenaMap.setVirtualWallIfBorder(row, col);    // make sure never reset border
-                } else if (id.equals("LR1") && (i == 5)) {
+                if ((id.equals("SR1") || id.equals("SR2") || id.equals("SR3")) || ((id.equals("SR4") || id.equals("SR5")) && i != 1) || (id.equals("LR1") && i == 5)) {
                     explorationArenaMap.resetVirtualWalls(row, col);
                     explorationArenaMap.setVirtualWallIfBorder(row, col);    // make sure never reset border
                 } else {
