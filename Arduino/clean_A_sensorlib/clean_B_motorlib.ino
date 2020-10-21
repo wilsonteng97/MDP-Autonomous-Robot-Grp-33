@@ -15,13 +15,14 @@ const int TURN_RPM = 80;
 const int ROTATE_RPM = 60;
 
 //Distance to cover in ticks
-const int TURN_TICKS_L = 794;
-const int TURN_TICKS_R = 798;
+const int TURN_TICKS_L = 790;
+const int TURN_TICKS_R = 792;
 const int TICKS[10] = {558, 1120, 1710, 2310, 2915, 3515, 4155, 4735, 5350};
 
 //PID tunings
-const double kp = 20, ki = 0.0, kd = 0.01; // Arena 1 STEP
-const double rtKp = 3, rtKi = 0.0, rtKd = 0.002; // Arena 1 TURN RIGHT
+const double kp = 10, ki = 0.0, kd = 0.01; // Arena 1 STEP
+const double ltKp = 20, ltKi = 0.0, ltKd = 0.001; // Arena 1 TURN LEFT
+const double rtKp = 15, rtKi = 0.0, rtKd = 0.005; // Arena 1 TURN RIGHT
 const double fKp = 10, fKi = 0.0, fKd = 0.0; // Arena 1 FAST
 
 int MOVE_FAST_SPEED_L = calculateSpeedL(FAST_RPM);
@@ -309,8 +310,8 @@ void turnRight() {
   double offset = 0;
 
   while (tick_L < TURN_TICKS_R || tick_R < TURN_TICKS_R) {
-    //Serial.println(tick_L - tick_R);
-    //delay(5);
+//    Serial.println(tick_L - tick_R);
+//    delay(5);
     if (myPID.Compute())
       md.setSpeeds(-(currentSpeedL - speed_O), (currentSpeedR + speed_O));
   }
@@ -322,7 +323,7 @@ void turnLeft() {
   initializeTick();
   initializeMotor_Start();
 
-  myPID.SetTunings(kp, ki, kd);
+  myPID.SetTunings(ltKp, ltKi, ltKd);
   
   double currentSpeedL = TURN_MAX_SPEED_L;
   double currentSpeedR = TURN_MAX_SPEED_R;
@@ -330,8 +331,8 @@ void turnLeft() {
   
   while (tick_L < (TURN_TICKS_L) || tick_R < (TURN_TICKS_L)) {
 
-   // Serial.println(tick_L - tick_R);
-   // delay(5);
+//    Serial.println(tick_L - tick_R);
+//    delay(5);
     if (myPID.Compute())
       md.setSpeeds((currentSpeedL - speed_O), -(currentSpeedR + speed_O));
   }
