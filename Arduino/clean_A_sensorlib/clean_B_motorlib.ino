@@ -15,8 +15,8 @@ const int TURN_RPM = 80;
 const int ROTATE_RPM = 60;
 
 //Distance to cover in ticks
-const int TURN_TICKS_L = 792;
-const int TURN_TICKS_R = 788;
+const int TURN_TICKS_L = 794;
+const int TURN_TICKS_R = 798;
 const int TICKS[10] = {558, 1120, 1710, 2310, 2915, 3515, 4155, 4735, 5350};
 
 //PID tunings
@@ -119,8 +119,8 @@ void moveForward(int distance) {
   int last_tick_L = 0;
   while (tick_L <= distance || tick_R <= distance) {
     //PID TESTING
-    //Serial.println(tick_L - tick_R);
-    //  delay(5);
+    Serial.println(tick_L - tick_R);
+      delay(5);
     if (myPID.Compute() || tick_L == last_tick_L) {
       md.setSpeeds(-(currentSpeedL - speed_O), -(currentSpeedR + speed_O)); 
     }

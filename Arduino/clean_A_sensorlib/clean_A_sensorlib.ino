@@ -218,7 +218,7 @@ void readRightSensor_2() {
 }
 
 void readLeftSensor_1() {
-  double irDistance=13359/analogRead(A4) - 5.6914; //Long range sensor left A4
+  double irDistance=13597/analogRead(A4) - 5.7685; //Long range sensor left A4
   leftIR_1_Median.add(irDistance);
   if (leftIR_1_Median.getCount() >= NUM_SAMPLES_MEDIAN) {
     if (abs(leftIR_1_Median.getHighest() - leftIR_1_Median.getLowest()) > 40) {
