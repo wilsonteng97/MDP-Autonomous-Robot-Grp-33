@@ -35,6 +35,7 @@ abstract public class ExplorationAlgo {
     private boolean calibrationMode;
     private int lastCalibrate;
 
+
     ArrayList<Actions> actionsTaken = new ArrayList<>();
 
     private static String goToPointActionsString;
@@ -640,8 +641,8 @@ abstract public class ExplorationAlgo {
             bot.takeAction(Actions.FACE_RIGHT, 0, exploredArenaMap, realArenaMap);
             senseAndRepaint();
         }
-
     }
+
 
     protected long getElapsedTime() {
         currentTime = System.currentTimeMillis();

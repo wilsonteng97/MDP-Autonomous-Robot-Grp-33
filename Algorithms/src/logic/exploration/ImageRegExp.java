@@ -18,21 +18,21 @@ import java.util.logging.Logger;
 
 import static hardware.AgentSettings.Actions.ALIGN_RIGHT;
 import static hardware.AgentSettings.Direction.*;
-import static hardware.AgentSettings.Direction.SOUTH;
 import static network.NetworkMgr.INSTRUCTIONS;
-import static utils.MsgParsingUtils.parseFastestPathString;
 import static utils.MsgParsingUtils.parsePictureMsg;
 import static utils.SimulatorSettings.GOHOMESLOW_SLEEP;
 import static utils.SimulatorSettings.SIM;
 
 public class ImageRegExp extends ExplorationAlgo {
     private static final Logger LOGGER = Logger.getLogger(ImageRegExp.class.getName());
+    private boolean hasTakenBotBorder, hasTakenTopBorder, hasTakenLeftBorder, hasTakenRightBorder;
 
     // for image reg
     private static LinkedHashMap<String, ObsSurface> notYetTaken;
 
     public ImageRegExp(ArenaMap exploredArenaMap, ArenaMap realArenaMap, Agent bot, int coverageLimit, int timeLimit) {
         super(exploredArenaMap, realArenaMap, bot, coverageLimit, timeLimit);
+        hasTakenBotBorder = false; hasTakenTopBorder = false; hasTakenLeftBorder = false; hasTakenRightBorder = false;
     }
 
     @Override
@@ -92,10 +92,48 @@ public class ImageRegExp extends ExplorationAlgo {
             senseAndRepaint();
             nextMove();
             System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
-
             areaExplored = calculateAreaExplored();
             System.out.println("Area explored: " + areaExplored);
             System.out.println();
+
+            // Turn to face the middle and take picture
+            // bot border: Turn to face WEST and take picture
+            if (!hasTakenBotBorder && bot.getAgtRow() <= 3 && (bot.getAgtCol() >= 6 && bot.getAgtCol() <= 8)) {
+                turnAndTakePicture(WEST);
+                hasTakenBotBorder = true;
+            } else if (!hasTakenBotBorder && bot.getAgtCol() > 8) {
+                // went across middle point but hasn't take picture
+                turnAndTakePicture(WEST);
+                hasTakenBotBorder = true;
+            }
+            // right border: Turn to face SOUTH and take picture
+            else if (!hasTakenRightBorder && bot.getAgtCol() >= 12 && (bot.getAgtRow() >= 9 && bot.getAgtRow() <= 10)) {
+                turnAndTakePicture(SOUTH);
+                hasTakenRightBorder = true;
+            } else if (!hasTakenRightBorder && bot.getAgtRow() > 10) {
+                // went across the middle point but hasn't take picture
+                turnAndTakePicture(SOUTH);
+                hasTakenRightBorder = true;
+            }
+            // top border: Turn to face EAST and take picture
+            else if (!hasTakenTopBorder && bot.getAgtRow() >= 16 && (bot.getAgtCol() >= 6 && bot.getAgtCol() <= 8)) {
+                turnAndTakePicture(EAST);
+                hasTakenTopBorder = true;
+            } else if (!hasTakenTopBorder && bot.getAgtCol() < 6) {
+                // went across middle point but hasn't take picture
+                turnAndTakePicture(EAST);
+                hasTakenTopBorder = true;
+            }
+            // left border: Turn to face NORTH and take picture
+            else if (!hasTakenLeftBorder && bot.getAgtCol() <= 2 && (bot.getAgtRow() >= 9 && bot.getAgtRow() <= 10)) {
+                turnAndTakePicture(NORTH);
+                hasTakenLeftBorder = true;
+            } else if (!hasTakenLeftBorder && bot.getAgtRow() < 9) {
+                // went across the middle point but hasn't take picture
+                turnAndTakePicture(NORTH);
+                hasTakenLeftBorder = true;
+            }
+
 
             if (bot.getAgtY() == r && bot.getAgtX() == c) {
                 if (areaExplored >= 100) {
@@ -256,16 +294,12 @@ public class ImageRegExp extends ExplorationAlgo {
         if (numOfTurn == 1) {
             if (AgentSettings.Direction.clockwise90(bot.getAgtDir()) == targetDir) {
                 bot.takeAction(Actions.FACE_RIGHT, 0, exploredArenaMap, realArenaMap);
-//                senseAndRepaint();
             } else {
                 bot.takeAction(Actions.FACE_LEFT, 0, exploredArenaMap, realArenaMap);
-//                senseAndRepaint();
             }
         } else if (numOfTurn == 2) {
             bot.takeAction(Actions.FACE_RIGHT, 0, exploredArenaMap, realArenaMap);
-//            senseAndRepaint();
             bot.takeAction(Actions.FACE_RIGHT, 0, exploredArenaMap, realArenaMap);
-//            senseAndRepaint();
         }
 
     }
@@ -524,6 +558,16 @@ public class ImageRegExp extends ExplorationAlgo {
             comm.sendMsg(msg, INSTRUCTIONS);
         }
         System.out.println("Taking image: " + msg);
+    }
+
+    /**
+     * Turn bot to a certain direction, taken picture, turn back
+     */
+    private void turnAndTakePicture(AgentSettings.Direction targetDir) {
+        AgentSettings.Direction curDir = bot.getAgtDir();
+        turnBotDirectionWithoutSense(targetDir);
+        imageRecognitionRight(exploredArenaMap, false);
+        turnBotDirectionWithoutSense(curDir);
     }
 
     /**
