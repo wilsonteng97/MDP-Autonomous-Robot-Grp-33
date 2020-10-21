@@ -50,7 +50,15 @@ class ImageProcessingServer:
         print('\nStarted image processing server.\n')
         while True:
             print('Waiting for image from RPi...')
+
             cdt,frame = self.image_hub.recv_image()
+
+            if(cdt == "END"):
+                self.stitch_images()
+                print("Stitching Images...")
+                print("Image Processing Server Ended")
+                break
+                
             print('Connected and received frame at time: ' + str(datetime.now()))
 
             frame = imutils.resize(frame, width=IMAGE_WIDTH)
