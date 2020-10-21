@@ -19,7 +19,7 @@ double frontIR3_Diffs[] = {15.00, 25.40, 36.00};//15-25cm is 2 blocks away etc
 double rightIR1_Diffs[] = {15.70, 25.40 ,32.70};
 double rightIR2_Diffs[] = {15.80, 23.00 ,27.50};
 
-double leftIR1_Diffs[] = {19.00, 27.30, 35.00, 45.00, 52.50};
+double leftIR1_Diffs[] = {19.00, 27.30, 35.00, 46.00, 56.00};
 
 double frontIR1_Value = 0, frontIR2_Value = 0, frontIR3_Value = 0;
 double rightIR1_Value = 0, rightIR2_Value = 0, leftIR1_Value = 0;

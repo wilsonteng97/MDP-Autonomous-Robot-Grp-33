@@ -347,7 +347,7 @@ void rotateLeft(int distance) {
   
   double currentSpeed = ROTATE_MAX_SPEED;
   double offset = 0;
-  if (distance < 3)
+  if (distance < 1.0)
     return;
   while (tick_L < distance || tick_R < distance) {
     if (myPID.Compute())
@@ -364,7 +364,7 @@ void rotateRight(int distance) {
   
   double currentSpeed = ROTATE_MAX_SPEED;
   double offset = 0;
-  if (distance < 3)
+  if (distance < 1.0)
     return;
   while (tick_L < distance || tick_R < distance) {
     if (myPID.Compute())
@@ -403,8 +403,8 @@ void alignFront() {
   delay(2);
   int moved = 0;
   double diff_dis = getMin(getFrontIR1(),20.0,getFrontIR3());
-  while ((abs(diff_dis) < 10.0 && moved < 30) || (abs(diff_dis) > 10.2 && moved < 20)){
-      if (diff_dis > 10.2) {
+  while ((abs(diff_dis) < 10.0 && moved < 30) || (abs(diff_dis) > 10.4 && moved < 20)){
+      if (diff_dis > 10.4) {
         moveForwardCalibrate(1);
           md.setSpeeds(50, -50);
       } else {
