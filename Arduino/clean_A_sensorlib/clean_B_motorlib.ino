@@ -234,7 +234,7 @@ void moveForwardCalibrate(int distance1) {
   
   myPID.SetTunings(kp, ki, kd);
   
-  double distance = distance1/19.48*562.25;
+  double distance = distance1/19.48*400;
   if (distance < 1)
     return;  
   double currentSpeedL = 0;
@@ -270,7 +270,7 @@ void moveBackwardsCalibrate(int distance1) {
 
    myPID.SetTunings(kp, ki, kd);
   
-  double distance = distance1/19.48*562.25;
+  double distance = distance1/19.48*400;
   if (distance < 1)
     return;  
   double currentSpeedL = 0;
@@ -378,7 +378,7 @@ void alignRight() {
   delay(2);
   double diff = getRightIR1() - getRightIR2();
   int rotated = 0;
-  while (abs(diff) >= 0.1 && rotated < 20 && getRightIR1_Block() == getRightIR2_Block() && getRightIR1_Block()< 2) {
+  while (abs(diff) >= 0.1 && abs(diff)< 3.0 && rotated < 20 && getRightIR1_Block() == getRightIR2_Block() && getRightIR1_Block()< 2) {
     rotated++;
     if (diff > 0) {
       rotateRight(abs(diff * 5));
@@ -406,10 +406,10 @@ void alignFront() {
   double diff_dis = getMin(getFrontIR1(),20.0,getFrontIR3());
   while ((abs(diff_dis) < 9.50 && moved < 30) || (abs(diff_dis) > 9.90 && moved < 20)){
       if (diff_dis > 9.90) {
-        moveForwardCalibrate(0.5);
+        moveForwardCalibrate(1);
           md.setSpeeds(50, -50);
       } else {
-        moveBackwardsCalibrate(0.5);
+        moveBackwardsCalibrate(1);
           md.setSpeeds(-50, 50);
       }
       delay(2);
@@ -511,7 +511,7 @@ void initializeMotor_Start() {
 void initializeMotor_End() {
   
   md.setSpeeds(0, 0);
-  md.setBrakes(400, 380);
+  md.setBrakes(380, 380);
   
   delay(5);
 }
