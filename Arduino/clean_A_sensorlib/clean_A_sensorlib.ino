@@ -1,6 +1,6 @@
 #include <RunningMedian.h>
 // reading sensor values based on running median
-const int MAX_SMALL_SENSOR = 40;
+const int MAX_SMALL_SENSOR = 50;
 const int MAX_BIG_SENSOR = 150;
 const int NUM_SAMPLES_MEDIAN = 15;
 
@@ -14,10 +14,10 @@ RunningMedian leftIR_1_Median = RunningMedian(NUM_SAMPLES_MEDIAN);
 
 double frontIR1_Diffs[] = {15.30, 25.00, 35.00};
 double frontIR2_Diffs[] = {12.00, 20.80, 31.00};//how it works is that for a certain range like 5-15 cm obstacle is considered as one block away
-double frontIR3_Diffs[] = {15.10, 25.40, 41.20};//15-25cm is 2 blocks away etc
+double frontIR3_Diffs[] = {15.10, 25.40, 38.20};//15-25cm is 2 blocks away etc
 
-double rightIR1_Diffs[] = {15.70, 24.40 ,33.00};//6TH
-double rightIR2_Diffs[] = {15.80, 24.00 ,33.50};//5TH
+double rightIR1_Diffs[] = {15.70, 24.40 ,33.00};//6TH RIGHT BACK
+double rightIR2_Diffs[] = {15.80, 24.00 ,33.50};//5TH RIGHT FRONT
 
 double leftIR1_Diffs[] = {19.00, 27.00, 37.30, 51.50, 65.50};
 
