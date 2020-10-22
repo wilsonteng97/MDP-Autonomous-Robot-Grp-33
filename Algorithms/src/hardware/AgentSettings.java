@@ -26,6 +26,9 @@ public class AgentSettings {
     public static final short CAMERA_RANGE = 4;
 
     // Sensors default range (In grids)
+    public static final int SPECIAL_MIN = 1;
+    public static final int SPECIAL_MAX = 2;
+
     public static final int SHORT_MIN = 1;
     public static final int SHORT_MAX = 3;
 
@@ -34,7 +37,7 @@ public class AgentSettings {
 
     // Camera default range (In grids)
     public static final int CAMERA_MIN = 1;
-    public static final int CAMERA_MAX = SHORT_MAX;     // Should be the same as SHORT_MAX
+    public static final int CAMERA_MAX = Math.min(SHORT_MAX, SPECIAL_MIN);     // Should be the same as SHORT_MAX
 
     // Camera Direction
     public static final Direction CAMERA_DIRECTION = Direction.EAST;

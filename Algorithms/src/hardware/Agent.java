@@ -106,7 +106,7 @@ public class Agent {
         // 2 Right SR Sensors, 1 Top & 1 Bottom
         SR4 = new Sensor("SR4", AgentSettings.SHORT_MIN, AgentSettings.SHORT_MAX, ctrY + 1, ctrX + 1,
                 AgentSettings.Direction.clockwise90(agtDir));
-        SR5 = new Sensor("SR5", AgentSettings.SHORT_MIN, AgentSettings.SHORT_MAX, ctrY - 1, ctrX + 1,
+        SR5 = new Sensor("SR5", AgentSettings.SHORT_MIN, AgentSettings.SPECIAL_MAX, ctrY - 1, ctrX + 1,
                 AgentSettings.Direction.clockwise90(agtDir));
 
         // Add sensors to SensorLst
