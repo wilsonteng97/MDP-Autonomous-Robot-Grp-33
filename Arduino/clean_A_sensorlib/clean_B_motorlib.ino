@@ -16,11 +16,11 @@ const int ROTATE_RPM = 60;
 
 //Distance to cover in ticks
 const int TURN_TICKS_L = 790;
-const int TURN_TICKS_R = 792;
-const int TICKS[10] = {558, 1120, 1710, 2310, 2915, 3515, 4155, 4735, 5350};
+const int TURN_TICKS_R = 788;
+const int TICKS[10] = {555, 1120, 1710, 2310, 2915, 3515, 4155, 4735, 5350};
 
 //PID tunings
-const double kp = 10, ki = 0.0, kd = 0.01; // Arena 1 STEP
+const double kp = 20, ki = 0., kd = 0.0; // Arena 1 STEP
 const double ltKp = 20, ltKi = 0.0, ltKd = 0.001; // Arena 1 TURN LEFT
 const double rtKp = 15, rtKi = 0.0, rtKd = 0.005; // Arena 1 TURN RIGHT
 const double fKp = 10, fKi = 0.0, fKd = 0.0; // Arena 1 FAST
@@ -48,7 +48,7 @@ double previous_tick_L = 0;
 double previous_error = 0;
 
 DualVNH5019MotorShield md;
-PID myPID(&tick_L, &speed_O, &tick_R, kp, ki, kd, DIRECT);
+PID myPID(&tick_R, &speed_O, &tick_L, kp, ki, kd, DIRECT);
 
 //--------------------------Motor Codes-------------------------------
 void setupMotorEncoder() {
@@ -66,7 +66,7 @@ void stopMotorEncoder() {
 
 void setupPID() {
   myPID.SetMode(AUTOMATIC);
-  myPID.SetOutputLimits(-370, 370);
+  myPID.SetOutputLimits(-100, 100);
   myPID.SetSampleTime(5);
 }
 
@@ -121,7 +121,7 @@ void moveForward(int distance) {
   while (tick_L <= distance || tick_R <= distance) {
     //PID TESTING
 //    Serial.println(tick_L - tick_R);
-//      delay(5);
+//    delay(5);
     if (myPID.Compute() || tick_L == last_tick_L) {
       md.setSpeeds(-(currentSpeedL - speed_O), -(currentSpeedR + speed_O)); 
     }
@@ -404,12 +404,12 @@ void alignFront() {
   delay(2);
   int moved = 0;
   double diff_dis = getMin(getFrontIR1(),20.0,getFrontIR3());
-  while ((abs(diff_dis) < 10.0 && moved < 30) || (abs(diff_dis) > 10.4 && moved < 20)){
-      if (diff_dis > 10.4) {
-        moveForwardCalibrate(1);
+  while ((abs(diff_dis) < 9.50 && moved < 30) || (abs(diff_dis) > 9.90 && moved < 20)){
+      if (diff_dis > 9.90) {
+        moveForwardCalibrate(0.5);
           md.setSpeeds(50, -50);
       } else {
-        moveBackwardsCalibrate(1);
+        moveBackwardsCalibrate(0.5);
           md.setSpeeds(-50, 50);
       }
       delay(2);
@@ -488,11 +488,11 @@ double getMin(double f1, double f2, double f3) {
 }
 
 void leftMotorTime() {
-  tick_R++;
+  tick_L++;
 }
 
 void rightMotorTime() {
-  tick_L++;
+  tick_R++;
 }
 
 void initializeTick() {
