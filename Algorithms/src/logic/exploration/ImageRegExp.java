@@ -25,14 +25,14 @@ import static utils.SimulatorSettings.SIM;
 
 public class ImageRegExp extends ExplorationAlgo {
     private static final Logger LOGGER = Logger.getLogger(ImageRegExp.class.getName());
-    private boolean hasTakenBotBorder, hasTakenTopBorder, hasTakenLeftBorder, hasTakenRightBorder;
+//    private boolean hasTakenBotBorder, hasTakenTopBorder, hasTakenLeftBorder, hasTakenRightBorder;
 
     // for image reg
     private static LinkedHashMap<String, ObsSurface> notYetTaken;
 
     public ImageRegExp(ArenaMap exploredArenaMap, ArenaMap realArenaMap, Agent bot, int coverageLimit, int timeLimit) {
         super(exploredArenaMap, realArenaMap, bot, coverageLimit, timeLimit);
-        hasTakenBotBorder = false; hasTakenTopBorder = false; hasTakenLeftBorder = false; hasTakenRightBorder = false;
+//        hasTakenBotBorder = false; hasTakenTopBorder = false; hasTakenLeftBorder = false; hasTakenRightBorder = false;
     }
 
     @Override
@@ -86,53 +86,52 @@ public class ImageRegExp extends ExplorationAlgo {
         notYetTaken = getUnTakenSurfaces();
         System.out.println(notYetTaken);
 
+        if (!bot.isSim()) NetworkMgr.getInstance().sendMsg("Z", INSTRUCTIONS);
+        senseAndRepaint();
         long elapsedTime = 0;
         do {
-            if (!bot.isSim()) NetworkMgr.getInstance().sendMsg("Z", INSTRUCTIONS);
-            senseAndRepaint();
             nextMove();
             System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
             areaExplored = calculateAreaExplored();
             System.out.println("Area explored: " + areaExplored);
-            System.out.println();
 
             // Turn to face the middle and take picture
-            // bot border: Turn to face WEST and take picture
-            if (!hasTakenBotBorder && bot.getAgtRow() <= 3 && (bot.getAgtCol() >= 6 && bot.getAgtCol() <= 8)) {
-                turnAndTakePicture(WEST);
-                hasTakenBotBorder = true;
-            } else if (!hasTakenBotBorder && bot.getAgtCol() > 8) {
-                // went across middle point but hasn't take picture
-                turnAndTakePicture(WEST);
-                hasTakenBotBorder = true;
-            }
-            // right border: Turn to face SOUTH and take picture
-            else if (hasTakenBotBorder && !hasTakenRightBorder && bot.getAgtCol() >= 12 && (bot.getAgtRow() >= 9 && bot.getAgtRow() <= 10)) {
-                turnAndTakePicture(SOUTH);
-                hasTakenRightBorder = true;
-            } else if (hasTakenBotBorder && !hasTakenRightBorder && bot.getAgtRow() > 10) {
-                // went across the middle point but hasn't take picture
-                turnAndTakePicture(SOUTH);
-                hasTakenRightBorder = true;
-            }
-            // top border: Turn to face EAST and take picture
-            else if (hasTakenBotBorder && hasTakenRightBorder && !hasTakenTopBorder && bot.getAgtRow() >= 16 && (bot.getAgtCol() >= 6 && bot.getAgtCol() <= 8)) {
-                turnAndTakePicture(EAST);
-                hasTakenTopBorder = true;
-            } else if (hasTakenBotBorder && hasTakenRightBorder && !hasTakenTopBorder && bot.getAgtCol() < 6) {
-                // went across middle point but hasn't take picture
-                turnAndTakePicture(EAST);
-                hasTakenTopBorder = true;
-            }
-            // left border: Turn to face NORTH and take picture
-            else if (hasTakenBotBorder && hasTakenRightBorder && hasTakenTopBorder && !hasTakenLeftBorder && bot.getAgtCol() <= 2 && (bot.getAgtRow() >= 9 && bot.getAgtRow() <= 10)) {
-                turnAndTakePicture(NORTH);
-                hasTakenLeftBorder = true;
-            } else if (hasTakenBotBorder && hasTakenRightBorder && hasTakenTopBorder && !hasTakenLeftBorder && bot.getAgtRow() < 9) {
-                // went across the middle point but hasn't take picture
-                turnAndTakePicture(NORTH);
-                hasTakenLeftBorder = true;
-            }
+//            // bot border: Turn to face WEST and take picture
+//            if (!hasTakenBotBorder && bot.getAgtRow() <= 3 && (bot.getAgtCol() >= 6 && bot.getAgtCol() <= 8)) {
+//                turnAndTakePicture(WEST);
+//                hasTakenBotBorder = true;
+//            } else if (!hasTakenBotBorder && bot.getAgtCol() > 8) {
+//                // went across middle point but hasn't take picture
+//                turnAndTakePicture(WEST);
+//                hasTakenBotBorder = true;
+//            }
+//            // right border: Turn to face SOUTH and take picture
+//            else if (hasTakenBotBorder && !hasTakenRightBorder && bot.getAgtCol() >= 12 && (bot.getAgtRow() >= 9 && bot.getAgtRow() <= 10)) {
+//                turnAndTakePicture(SOUTH);
+//                hasTakenRightBorder = true;
+//            } else if (hasTakenBotBorder && !hasTakenRightBorder && bot.getAgtRow() > 10) {
+//                // went across the middle point but hasn't take picture
+//                turnAndTakePicture(SOUTH);
+//                hasTakenRightBorder = true;
+//            }
+//            // top border: Turn to face EAST and take picture
+//            else if (hasTakenBotBorder && hasTakenRightBorder && !hasTakenTopBorder && bot.getAgtRow() >= 16 && (bot.getAgtCol() >= 6 && bot.getAgtCol() <= 8)) {
+//                turnAndTakePicture(EAST);
+//                hasTakenTopBorder = true;
+//            } else if (hasTakenBotBorder && hasTakenRightBorder && !hasTakenTopBorder && bot.getAgtCol() < 6) {
+//                // went across middle point but hasn't take picture
+//                turnAndTakePicture(EAST);
+//                hasTakenTopBorder = true;
+//            }
+//            // left border: Turn to face NORTH and take picture
+//            else if (hasTakenBotBorder && hasTakenRightBorder && hasTakenTopBorder && !hasTakenLeftBorder && bot.getAgtCol() <= 2 && (bot.getAgtRow() >= 9 && bot.getAgtRow() <= 10)) {
+//                turnAndTakePicture(NORTH);
+//                hasTakenLeftBorder = true;
+//            } else if (hasTakenBotBorder && hasTakenRightBorder && hasTakenTopBorder && !hasTakenLeftBorder && bot.getAgtRow() < 9) {
+//                // went across the middle point but hasn't take picture
+//                turnAndTakePicture(NORTH);
+//                hasTakenLeftBorder = true;
+//            }
 
 
             if (bot.getAgtY() == r && bot.getAgtX() == c) {
