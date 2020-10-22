@@ -109,9 +109,9 @@ abstract public class ExplorationAlgo {
         System.out.println("[coverageLimit + timeLimit] " + coverageLimit + " | " + timeLimit);
 
         long elapsedTime = 0;
+        NetworkMgr.getInstance().sendMsg("Z", NetworkMgr.INSTRUCTIONS);
+        senseAndRepaint();
         do {
-            NetworkMgr.getInstance().sendMsg("Z", NetworkMgr.INSTRUCTIONS);
-            senseAndRepaint();
             nextMove();
             System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
 
