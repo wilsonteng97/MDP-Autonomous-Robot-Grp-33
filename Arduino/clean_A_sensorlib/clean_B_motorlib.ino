@@ -235,7 +235,7 @@ void moveForwardCalibrate(int distance1) {
   
   myPID.SetTunings(kp, ki, kd);
   
-  double distance = distance1/19.48*200;
+  double distance = distance1/19.48*100;
   if (distance < 1)
     return;  
   double currentSpeedL = 0;
@@ -271,7 +271,7 @@ void moveBackwardsCalibrate(int distance1) {
 
    myPID.SetTunings(kp, ki, kd);
   
-  double distance = distance1/19.48*200;
+  double distance = distance1/19.48*100;
   if (distance < 1)
     return;  
   double currentSpeedL = 0;
@@ -379,7 +379,7 @@ void alignRight() {
   delay(2);
   double diff = getRightIR1() - getRightIR2();
   int rotated = 0;
-  while (abs(diff) >= 0.1 && abs(diff)< 3.0 && rotated < 20 && getRightIR1_Block() == getRightIR2_Block() && getRightIR1_Block()< 2) {
+  while (abs(diff) >= 0.1 && abs(diff)< 4.0 && rotated < 20 && getRightIR1_Block() == getRightIR2_Block() && getRightIR1_Block()< 2) {
     rotated++;
     if (diff > 0) {
       rotateRight(abs(diff * 5));
@@ -405,8 +405,8 @@ void alignFront() {
   delay(2);
   int moved = 0;
   double diff_dis = getMin(getFrontIR1(),20.0,getFrontIR3());
-  while ((abs(diff_dis) < 10.10 && moved < 30) || (abs(diff_dis) > 10.40 && moved < 20)){
-      if (diff_dis > 10.50) {
+  while ((abs(diff_dis) < 10.20 && moved < 30) || (abs(diff_dis) > 10.40 && moved < 20)){
+      if (diff_dis > 10.40) {
         moveForwardCalibrate(1);
           md.setSpeeds(50, -50);
       } else {

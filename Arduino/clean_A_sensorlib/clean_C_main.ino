@@ -22,6 +22,17 @@ void loop() {
     switch (command) {
       case 'W':
         value=takeInt();
+        if (getRightIR1()<9 || getRightIR2()<9 && value==1)
+        {
+          turnRight();
+          delay(10);
+          alignFront();
+          delay(10);
+          turnLeft();
+          delay(10);
+          alignRight();
+          delay(10);
+        }
         moveForward(value * 10);
         delay(10);
         alignRight();
