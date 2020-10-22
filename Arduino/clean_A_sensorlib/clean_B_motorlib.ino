@@ -347,7 +347,7 @@ void rotateLeft(int distance) {
   
   double currentSpeed = ROTATE_MAX_SPEED;
   double offset = 0;
-  if (distance < 1.0)
+  if (distance < 2.0)
     return;
   while (tick_L < distance || tick_R < distance) {
     if (myPID.Compute())
@@ -364,7 +364,7 @@ void rotateRight(int distance) {
   
   double currentSpeed = ROTATE_MAX_SPEED;
   double offset = 0;
-  if (distance < 1.0)
+  if (distance < 2.0)
     return;
   while (tick_L < distance || tick_R < distance) {
     if (myPID.Compute())
