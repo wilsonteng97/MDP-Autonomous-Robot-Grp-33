@@ -37,13 +37,18 @@
             app:layout_constraintStart_toEndOf="@+id/map"
             app:layout_constraintTop_toTopOf="parent">
 
-            <com.example.mdp.JoyStick
-                android:id="@+id/joystick"
-                android:layout_width="fill_parent"
-                android:layout_height="0dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+            <TextView
+                android:id="@+id/statusView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/indicator"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                android:text="Stationary"
+                android:textAlignment="center"
+                android:textColor="@color/xiketic"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:layout_editor_absoluteX="66dp" />
 
             <Switch
                 android:id="@+id/updateSwitch"
@@ -60,19 +65,6 @@
                 app:layout_constraintTop_toBottomOf="@+id/statusView" />
 
             <Switch
-                android:id="@+id/touchSwitch"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="Enable Touch"
-                android:textAlignment="textStart"
-                android:textColor="#FFFFFF"
-                android:theme="@style/SwitchTheme"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/updateSwitch" />
-
-            <Switch
                 android:id="@+id/tiltSensorSwitch"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -83,7 +75,28 @@
                 android:theme="@style/SwitchTheme"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/touchSwitch" />
+                app:layout_constraintTop_toBottomOf="@+id/updateSwitch" />
+
+            <com.example.mdp.JoyStick
+                android:id="@+id/joystick"
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <!--            <Switch-->
+<!--                android:id="@+id/touchSwitch"-->
+<!--                android:layout_width="fill_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="10dp"-->
+<!--                android:text="Enable Touch"-->
+<!--                android:textAlignment="textStart"-->
+<!--                android:textColor="#FFFFFF"-->
+<!--                android:theme="@style/SwitchTheme"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@+id/updateSwitch" />-->
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/bluetoothContainer"
@@ -120,18 +133,47 @@
                     app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <TextView
-                android:id="@+id/statusView"
+            <Button
+                android:id="@+id/updateMap"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/indicator"
-                android:paddingTop="15dp"
-                android:paddingBottom="15dp"
-                android:text="Stationary"
-                android:textAlignment="center"
-                android:textColor="@color/xiketic"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:layout_editor_absoluteX="66dp" />
+                android:layout_marginTop="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/roundercornerbutton"
+                android:onClick="updateMapManual"
+                android:text="Update Map"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                app:layout_constraintTop_toBottomOf="@+id/bluetoothContainer"
+                tools:layout_editor_absoluteX="273dp" />
+
+<!--            <Button-->
+<!--            android:id="@+id/emergencyImg"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="10dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:background="@drawable/roundercornerbuttonemergency"-->
+<!--            android:onClick="emergencyImg"-->
+<!--            android:text="E. Image"-->
+<!--            android:textColor="#FFFFFF"-->
+<!--            android:textSize="12sp"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/updateMap"-->
+<!--            tools:layout_editor_absoluteX="273dp" />-->
+
+<!--            <Button-->
+<!--                android:id="@+id/emergencyMap"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="10dp"-->
+<!--                android:layout_weight="1"-->
+<!--                android:background="@drawable/roundercornerbuttonemergency"-->
+<!--                android:onClick="emergencyMap"-->
+<!--                android:text="E. Map"-->
+<!--                android:textColor="#FFFFFF"-->
+<!--                android:textSize="12sp"-->
+<!--                app:layout_constraintTop_toBottomOf="@+id/emergencyImg"-->
+<!--                tools:layout_editor_absoluteX="273dp" />-->
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -303,16 +345,16 @@
                     android:layout_marginBottom="10dp">
 
                     <Button
-                        android:id="@+id/updateMap"
+                        android:id="@+id/imagesCoordinate"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="10dp"
                         android:layout_weight="1"
                         android:background="@drawable/roundercornerbutton"
-                        android:onClick="updateMapManual"
-                        android:text="Update Map"
+                        android:onClick="sendImagesCoordinate"
+                        android:text="Images Coordinate"
                         android:textColor="#FFFFFF"
-                        android:textSize="12sp"
+                        android:textSize="11sp"
                         app:layout_columnWeight="1" />
 
                     <Button

@@ -1,5 +1,7 @@
 package com.example.mdp;
 
+import java.security.spec.ECField;
+
 public class MapDescriptorFormat {
 
     public static String binToHex(String bin) {
@@ -12,8 +14,16 @@ public class MapDescriptorFormat {
         int temp;
         for (int i = 0; i < hexStr.length(); i++) {
             tempStr += hexStr.charAt(i);
-            temp = Integer.parseInt(tempStr, 16);
-            tempBin = Integer.toBinaryString(temp);
+            try {
+                temp = Integer.parseInt(tempStr, 16);
+            } catch (Exception e) {
+                temp = 0;
+            }
+            try {
+                tempBin = Integer.toBinaryString(temp);
+            } catch (Exception e) {
+                tempBin = "0";
+            }
             if (tempBin.length() != 4)
                 while (tempBin.length() != 4)
                     tempBin = "0" + tempBin;
@@ -21,6 +31,14 @@ public class MapDescriptorFormat {
             tempStr = "";
         }
         return bin;
+    }
+
+    public static String checkBar (String s) {
+        int length = s.length();
+        if (s.substring(length-1).equals("|")) {
+            return s.substring(0, length-3);
+        }
+        return s;
     }
 
 //    public static String[] generateMapDescriptorFormat(Map map) {

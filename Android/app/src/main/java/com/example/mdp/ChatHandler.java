@@ -8,7 +8,12 @@ public class ChatHandler {
     }
 
     public String[] splitCommand (String msg) {
-        msg = cleanCommand(new String[] {"\"", "{", "}", "[", "]"} ,msg);
+        msg = cleanCommand(new String[] {"\"", "{", "}", "[", "]", " ", "(", ")"} ,msg);
+        String[] arr = msg.split("\\|");
+        return arr;
+    }
+
+    public String[] getCommand (String msg) {
         String[] arr = msg.split(":", 2);
         return arr;
     }

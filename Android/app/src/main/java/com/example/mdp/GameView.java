@@ -10,15 +10,10 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-
 import androidx.annotation.Nullable;
-
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 public class GameView extends View {
@@ -30,14 +25,15 @@ public class GameView extends View {
     public static final int DOWN = 270;
     public static final int ROTATELEFT = -1;
     public static final int ROTATERIGHT = 1;
-    public static final int WAYPOINT = 20;
+    public static final int BACKWARD = 2;
 
     //Constant values -> Drawing
     public static final int FREE = 0;
     public static final int EXPLORED = 17;
     public static final int OBSTACLE = 16;
+    public static final int WAYPOINT = 18;
     public static final int ROBOT = 19;
-    public static final int FINISH = 18;
+    public static final int FINISH = 20;
 
     //Map
     int col, row;
@@ -46,7 +42,9 @@ public class GameView extends View {
     float cellSize = 0;
     String mapDescriptor = "";
     String mapDescriptor2 = "";
+    int[] waypoint = {-1, -1};
     Rect temp;
+    ArrayList<ArrayList<Integer>> specialObstacle = new ArrayList<>();
 
     //Robot
     Robot robot;
@@ -66,7 +64,7 @@ public class GameView extends View {
     Bitmap sign13Bitmap;
     Bitmap sign14Bitmap;
     Bitmap sign15Bitmap;
-    Bitmap waypoint;
+    Bitmap waypointBitmap;
 
     //Destination
     Destination finish;
@@ -139,10 +137,18 @@ public class GameView extends View {
     }
 
     public void addObstacle (int x, int y, int id) { //16 for normal obstacle
-        try {
-            mapState[y][x] = id;
-        } catch (Exception e) {
+        if (id != 16) {
+            try {
+                ArrayList<Integer> _ = new ArrayList<Integer>();
+                _.add(id);
+                _.add(x);
+                _.add(y);
+                specialObstacle.add(_);
+            } catch (Exception e) {
 
+            }
+        } else {
+            mapState[y][x] = OBSTACLE;
         }
         this.post(new Runnable() {
             @Override
@@ -150,6 +156,16 @@ public class GameView extends View {
                 invalidate();
             }
         });
+    }
+
+    public void specialObstacleToMap () {
+        int id, x, y;
+        for (ArrayList<Integer> so : specialObstacle) {
+            id = so.get(0);
+            x = so.get(1);
+            y = so.get(2);
+            mapState[y][x] = id;
+        }
     }
 
     public void addExplored (int x, int y, char _) {
@@ -175,13 +191,13 @@ public class GameView extends View {
     private void initMap () {
         for (int j = 0; j<row; j++) {
             for (int i = 0; i<col; i++) {
-                if (mapState[j][i] < 1 || mapState[j][i] > 17) {
+                if (mapState[j][i] < 1 || mapState[j][i] > 18) {
                     mapState[j][i] = FREE;
                 }
             }
         }
         mapToMap(finish.x, finish.y, FINISH);
-        mapToMap(robot.x, robot.y, ROBOT);
+//        mapToMap(robot.x, robot.y, ROBOT);
     }
 
     public void resetMap () {
@@ -190,8 +206,11 @@ public class GameView extends View {
                 mapState[j][i] = FREE;
             }
         }
+        specialObstacle = new ArrayList<ArrayList<Integer>>();
         mapToMap(finish.x, finish.y, FINISH);
-        mapToMap(robot.x, robot.y, ROBOT);
+        robot.x = 0;
+        robot.y = 19;
+        robot.dir = UP;
         this.post(new Runnable() {
             @Override
             public void run() {
@@ -217,7 +236,7 @@ public class GameView extends View {
         sign13Bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.x_13);
         sign14Bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.y_14);
         sign15Bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.z_15);
-        waypoint = BitmapFactory.decodeResource(getResources(), R.mipmap.waypoint);
+        waypointBitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.waypoint);
     }
 
     private void initRobot () {
@@ -297,13 +316,14 @@ public class GameView extends View {
         sign13Bitmap = Bitmap.createScaledBitmap(sign13Bitmap, (int) cellSize, (int) cellSize, false);
         sign14Bitmap = Bitmap.createScaledBitmap(sign14Bitmap, (int) cellSize, (int) cellSize, false);
         sign15Bitmap = Bitmap.createScaledBitmap(sign15Bitmap, (int) cellSize, (int) cellSize, false);
-        waypoint = Bitmap.createScaledBitmap(waypoint, (int) cellSize, (int) cellSize, false);
+        waypointBitmap = Bitmap.createScaledBitmap(waypointBitmap, (int) cellSize, (int) cellSize, false);
     }
 
     private void drawCanvas (Canvas canvas) {
         Rect bgRect = new Rect(0, 0, (int) cellSize*15, (int) cellSize*20);
         bg.setBounds(bgRect);
         bg.draw(canvas);
+        specialObstacleToMap();
         for (int j = 0; j<row; j++) {
             for (int i = 0; i<col; i++) {
                 temp = new Rect((int) cellSize*i,(int)cellSize*j, (int)cellSize*(i+1), (int)cellSize*(j+1));
@@ -374,16 +394,23 @@ public class GameView extends View {
                     case FINISH:
                         canvas.drawRect(temp, finishPaint);
                         break;
-                    case WAYPOINT:
-                        drawSigns(temp, canvas, waypoint);
-                        break;
                     default:
                         break;
                 }
             }
         }
+        try {
+            drawWaypoint(waypoint[0], waypoint[1], canvas);
+        } catch (Exception e) {
+
+        }
         canvas.drawText("Finish", (int) finish.x*cellSize+10, (int) finish.y*cellSize - 10, textPaint);
-        drawRobot(robot.pos, canvas);
+        drawRobot(canvas);
+    }
+
+    public void drawWaypoint (int x, int y, Canvas canvas) {
+        temp = new Rect((int) cellSize*x,(int)cellSize*y, (int)cellSize*(x+1), (int)cellSize*(y+1));
+        drawSigns(temp, canvas, waypointBitmap);
     }
 
     int rotationDegree;
@@ -394,7 +421,10 @@ public class GameView extends View {
         canvas.drawBitmap(b, matrix, null);
     }
 
-    private void drawRobot (Rect pos, Canvas canvas) {
+    private void drawRobot (Canvas canvas) {
+        int i = robot.x;
+        int j = (robot.y)-2;
+        Rect pos = new Rect((int) cellSize*i,(int) cellSize*j, (int) (3*cellSize+cellSize*i), (int) (3*cellSize+cellSize*j));
         Matrix matrix = new Matrix();
         switch (robot.dir) {
             case UP:
@@ -420,6 +450,10 @@ public class GameView extends View {
         moveRobot(robot.dir, updateMap);
     }
 
+    public void moveBackward (boolean updateMap) {
+        moveRobot(BACKWARD, updateMap);
+    }
+
     //to move robot
     public void moveRobot (int direction, boolean updateMap) {
 
@@ -428,9 +462,39 @@ public class GameView extends View {
 //        public static final int RIGHT = 0;
 //        public static final int DOWN = 270;
 
+        int rotation = robot.dir - direction;
+        if (direction == BACKWARD || Math.abs(rotation) == 180) {
+            switch (robot.dir){
+                case UP:
+                    canMove(robot.x, robot.y+1, ROBOT);
+                    robot.dir = UP;
+                    break;
+                case RIGHT:
+                    canMove(robot.x - 1, robot.y, ROBOT);
+                    robot.dir = RIGHT;
+                    break;
+                case DOWN:
+                    canMove(robot.x, robot.y - 1, ROBOT);
+                    robot.dir = DOWN;
+                    break;
+                case LEFT:
+                    canMove(robot.x + 1, robot.y, ROBOT);
+                    robot.dir = LEFT;
+                    break;
+                default:
+                    break;
+            }
+            initMap();
+            if (updateMap) updateMapManual();
+            return;
+        }
+
         int newdir;
         if (direction != 1 && direction != -1) {
-            int rotation = robot.dir - direction;
+            rotation = robot.dir - direction;
+            if ((rotation) == 270) rotation = -90;
+            else if ((rotation) == -270) rotation = 90;
+
             if (rotation > 90 || rotation < -90) return;
             String ins = "";
             if (rotation == 90) {
@@ -503,7 +567,7 @@ public class GameView extends View {
 
         for (int j = 0; j <= 2; j++) {
             for (int i = 0; i <= 2; i++) {
-                if ((mapState[newY-j][newX+i] != FREE && mapState[newY-j][newX+i] != FINISH) && mapState[newY-j][newX+i] != what) {
+                if ((mapState[newY-j][newX+i] != FREE && mapState[newY-j][newX+i] != FINISH && mapState[newY-j][newX+i] != EXPLORED && mapState[newY-j][newX+i] != WAYPOINT) && mapState[newY-j][newX+i] != what) {
                     return;
                 }
             }
@@ -519,7 +583,7 @@ public class GameView extends View {
                 finish.y = newY;
                 break;
         }
-
+        initMap();
         return;
     }
 
@@ -579,11 +643,6 @@ public class GameView extends View {
         return true;
     }
 
-//    public void sendWaypoint () {
-//        String newPos = ( row - (finish.y)) +","+(finish.x+1);
-//        BluetoothCommunication.writeMsg(newPos.getBytes(Charset.defaultCharset()));
-//    }
-
     public void toggleTouchScreen () {
         canTouch = !canTouch;
     }
@@ -602,6 +661,17 @@ public class GameView extends View {
 
     public String getMapDescriptor2 () {
         return mapDescriptor2;
+    }
+
+    public void setWaypoint (int x, int y, Boolean updateMap) {
+        waypoint[0] = x;
+        waypoint[1] = y;
+        initMap();
+        if (updateMap) updateMapManual();
+    }
+
+    public ArrayList<ArrayList<Integer>> getSpecialObstacle () {
+        return specialObstacle;
     }
 }
 
