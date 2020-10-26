@@ -4,10 +4,9 @@ import hardware.Agent;
 import hardware.AgentSettings;
 import hardware.AgentSettings.Actions;
 import hardware.AgentSettings.Direction;
+import map.ArenaMap;
 import map.Cell;
-import map.Map;
 import map.MapSettings;
-import network.NetworkMgr;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,19 +26,27 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
 
     private Scanner scanner = new Scanner(System.in);
 
-    public AStarHeuristicSearch(Map exploredMap, Agent bot) {
-        super(exploredMap, bot);
+    /**
+     * Constructor called during Fastest Path leaderboard.
+     * explorationMode not used here
+     */
+    public AStarHeuristicSearch(ArenaMap exploredArenaMap, Agent bot) {
+        super(exploredArenaMap, bot);
     }
 
-    public AStarHeuristicSearch(Map exploredMap, Agent bot, Map realMap) {
-        super(exploredMap, bot, realMap);
+    /**
+     * Constructor called during Exploration/ImageReg leaderboard (to use fastest path for ImageReg leaderboard)
+     * explorationMode = true
+     */
+    public AStarHeuristicSearch(ArenaMap exploredArenaMap, Agent bot, ArenaMap realArenaMap) {
+        super(exploredArenaMap, bot, realArenaMap);
     }
 
     /**
      * Initialise the FastestPathAlgo object.
      */
-    protected void initObject(Map map, Agent bot) {
-        super.initObject(map, bot);
+    protected void initObject(ArenaMap arenaMap, Agent bot) {
+        super.initObject(arenaMap, bot);
         this.toVisit = new ArrayList<>();
         this.visited = new ArrayList<>();
         this.parents = new HashMap<>();
@@ -49,7 +56,7 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
         // Initialise gCosts array
         for (int i = 0; i < MapSettings.MAP_ROWS; i++) {
             for (int j = 0; j < MapSettings.MAP_COLS; j++) {
-                Cell cell = map.getCell(i, j);
+                Cell cell = arenaMap.getCell(i, j);
                 if (!canBeVisited(cell)) {
                     gCosts[i][j] = AgentSettings.INFINITE_COST;
                 } else {
@@ -122,7 +129,7 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
      */
     @Override
     public String runFastestPath(int goalRow, int goalCol) {
-        System.out.println("Calculating fastest path from (" + current.getRow() + ", " + current.getCol() + ") to goal (" + goalRow + ", " + goalCol + ")...");
+        System.out.println("Calculating fastest path from (" + current.getX() + ", " + current.getY() + ") to goal (" + goalCol + ", " + goalRow + ")...");
 
         Stack<Cell> path;
         do {
@@ -139,7 +146,7 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
             visited.add(current);       // add current to visited
             toVisit.remove(current);    // remove current from toVisit
 
-            if (visited.contains(exploredMap.getCell(goalRow, goalCol))) {
+            if (visited.contains(exploredArenaMap.getCell(goalRow, goalCol))) {
                 System.out.println("Goal visited. Path found!");
                 path = getPath(goalRow, goalCol);
                 printFastestPath(path);
@@ -147,26 +154,26 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
             }
 
             // Setup neighbors of current cell. [Top, Bottom, Left, Right].
-            if (exploredMap.checkValidCell(current.getRow() + 1, current.getCol())) {
-                neighbors[0] = exploredMap.getCell(current.getRow() + 1, current.getCol());
+            if (exploredArenaMap.checkValidCell(current.getRow() + 1, current.getCol())) {
+                neighbors[0] = exploredArenaMap.getCell(current.getRow() + 1, current.getCol());
                 if (!canBeVisited(neighbors[0])) {
                     neighbors[0] = null;
                 }
             }
-            if (exploredMap.checkValidCell(current.getRow() - 1, current.getCol())) {
-                neighbors[1] = exploredMap.getCell(current.getRow() - 1, current.getCol());
+            if (exploredArenaMap.checkValidCell(current.getRow() - 1, current.getCol())) {
+                neighbors[1] = exploredArenaMap.getCell(current.getRow() - 1, current.getCol());
                 if (!canBeVisited(neighbors[1])) {
                     neighbors[1] = null;
                 }
             }
-            if (exploredMap.checkValidCell(current.getRow(), current.getCol() - 1)) {
-                neighbors[2] = exploredMap.getCell(current.getRow(), current.getCol() - 1);
+            if (exploredArenaMap.checkValidCell(current.getRow(), current.getCol() - 1)) {
+                neighbors[2] = exploredArenaMap.getCell(current.getRow(), current.getCol() - 1);
                 if (!canBeVisited(neighbors[2])) {
                     neighbors[2] = null;
                 }
             }
-            if (exploredMap.checkValidCell(current.getRow(), current.getCol() + 1)) {
-                neighbors[3] = exploredMap.getCell(current.getRow(), current.getCol() + 1);
+            if (exploredArenaMap.checkValidCell(current.getRow(), current.getCol() + 1)) {
+                neighbors[3] = exploredArenaMap.getCell(current.getRow(), current.getCol() + 1);
                 if (!canBeVisited(neighbors[3])) {
                     neighbors[3] = null;
                 }
@@ -206,7 +213,7 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
     @Override
     protected Stack<Cell> getPath(int goalRow, int goalCol) {
         Stack<Cell> actualPath = new Stack<>();
-        Cell temp = exploredMap.getCell(goalRow, goalCol);
+        Cell temp = exploredArenaMap.getCell(goalRow, goalCol);
 
         while (true) {
             actualPath.push(temp);
@@ -252,7 +259,7 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
 
             System.out.println("Movement " + Actions.print(m) + " from (" + tempBot.getAgtCol() + ", " + tempBot.getAgtRow() + ") to (" + temp.getCol() + ", " + temp.getRow() + ")");
 
-            tempBot.takeAction(m, 1, exploredMap, realMap);
+            tempBot.takeAction(m, 1, exploredArenaMap, realArenaMap);
             movements.add(m);
             outputString.append(Actions.print(m));
 //            scanner.nextLine();
@@ -268,46 +275,59 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
                     }
                 }
 
-                bot.takeAction(x, 1, exploredMap, realMap);
-                this.exploredMap.repaint();
+                bot.takeAction(x, 1, exploredArenaMap, realArenaMap);
+                this.exploredArenaMap.repaint();
 
-                // During exploration, use sensor data to update exploredMap.
+                // During exploration, use sensor data to update exploredArenaMap.
                 if (explorationMode) {
                     bot.setSensors();
-                    bot.senseEnv(this.exploredMap, this.realMap);
-                    this.exploredMap.repaint();
+                    bot.senseEnv(this.exploredArenaMap, this.realArenaMap);
+                    this.exploredArenaMap.repaint();
                 }
             }
         }
         else {
             // TODO real bot
+            System.out.println("[ASTAR] in Image Rec mode");
+            for (Actions x : movements) {
+                if (x == Actions.FORWARD) {
+                    if (!canMoveForward()) {
+                        System.out.println("Early termination of fastest path execution.");
+                        return "T";
+                    }
+                }
+
+                bot.takeActionNotSent(x, 1, exploredArenaMap, realArenaMap);
+                this.exploredArenaMap.repaint();
+            }
+
+
 //            int fCount = 0;
 //            for (Actions x : movements) {
 //                if (x == Actions.FORWARD) {
 //                    fCount++;
 //                    if (fCount == 10) {
-//                        bot.takeAction(Actions.FORWARD, fCount, exploredMap, realMap);
+//                        bot.takeAction(Actions.FORWARD, fCount, exploredArenaMap, realArenaMap);
 //                        fCount = 0;
-//                        exploredMap.repaint();
+//                        exploredArenaMap.repaint();
 //                    }
 //                } else if (x == Actions.FACE_RIGHT || x == Actions.FACE_LEFT) {
 //                    if (fCount > 0) {
-//                        bot.takeAction(Actions.FORWARD, fCount, exploredMap, realMap);
+//                        bot.takeAction(Actions.FORWARD, fCount, exploredArenaMap, realArenaMap);
 //                        fCount = 0;
-//                        exploredMap.repaint();
+//                        exploredArenaMap.repaint();
 //                    }
 //
-//                    bot.takeAction(x, 1, exploredMap, realMap);
-//                    exploredMap.repaint();
+//                    bot.takeAction(x, 1, exploredArenaMap, realArenaMap);
+//                    exploredArenaMap.repaint();
 //                }
 //            }
 //
 //            if (fCount > 0) {
-//                bot.takeAction(Actions.FORWARD, fCount, exploredMap, realMap);
-//                exploredMap.repaint();
+//                bot.takeAction(Actions.FORWARD, fCount, exploredArenaMap, realArenaMap);
+//                exploredArenaMap.repaint();
 //            }
 //            NetworkMgr.getInstance().sendMsg(outputString + "", NetworkMgr.INSTRUCTIONS);
-
         }
 
         System.out.println("\nMovements: " + outputString.toString());

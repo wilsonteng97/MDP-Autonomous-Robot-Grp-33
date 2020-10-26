@@ -1,5 +1,7 @@
 package hardware;
 
+import java.awt.*;
+
 public class AgentSettings {
     // Agent Start Direction
     public static final Direction START_DIR = Direction.NORTH;
@@ -25,10 +27,17 @@ public class AgentSettings {
 
     // Sensors default range (In grids)
     public static final int SHORT_MIN = 1;
-    public static final int SHORT_MAX = 3;
+    public static final int SHORT_MAX = 2;
 
     public static final int LONG_MIN = 1;
-    public static final int LONG_MAX = 6;
+    public static final int LONG_MAX = 5;
+
+    // Camera default range (In grids)
+    public static final int CAMERA_MIN = 1;
+    public static final int CAMERA_MAX = SHORT_MAX;     // Should be the same as SHORT_MAX
+
+    // Camera Direction
+    public static final Direction CAMERA_DIRECTION = Direction.EAST;
 
     public static final double RIGHT_THRES = 0.5;       // Threshold value or right sensor will calibrate once exceeded
     public static final double RIGHT_DIS_THRES_CLOSE = 1.0;
@@ -102,7 +111,7 @@ public class AgentSettings {
         TAKE_PICTURE,
 
         ERROR;                                      // Error
-          
+
           public static String print(Actions m) {
             switch (m) {
                 case FORWARD:
@@ -111,12 +120,12 @@ public class AgentSettings {
                     return "S|";
                 case FACE_RIGHT:
                     return "D1|";
-                case MOVE_RIGHT:
-                    return "D1|";
+//                case MOVE_RIGHT:
+//                    return "D1|";
                 case FACE_LEFT:
                     return "A1|";
-                case MOVE_LEFT:
-                    return "A1|";
+//                case MOVE_LEFT:
+//                    return "A1|";
                 case START_EXP:
                     return "ES";
                 case ALIGN_FRONT:
@@ -131,16 +140,6 @@ public class AgentSettings {
                 default:
                     return "E";
             }
-        }
-
-        /**
-         * parse and returns a taking picture command
-         * @param row row of the sticker
-         * @param col column of the sticker
-         * @return taking picture command
-         */
-        public static String parsePictureMsg(int row, int col) {
-            return "P|" + Integer.toString(col) + "|" + Integer.toString(row) + "|";
         }
     }
 }

@@ -1,6 +1,6 @@
 package hardware;
 
-import map.Map;
+import map.ArenaMap;
 
 import java.awt.*;
 
@@ -86,28 +86,28 @@ public class Sensor {
     /**
      * Simulation detection Methods
      */
-    public int simDetect(Map explorationMap, Map simMap) {
+    public int simDetect(ArenaMap explorationArenaMap, ArenaMap simArenaMap) {
         // range in measured in blks
         switch (sensorDir) {
             case NORTH:
-                return checkSimMap(explorationMap, simMap, 1, 0);
+                return checkSimMap(explorationArenaMap, simArenaMap, 1, 0);
             case EAST:
-                return checkSimMap(explorationMap, simMap, 0, 1);
+                return checkSimMap(explorationArenaMap, simArenaMap, 0, 1);
             case SOUTH:
-                return checkSimMap(explorationMap, simMap, -1, 0);
+                return checkSimMap(explorationArenaMap, simArenaMap, -1, 0);
             case WEST:
-                return checkSimMap(explorationMap, simMap, 0, -1);
+                return checkSimMap(explorationArenaMap, simArenaMap, 0, -1);
         }
         return -1;
     }
-    public int checkSimMap(Map explorationMap, Map simMap, int rowDisplacement, int colDisplacement) {
+    public int checkSimMap(ArenaMap explorationArenaMap, ArenaMap simArenaMap, int rowDisplacement, int colDisplacement) {
         // Check if starting point is valid for sensors with lowerRange > 1.
         if (lowerLimit > 1) {
             for (int i = 1; i < this.lowerLimit; i++) {
                 int row = this.getBoardY() + (rowDisplacement * i);
                 int col = this.getBoardX() + (colDisplacement * i);
 
-                if (!explorationMap.checkValidCell(row, col) || simMap.getCell(row, col).isObstacle()) {
+                if (!explorationArenaMap.checkValidCell(row, col) || simArenaMap.getCell(row, col).isObstacle()) {
                     return i;
                 }
             }
@@ -118,10 +118,10 @@ public class Sensor {
         for (int i = this.lowerLimit; i <= this.upperLimit; i++) {
             int row = this.getBoardY() + (rowDisplacement * i);
             int col = this.getBoardX() + (colDisplacement * i);
-            if (!explorationMap.checkValidCell(row, col)) {
+            if (!explorationArenaMap.checkValidCell(row, col)) {
                 return i;
             }
-            if (simMap.getCell(row, col).isObstacle()) {
+            if (simArenaMap.getCell(row, col).isObstacle()) {
                 return i;
             }
         }
@@ -132,20 +132,20 @@ public class Sensor {
     /**
      * Real detection Methods
      */
-    public void realDetect(Map explorationMap, int sensorVal) {
+    public void realDetect(ArenaMap explorationArenaMap, int sensorVal) {
         switch (sensorDir) {
             case NORTH:
-                detectObstacle(explorationMap, sensorVal, 1, 0); break;
+                detectObstacle(explorationArenaMap, sensorVal, 1, 0); break;
             case EAST:
-                detectObstacle(explorationMap, sensorVal, 0, 1); break;
+                detectObstacle(explorationArenaMap, sensorVal, 0, 1); break;
             case SOUTH:
-                detectObstacle(explorationMap, sensorVal, -1, 0); break;
+                detectObstacle(explorationArenaMap, sensorVal, -1, 0); break;
             case WEST:
-                detectObstacle(explorationMap, sensorVal, 0, -1); break;
+                detectObstacle(explorationArenaMap, sensorVal, 0, -1); break;
         }
     }
 
-    public void detectObstacle(Map explorationMap, int sensorVal, int rowDispl, int colDispl) {
+    public void detectObstacle(ArenaMap explorationArenaMap, int sensorVal, int rowDispl, int colDispl) {
         if (sensorVal == 0) return;  // return value for LR sensor if obstacle before lowerRange
 
         // If above fails, check if starting point is valid for sensors with lowerRange > 1.
@@ -153,38 +153,42 @@ public class Sensor {
             int row = this.getBoardY() + (rowDispl * i);
             int col = this.getBoardX() + (colDispl * i);
 
-            if (!explorationMap.checkValidCell(row, col)) return;
-            if (explorationMap.getCell(row, col).isObstacle()) return;
+            if (!explorationArenaMap.checkValidCell(row, col)) return;
+            if (explorationArenaMap.getCell(row, col).isObstacle()) return;
         }
 
-        // Update Map according to sensor value
+        // Update ArenaMap according to sensor value
         for (int i = this.lowerLimit; i <= this.upperLimit; i++) {
             int row = this.getBoardY() + (rowDispl * i);
             int col = this.getBoardX() + (colDispl * i);
-            if (!explorationMap.checkValidCell(row, col)) {
+            if (!explorationArenaMap.checkValidCell(row, col)) {
 //                System.out.println("[DEBUG] Cell[" + col + ", " + row + "]" + "is not valid");
                 return;
             }
 
 //            System.out.println("[!SETEXPLORED@" + i + "] Cell[" + col + ", " + row + "]");
-            explorationMap.setVirtualWallIfBorder(row, col);
-            explorationMap.getCell(row, col).setExplored(true);
+            explorationArenaMap.setVirtualWallIfBorder(row, col);
+            explorationArenaMap.getCell(row, col).setExplored(true);
             if (sensorVal == i) {
 //                System.out.println("[!SETOBSTACLE@" + i + "] Cell[" + col + ", " + row + "]");
-                explorationMap.getCell(row, col).setObstacle(true);
-                explorationMap.createVirtualWalls(row, col);
-//                System.out.println("Cell is virtualwall @[" + (row+1) + ", " + col + "]=" + explorationMap.getCell(row+1, col).isVirtualWall());
+                explorationArenaMap.getCell(row, col).setObstacle(true);
+                explorationArenaMap.createVirtualWalls(row, col);
+//                System.out.println("Cell is virtualwall @[" + (row+1) + ", " + col + "]=" + explorationArenaMap.getCell(row+1, col).isVirtualWall());
                 return;
             }
             // Override previous obstacle value if front and right sensors detect no obstacle.
-            // Override previous obstacle value if long-range sensor detects no obstacle in distance 5 and 6
-            if (explorationMap.getCell(row, col).isObstacle()) {
+            // Override previous obstacle value if long-range sensor detects no obstacle in distance 5
+            if (explorationArenaMap.getCell(row, col).isObstacle()) {
                 if (id.equals("SR1") || id.equals("SR2") || id.equals("SR3") || id.equals("SR4") || id.equals("SR5")) {
-                    explorationMap.resetVirtualWalls(row, col);
-                } else if (id.equals("LR1") && (i == 5 || i == 6)) {
-                    explorationMap.resetVirtualWalls(row, col);
+                    explorationArenaMap.resetVirtualWalls(row, col);
+                    explorationArenaMap.setVirtualWallIfBorder(row, col);    // make sure never reset border
+                } else if (id.equals("LR1") && (i == 5)) {
+                    explorationArenaMap.resetVirtualWalls(row, col);
+                    explorationArenaMap.setVirtualWallIfBorder(row, col);    // make sure never reset border
+                } else {
+                    explorationArenaMap.setVirtualWallIfBorder(row, col);    // make sure never reset border
+                    break;
                 }
-                explorationMap.setVirtualWallIfBorder(row, col);    // make sure never reset border
             }
         }
     }

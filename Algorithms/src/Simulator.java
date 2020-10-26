@@ -1,10 +1,11 @@
 import hardware.Agent;
 import hardware.AgentSettings;
 import logic.exploration.ExplorationAlgo;
+import logic.exploration.ImageRegExp;
 import logic.exploration.RightWallHugging;
 import logic.fastestpath.AStarHeuristicSearch;
 import logic.fastestpath.FastestPathAlgo;
-import map.Map;
+import map.ArenaMap;
 import map.MapSettings;
 import network.NetworkMgr;
 import utils.SimulatorSettings;
@@ -19,6 +20,7 @@ import java.util.Scanner;
 
 import static utils.FileIO.loadMap;
 import static utils.MapDescriptorFormat.generateMapDescriptorFormat;
+import static utils.MsgParsingUtils.parseFastestPathString;
 
 public class Simulator {
     private static final boolean sim = SimulatorSettings.SIM;
@@ -31,8 +33,8 @@ public class Simulator {
     private static Agent agt;
     private static AgentSettings.Direction startDir = AgentSettings.START_DIR;  // Agent Start Direction
 
-    private static Map dummyMap = null;                                         // real map
-    private static Map explorationMap = null;                                   // exploration map
+    private static ArenaMap dummyArenaMap = null;                                         // real map
+    private static ArenaMap explorationArenaMap = null;                                   // exploration map
 
     private static int timeLimit = 3600;                                        // in seconds
     private static int coverageLimit = 300;                                     // coverage limit
@@ -54,9 +56,9 @@ public class Simulator {
 
         agt = new Agent(MapSettings.START_ROW, MapSettings.START_COL, sim);
         if (sim) {
-            dummyMap = new Map(agt); dummyMap.setAllUnexplored();
+            dummyArenaMap = new ArenaMap(agt); dummyArenaMap.setAllUnexplored();
         }
-        explorationMap = new Map(agt); explorationMap.setAllUnexplored();
+        explorationArenaMap = new ArenaMap(agt); explorationArenaMap.setAllUnexplored();
 
         displayAll();
 
@@ -100,9 +102,9 @@ public class Simulator {
 
     private static void initMainLayout() {
         CardLayout cl = ((CardLayout) _mapCards.getLayout());
-        _mapCards.add(explorationMap, "EXPLORATION");
+        _mapCards.add(explorationArenaMap, "EXPLORATION");
         if (sim) {
-            _mapCards.add(dummyMap, "DUMMY_MAP");
+            _mapCards.add(dummyArenaMap, "DUMMY_MAP");
             cl.show(_mapCards, "DUMMY_MAP");
         } else {
             cl.show(_mapCards, "EXPLORATION");
@@ -121,8 +123,8 @@ public class Simulator {
 
     private static void addButtons() {
         if (sim) {
-            // Load Map Button
             JButton btn_LoadMap = new JButton("Load Map");
+            // Load ArenaMap Button
             formatButton(btn_LoadMap);
             btn_LoadMap.addMouseListener(new MouseAdapter() {
                 public void mousePressed(MouseEvent e) {
@@ -138,12 +140,12 @@ public class Simulator {
                         @Override
                         public void keyPressed(KeyEvent e) {
                             if (e.getKeyCode()==KeyEvent.VK_ENTER) {
-                                explorationMap.resetMap();
+                                explorationArenaMap.resetMap();
                                 loadMapDialog.setVisible(false);
-                                loadMap(dummyMap, loadTF.getText());
+                                loadMap(dummyArenaMap, loadTF.getText());
                                 CardLayout cl = ((CardLayout) _mapCards.getLayout());
                                 cl.show(_mapCards, "DUMMY_MAP");
-                                dummyMap.repaint();
+                                dummyArenaMap.repaint();
                             }
                         }
 
@@ -158,12 +160,12 @@ public class Simulator {
                     loadMapButton.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mousePressed(MouseEvent e) {
-                            explorationMap.resetMap();
+                            explorationArenaMap.resetMap();
                             loadMapDialog.setVisible(false);
-                            loadMap(dummyMap, loadTF.getText());
+                            loadMap(dummyArenaMap, loadTF.getText());
                             CardLayout cl = ((CardLayout) _mapCards.getLayout());
                             cl.show(_mapCards, "DUMMY_MAP");
-                            dummyMap.repaint();
+                            dummyArenaMap.repaint();
                         }
 
 
@@ -182,14 +184,14 @@ public class Simulator {
             formatButton(btn_ShowDummyMap);
             btn_ShowDummyMap.addMouseListener(new MouseAdapter() {
                 public void mousePressed(MouseEvent e) {
-                    if (dummyMap.isMapExplored()) {
-                        dummyMap.setAllUnexplored();
+                    if (dummyArenaMap.isMapExplored()) {
+                        dummyArenaMap.setAllUnexplored();
                     } else {
-                        dummyMap.setAllExplored();
+                        dummyArenaMap.setAllExplored();
                     }
                     CardLayout cl = ((CardLayout) _mapCards.getLayout());
                     cl.show(_mapCards, "DUMMY_MAP");
-                    dummyMap.repaint();
+                    dummyArenaMap.repaint();
                 }
             });
             _buttons.add(btn_ShowDummyMap);
@@ -200,31 +202,38 @@ public class Simulator {
             protected Integer doInBackground() throws Exception {
                 System.out.println("Executing Fastest path");
                 agt.setAgtCtrCoord(agt.getAgtRow(), agt.getAgtCol());
-//                if (!sim) agt.setSim(true);
-                Agent fakeBot = new Agent(agt.getAgtRow(), agt.getAgtCol(), true);
-                explorationMap.repaint();
+
 
                 if (!sim) {
+                    Agent fakeBot = new Agent(agt.getAgtRow(), agt.getAgtCol(), true);
+                    FastestPathAlgo toWaypoint, toGoal ;
+                    toWaypoint = new AStarHeuristicSearch(explorationArenaMap, fakeBot);
+                    startToWaypoint = toWaypoint.runFastestPath(waypointY, waypointX);
+
+                    toGoal = new AStarHeuristicSearch(explorationArenaMap, fakeBot);
+                    waypointToGoal = toGoal.runFastestPath(MapSettings.GOAL_ROW, MapSettings.GOAL_COL);
+
                     // Transmit signal to get Agent to start. Initiate handshake signals.
                     while (true) {
                         System.out.println("Waiting for FS|...");
                         String msg = comm.receiveMsg();
                         if (msg.equals(NetworkMgr.FP_START)) break;
                     }
+
+                    NetworkMgr.getInstance().sendMsg("K" + parseFastestPathString(startToWaypoint + waypointToGoal) + "|", NetworkMgr.INSTRUCTIONS);
+                } else {
+                    explorationArenaMap.repaint();
+                    readWaypointFromStdin();
+                    FastestPathAlgo toWaypoint, toGoal ;
+                    toWaypoint = new AStarHeuristicSearch(explorationArenaMap, agt);
+                    startToWaypoint = parseFastestPathString(toWaypoint.runFastestPath(waypointY, waypointX));
+
+                    toGoal = new AStarHeuristicSearch(explorationArenaMap, agt);
+                    waypointToGoal = parseFastestPathString(toGoal.runFastestPath(MapSettings.GOAL_ROW, MapSettings.GOAL_COL));
+
+                    System.out.println("K" + startToWaypoint + waypointToGoal + "|");
                 }
 
-                FastestPathAlgo toGoal, toWaypoint;
-                if (sim) readWaypointFromStdin();
-                toWaypoint = new AStarHeuristicSearch(explorationMap, fakeBot);
-                startToWaypoint = toWaypoint.runFastestPath(waypointY, waypointX);
-
-                toGoal = new AStarHeuristicSearch(explorationMap, fakeBot);
-                waypointToGoal = toGoal.runFastestPath(MapSettings.GOAL_ROW, MapSettings.GOAL_COL);
-
-                if (!sim) NetworkMgr.getInstance().sendMsg("K" + startToWaypoint + waypointToGoal, NetworkMgr.INSTRUCTIONS);
-                else System.out.println("K" + startToWaypoint + waypointToGoal);
-
-//                if (!sim) agt.setSim(false);
 
                 return 222;
             }
@@ -239,13 +248,17 @@ public class Simulator {
                 row = MapSettings.START_ROW;
                 col = MapSettings.START_COL;
 
-                explorationMap.setAllUnexplored();
-                if (dummyMap != null && sim) dummyMap.setAllUnexplored();
+                explorationArenaMap.setAllUnexplored();
+                if (dummyArenaMap != null && sim) dummyArenaMap.setAllUnexplored();
                 agt.setAgtCtrCoord(row, col);
-                explorationMap.repaint();
+                explorationArenaMap.repaint();
 
                 ExplorationAlgo exploration;
-                exploration = new RightWallHugging(explorationMap, dummyMap, agt, coverageLimit, timeLimit);
+                if (SimulatorSettings.EXPLORATION_ALGO_MODE == "P") {
+                    exploration = new ImageRegExp(explorationArenaMap, dummyArenaMap, agt, coverageLimit, timeLimit);
+                } else {
+                    exploration = new RightWallHugging(explorationArenaMap, dummyArenaMap, agt, coverageLimit, timeLimit);
+                }
 
 //                if (!sim) {
                     // Transmit signal to start Agent
@@ -259,7 +272,7 @@ public class Simulator {
                     new FastestPath().execute();
                 }
 
-                stringMDF = generateMapDescriptorFormat(explorationMap);
+                stringMDF = generateMapDescriptorFormat(explorationArenaMap);
                 return 111;
             }
         }
@@ -293,9 +306,9 @@ public class Simulator {
         class TimeExploration extends SwingWorker<Integer, String> {
             protected Integer doInBackground() throws Exception {
                 agt.setAgtCtrCoord(MapSettings.START_ROW, MapSettings.START_COL);
-                explorationMap.repaint();
+                explorationArenaMap.repaint();
 
-                ExplorationAlgo timeExplo = new RightWallHugging(explorationMap, dummyMap, agt, coverageLimit, timeLimit);
+                ExplorationAlgo timeExplo = new RightWallHugging(explorationArenaMap, dummyArenaMap, agt, coverageLimit, timeLimit);
                 timeExplo.runExploration();
 
                 return 333;
@@ -361,9 +374,9 @@ public class Simulator {
         class CoverageExploration extends SwingWorker<Integer, String> {
             protected Integer doInBackground() throws Exception {
                 agt.setAgtCtrCoord(MapSettings.START_ROW, MapSettings.START_COL);
-                explorationMap.repaint();
+                explorationArenaMap.repaint();
 
-                ExplorationAlgo coverageExplo = new RightWallHugging(explorationMap, dummyMap, agt, coverageLimit, timeLimit);
+                ExplorationAlgo coverageExplo = new RightWallHugging(explorationArenaMap, dummyArenaMap, agt, coverageLimit, timeLimit);
                 coverageExplo.runExploration();
 
                 return 444;

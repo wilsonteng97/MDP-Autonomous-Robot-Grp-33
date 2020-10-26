@@ -5,13 +5,13 @@ import hardware.AgentSettings;
 import hardware.AgentSettings.Actions;
 import hardware.AgentSettings.Direction;
 import logic.fastestpath.AStarHeuristicSearch;
+import map.ArenaMap;
 import map.Cell;
-import map.Map;
 import map.MapSettings;
 import network.NetworkMgr;
 import utils.SimulatorSettings;
 
-import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -19,13 +19,14 @@ import java.util.Queue;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
+import static utils.MsgParsingUtils.parseFastestPathString;
 import static utils.SimulatorSettings.GOHOMESLOW_SLEEP;
 import static utils.SimulatorSettings.SIM;
 
 abstract public class ExplorationAlgo {
-    protected final Map exploredMap;
-    protected final Map realMap;
-    protected final Agent bot;
+    protected static ArenaMap exploredArenaMap;
+    protected static ArenaMap realArenaMap;
+    protected static Agent bot;
     protected int coverageLimit = 300;
     protected int timeLimit = 3600;    // in second
     protected int areaExplored;
@@ -36,12 +37,14 @@ abstract public class ExplorationAlgo {
 
     ArrayList<Actions> actionsTaken = new ArrayList<>();
 
+    private static String goToPointActionsString;
+
 
     Scanner scanner = new Scanner(System.in);
 
-    public ExplorationAlgo(Map exploredMap, Map realMap, Agent bot, int coverageLimit, int timeLimit) {
-        this.exploredMap = exploredMap;
-        this.realMap = realMap;
+    public ExplorationAlgo(ArenaMap exploredArenaMap, ArenaMap realArenaMap, Agent bot, int coverageLimit, int timeLimit) {
+        this.exploredArenaMap = exploredArenaMap;
+        this.realArenaMap = realArenaMap;
         this.bot = bot;
         this.coverageLimit = coverageLimit;
         this.timeLimit = timeLimit * 1000;
@@ -49,27 +52,17 @@ abstract public class ExplorationAlgo {
         System.out.println("[coverageLimit && timeLimit(s)] " + coverageLimit + " | " + timeLimit);
     }
 
-    public void runExploration() {
-        // FIXME check for real bot connection
-//        System.out.println("[DEBUG: runExploration] executed");
+    public void runExploration() throws InterruptedException {
         if (!bot.isSim()) {
             System.out.println("Starting calibration...");
 
-//            NetworkMgr.getInstance().receiveMsg();
-
-//            // TODO initial calibration
             if (!bot.isSim()) {
-                // Facing the back
-//                bot.takeAction(Actions.BACKWARD, 0, exploredMap, realMap);
-//                NetworkMgr.getInstance().receiveMsg();
-//                bot.takeAction(Actions.ALIGN_FRONT, 0, exploredMap, realMap);
-//                NetworkMgr.getInstance().receiveMsg();
-//                bot.takeAction(Actions.FACE_LEFT);
-//                NetworkMgr.getInstance().receiveMsg();
-//                bot.takeAction(Actions.ALIGN_FRONT, 0, exploredMap, realMap);
-//                NetworkMgr.getInstance().receiveMsg();
-//                bot.takeAction(Actions.FACE_LEFT);
-//                NetworkMgr.getInstance().receiveMsg();
+                // Facing NORTH
+                turnBotDirection(Direction.WEST);
+                moveBot(Actions.ALIGN_FRONT);
+                turnBotDirection(Direction.SOUTH);
+                moveBot(Actions.ALIGN_FRONT);
+                turnBotDirection(Direction.EAST);
             }
 
             while (true) {
@@ -91,12 +84,15 @@ abstract public class ExplorationAlgo {
         System.out.println();
 
         explorationLoop(bot.getAgtY(), bot.getAgtX());
+        if (!bot.isSim()) NetworkMgr.getInstance().sendMsg("EF|", NetworkMgr.INSTRUCTIONS);
+        alignBeforeFastestPath();
+
 
 //        if (!bot.isSim()) {
 //            NetworkMgr.getInstance().sendMsg(null, NetworkMgr.BOT_START);
 //        }
 //        senseAndRepaint();
-        exploredMap.repaint();
+        exploredArenaMap.repaint();
     }
 
 
@@ -113,13 +109,10 @@ abstract public class ExplorationAlgo {
 
         long elapsedTime = 0;
         do {
-//            senseAndRepaint();
+            NetworkMgr.getInstance().sendMsg("Z", NetworkMgr.INSTRUCTIONS);
+            senseAndRepaint();
             nextMove();
             System.out.printf("Current Bot Pos: [%d, %d]\n", bot.getAgtX(), bot.getAgtY());
-
-            // take picture on RHS if can
-            tryTakePicture();
-
 
             areaExplored = calculateAreaExplored();
             System.out.println("Area explored: " + areaExplored);
@@ -184,7 +177,7 @@ abstract public class ExplorationAlgo {
                 destCell = findSurroundingReachable(targetRow, targetCol);
                 if (destCell != null) {
                     System.out.println(destCell);
-                    keepExploring = new AStarHeuristicSearch(exploredMap, bot, realMap);
+                    keepExploring = new AStarHeuristicSearch(exploredArenaMap, bot, realArenaMap);
                     keepExploring.runFastestPath(destCell.getRow(), destCell.getCol());
                     i = 0;
                 } else {
@@ -303,16 +296,19 @@ abstract public class ExplorationAlgo {
     }
 
     /**
-     * Send the bot to START and points the bot northwards
+     * Send the bot to START
      */
     protected void goHome() {
         if (!bot.hasEnteredGoal() && coverageLimit == 300 && timeLimit == 3600) {
-            AStarHeuristicSearch goToGoal = new AStarHeuristicSearch(exploredMap, bot, realMap);
-            goToGoal.runFastestPath(AgentSettings.GOAL_ROW, AgentSettings.GOAL_COL);
+            AStarHeuristicSearch goToGoal = new AStarHeuristicSearch(exploredArenaMap, bot);
+            String actionString = goToGoal.runFastestPath(AgentSettings.GOAL_ROW, AgentSettings.GOAL_COL);
+
+            if (!bot.isSim()) NetworkMgr.getInstance().sendMsg("K" + actionString, NetworkMgr.INSTRUCTIONS);
         }
 
-        AStarHeuristicSearch returnToStart = new AStarHeuristicSearch(exploredMap, bot, realMap);
-        returnToStart.runFastestPath(AgentSettings.START_ROW, AgentSettings.START_COL);
+        AStarHeuristicSearch returnToStart = new AStarHeuristicSearch(exploredArenaMap, bot);
+        String actionString = returnToStart.runFastestPath(AgentSettings.START_ROW, AgentSettings.START_COL);
+        if (!bot.isSim()) NetworkMgr.getInstance().sendMsg("K" + actionString, NetworkMgr.INSTRUCTIONS);
 
         System.out.println("Exploration complete!");
         areaExplored = calculateAreaExplored();
@@ -320,16 +316,38 @@ abstract public class ExplorationAlgo {
         System.out.println(", " + areaExplored + " Cells");
         System.out.println((getElapsedTime()) / 1000 + " Seconds");
 
-        // realbot
+    }
+
+    void alignBeforeFastestPath() {
+        // Align before fastest path
         if (!bot.isSim()) {
             turnBotDirection(Direction.SOUTH);
             moveBot(Actions.ALIGN_RIGHT);
             moveBot(Actions.ALIGN_FRONT);
             turnBotDirection(Direction.WEST);
             moveBot(Actions.ALIGN_FRONT);
+            turnBotDirection(Direction.EAST);
+            moveBot(Actions.ALIGN_RIGHT);
         }
         turnBotDirection(Direction.NORTH);
         System.out.println("Went home");
+    }
+
+    protected void goToPoint(int row, int col) {
+        goToPoint(new Point(col, row));
+    }
+
+    protected void goToPoint(Point coord) {
+        System.out.println(coord);
+        System.out.println(bot.getAgtPos());
+        if (coord.x == bot.getAgtX() && coord.y == bot.getAgtY()) {
+            System.out.println("[goToPoint()] Same position, fastest path skipped.");
+            return;
+        }
+        AStarHeuristicSearch goToPoint = new AStarHeuristicSearch(exploredArenaMap, bot);
+        String mergedOutputString = parseFastestPathString(goToPoint.runFastestPath(coord.y, coord.x));
+
+        if (!bot.isSim()) NetworkMgr.getInstance().sendMsg("K" + mergedOutputString, NetworkMgr.INSTRUCTIONS);
     }
 
     /**
@@ -354,7 +372,7 @@ abstract public class ExplorationAlgo {
         HashSet<Cell> hasSeen = new HashSet<>();
         ArrayList<Cell> result = new ArrayList<>();
 
-        curCell = exploredMap.getCell(0, 0);
+        curCell = exploredArenaMap.getCell(0, 0);
         queue.add(curCell);
         hasSeen.add(curCell);
         while (queue.size() != 0) {
@@ -363,7 +381,7 @@ abstract public class ExplorationAlgo {
             if (!curCell.isExplored() ) result.add(curCell);
 
             if (curRow + 1 < MapSettings.MAP_ROWS && curCol < MapSettings.MAP_COLS) {
-                topCell = exploredMap.getCell(curRow + 1, curCol);
+                topCell = exploredArenaMap.getCell(curRow + 1, curCol);
                 if (!hasSeen.contains(topCell)) {
                     hasSeen.add(topCell);
                     queue.add(topCell);
@@ -371,7 +389,7 @@ abstract public class ExplorationAlgo {
             }
 
             if (curRow < MapSettings.MAP_ROWS && curCol + 1 < MapSettings.MAP_COLS) {
-                rightCell = exploredMap.getCell(curRow, curCol + 1);
+                rightCell = exploredArenaMap.getCell(curRow, curCol + 1);
                 if (!hasSeen.contains(rightCell)) {
                     hasSeen.add(rightCell);
                     queue.add(rightCell);
@@ -392,28 +410,28 @@ abstract public class ExplorationAlgo {
         while (true) {
             // bot
             if (row - offset >= 0) {
-                tmpCell = exploredMap.getCell(row - offset, col);
+                tmpCell = exploredArenaMap.getCell(row - offset, col);
                 if (!tmpCell.isExplored() || tmpCell.isObstacle()) botClear = false;
                 else if (botClear && !tmpCell.isObstacle() && !tmpCell.isVirtualWall()) return tmpCell;
             }
 
             // left
             if (col - offset >= 0) {
-                tmpCell = exploredMap.getCell(row, col - offset);
+                tmpCell = exploredArenaMap.getCell(row, col - offset);
                 if (!tmpCell.isExplored() || tmpCell.isObstacle()) leftClear = false;
                 else if (leftClear && !tmpCell.isObstacle() && !tmpCell.isVirtualWall()) return tmpCell;
             }
 
             // right
             if (row + offset < MapSettings.MAP_ROWS) {
-                tmpCell = exploredMap.getCell(row + offset, col);
+                tmpCell = exploredArenaMap.getCell(row + offset, col);
                 if (!tmpCell.isExplored() || tmpCell.isObstacle()) rightClear = false;
                 else if (rightClear && !tmpCell.isObstacle() && !tmpCell.isVirtualWall()) return tmpCell;
             }
 
             // top
             if (col + offset < MapSettings.MAP_COLS) {
-                tmpCell = exploredMap.getCell(row, col + offset);
+                tmpCell = exploredArenaMap.getCell(row, col + offset);
                 if (!tmpCell.isExplored() || tmpCell.isObstacle()) topClear = false;
                 else if (topClear && !tmpCell.isObstacle() && !tmpCell.isVirtualWall()) return tmpCell;
             }
@@ -428,9 +446,9 @@ abstract public class ExplorationAlgo {
      * Returns true for cells that are explored and not obstacles.
      */
     protected boolean isExploredNotObstacle(int r, int c) {
-//        System.out.println(exploredMap.getCell(r, c));
-        if (exploredMap.checkValidCell(r, c)) {
-            Cell tmp = exploredMap.getCell(r, c);
+//        System.out.println(exploredArenaMap.getCell(r, c));
+        if (exploredArenaMap.checkValidCell(r, c)) {
+            Cell tmp = exploredArenaMap.getCell(r, c);
             return (tmp.isExplored() && !tmp.isObstacle());
         }
         return false;
@@ -440,8 +458,8 @@ abstract public class ExplorationAlgo {
      * Returns true for cells that are explored, not virtual walls and not obstacles.
      */
     protected boolean isExploredAndFree(int r, int c) {
-        if (exploredMap.checkValidCell(r, c)) {
-            Cell b = exploredMap.getCell(r, c);
+        if (exploredArenaMap.checkValidCell(r, c)) {
+            Cell b = exploredArenaMap.getCell(r, c);
             return (b.isExplored() && !b.isVirtualWall() && !b.isObstacle());
         }
         return false;
@@ -454,7 +472,7 @@ abstract public class ExplorationAlgo {
         int result = 0;
         for (int r = 0; r < MapSettings.MAP_ROWS; r++) {
             for (int c = 0; c < MapSettings.MAP_COLS; c++) {
-                if (exploredMap.getCell(r, c).isExplored()) {
+                if (exploredArenaMap.getCell(r, c).isExplored()) {
                     result++;
                 }
             }
@@ -495,77 +513,86 @@ abstract public class ExplorationAlgo {
         //        System.out.println("[Agent Dir] " + bot.getAgtDir());
         System.out.println("Action executed: " + m);
         actionsTaken.add(m);
-        bot.takeAction(m, 1, exploredMap, realMap);
+        bot.takeAction(m, 1, exploredArenaMap, realArenaMap);
 
         senseAndRepaint();
 
     }
 
     /**
-     * Sets the bot's sensors, processes the sensor data and repaints the map.
+     * Sets the bot's sensors and processes the sensor data.
      */
-    protected int[] senseAndRepaint() {
+    protected int[] sense() {
         bot.setSensors();
-        int[] sensorReadings = bot.senseEnv(exploredMap, realMap);
-        exploredMap.repaint();
+        int[] sensorReadings = bot.senseEnv(exploredArenaMap, realArenaMap);
 
         return sensorReadings;
     }
 
     /**
-     * take picture and send out coordinate is there are walls/obstacles in surrounding
+     * Sets the bot's sensors, processes the sensor data and repaints the map.
      */
-    protected void tryTakePicture() {
-        Direction botDir = bot.getAgtDir();
-        for (int offset = AgentSettings.SHORT_MIN; offset <= AgentSettings.SHORT_MAX; offset++) {
-            if (canTakePicture(botDir, offset)) {
-                if (botDir == Direction.NORTH) bot.takePicture(bot.getAgtRow(), bot.getAgtCol() + (1 + offset));
-                else if (botDir == Direction.EAST) bot.takePicture(bot.getAgtRow() - (1 + offset), bot.getAgtCol());
-                else if (botDir == Direction.WEST) bot.takePicture(bot.getAgtRow() + (1 + offset), bot.getAgtCol());
-                else bot.takePicture(bot.getAgtRow(), bot.getAgtCol() - (1 + offset));
-                break;
-            }
-        }
+    protected int[] senseAndRepaint() {
+        int[] sensorReadings = this.sense();
+        exploredArenaMap.repaint();
+
+        return sensorReadings;
     }
 
-    /**
-     * Check if the if the center cell on the RHS of the bot is wall/obstacle so can take picture
-     */
-    private boolean canTakePicture(Direction botDir, int offset) {
-        int row = bot.getAgtRow();
-        int col = bot.getAgtCol();
+//    /**
+//     * take picture and send out coordinate is there are walls/obstacles in surrounding
+//     */
+//    protected void tryTakePicture() {
+//        Direction botDir = bot.getAgtDir();
+//        for (int offset = AgentSettings.SHORT_MIN; offset <= AgentSettings.SHORT_MAX; offset++) {
+//            if (canTakePicture(botDir, offset)) {
+//                if (botDir == Direction.NORTH) bot.takePicture(bot.getAgtRow(), bot.getAgtCol() + (1 + offset));
+//                else if (botDir == Direction.EAST) bot.takePicture(bot.getAgtRow() - (1 + offset), bot.getAgtCol());
+//                else if (botDir == Direction.WEST) bot.takePicture(bot.getAgtRow() + (1 + offset), bot.getAgtCol());
+//                else bot.takePicture(bot.getAgtRow(), bot.getAgtCol() - (1 + offset));
+//                break;
+//            }
+//        }
+//    }
 
-        switch (botDir) {
-            case NORTH:
-                return exploredMap.isWallOrObstacleCell(row, col + (1 + offset));
-            case EAST:
-                return exploredMap.isWallOrObstacleCell(row - (1 + offset), col);
-            case SOUTH:
-                return exploredMap.isWallOrObstacleCell(row, col - (1 + offset));
-            case WEST:
-                return exploredMap.isWallOrObstacleCell(row + (1 + offset), col);
-        }
-
-        return false;
-    }
+//    /**
+//     * Check if the if the center cell on the RHS of the bot is wall/obstacle so can take picture
+//     */
+//    private boolean canTakePicture(Direction botDir, int offset) {
+//        int row = bot.getAgtRow();
+//        int col = bot.getAgtCol();
+//
+//        switch (botDir) {
+//            case NORTH:
+//                return exploredArenaMap.isWallOrObstacleCell(row, col + (1 + offset));
+//            case EAST:
+//                return exploredArenaMap.isWallOrObstacleCell(row - (1 + offset), col);
+//            case SOUTH:
+//                return exploredArenaMap.isWallOrObstacleCell(row, col - (1 + offset));
+//            case WEST:
+//                return exploredArenaMap.isWallOrObstacleCell(row + (1 + offset), col);
+//        }
+//
+//        return false;
+//    }
 
 
     /**
      * Checks if there's wall/obstacle in front of the bot so can alignfront
      */
-    private boolean canAlignFront(Direction botDir) {
+    boolean canAlignFront(Direction botDir) {
         int row = bot.getAgtRow();
         int col = bot.getAgtCol();
 
         switch (botDir) {
             case NORTH:
-                return exploredMap.isWallOrObstacleCell(row + 2, col - 1) && exploredMap.isWallOrObstacleCell(row + 2, col) && exploredMap.isWallOrObstacleCell(row + 2, col + 1);
+                return exploredArenaMap.isWallOrObstacleCell(row + 2, col - 1) && exploredArenaMap.isWallOrObstacleCell(row + 2, col) && exploredArenaMap.isWallOrObstacleCell(row + 2, col + 1);
             case EAST:
-                return exploredMap.isWallOrObstacleCell(row + 1, col + 2) && exploredMap.isWallOrObstacleCell(row, col + 2) && exploredMap.isWallOrObstacleCell(row - 1, col + 2);
+                return exploredArenaMap.isWallOrObstacleCell(row + 1, col + 2) && exploredArenaMap.isWallOrObstacleCell(row, col + 2) && exploredArenaMap.isWallOrObstacleCell(row - 1, col + 2);
             case SOUTH:
-                return exploredMap.isWallOrObstacleCell(row - 2, col - 1) && exploredMap.isWallOrObstacleCell(row - 2, col) && exploredMap.isWallOrObstacleCell(row - 2, col + 1);
+                return exploredArenaMap.isWallOrObstacleCell(row - 2, col - 1) && exploredArenaMap.isWallOrObstacleCell(row - 2, col) && exploredArenaMap.isWallOrObstacleCell(row - 2, col + 1);
             case WEST:
-                return exploredMap.isWallOrObstacleCell(row + 1, col - 2) && exploredMap.isWallOrObstacleCell(row, col - 2) && exploredMap.isWallOrObstacleCell(row - 1, col - 2);
+                return exploredArenaMap.isWallOrObstacleCell(row + 1, col - 2) && exploredArenaMap.isWallOrObstacleCell(row, col - 2) && exploredArenaMap.isWallOrObstacleCell(row - 1, col - 2);
         }
 
         return false;
@@ -574,7 +601,7 @@ abstract public class ExplorationAlgo {
     /**
      * Checks if there's wall/obstacle at RHS of the bot so can align right
      */
-    private boolean canAlignRight(Direction botDir) {
+    boolean canAlignRight(Direction botDir) {
 //        System.out.println(canAlignFront(Direction.clockwise90(botDir)));
         return canAlignFront(Direction.clockwise90(botDir));
     }
@@ -595,22 +622,22 @@ abstract public class ExplorationAlgo {
     /**
      * Turns the robot to the required direction.
      */
-    private void turnBotDirection(Direction targetDir) {
+    protected void turnBotDirection(Direction targetDir) {
         int numOfTurn = Math.abs(bot.getAgtDir().ordinal() - targetDir.ordinal()) / 2;
         if (numOfTurn > 2) numOfTurn = numOfTurn % 2;
 
         if (numOfTurn == 1) {
             if (Direction.clockwise90(bot.getAgtDir()) == targetDir) {
-                bot.takeAction(Actions.FACE_RIGHT, 0, exploredMap, realMap);
+                bot.takeAction(Actions.FACE_RIGHT, 0, exploredArenaMap, realArenaMap);
                 senseAndRepaint();
             } else {
-                bot.takeAction(Actions.FACE_LEFT, 0, exploredMap, realMap);
+                bot.takeAction(Actions.FACE_LEFT, 0, exploredArenaMap, realArenaMap);
                 senseAndRepaint();
             }
         } else if (numOfTurn == 2) {
-            bot.takeAction(Actions.FACE_RIGHT, 0, exploredMap, realMap);
+            bot.takeAction(Actions.FACE_RIGHT, 0, exploredArenaMap, realArenaMap);
             senseAndRepaint();
-            bot.takeAction(Actions.FACE_RIGHT, 0, exploredMap, realMap);
+            bot.takeAction(Actions.FACE_RIGHT, 0, exploredArenaMap, realArenaMap);
             senseAndRepaint();
         }
 
