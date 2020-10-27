@@ -25,7 +25,6 @@ import com.example.mdp.Chat.ChatAdapter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -76,8 +75,6 @@ public class MainActivity extends AppCompatActivity {
     // Bluetooth Connection
     BluetoothAdapter bluetoothAdapter;
 
-    //private static final UUID mdpUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -122,24 +119,31 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onValueChanged(int angle, int power, final int direction) {
                 int transformedDir;
+                String str;
                 switch (direction) {
                     case UP:
                         transformedDir = map.UP;
+                        str = "m:W";
                         break;
                     case DOWN:
+                        str = "m:S";
                         transformedDir = map.DOWN;
                         break;
                     case LEFT:
+                        str = "m:A";
                         transformedDir = map.LEFT;
                         break;
                     case RIGHT:
+                        str = "m:D";
                         transformedDir = map.RIGHT;
                         break;
                     default:
+                        str = "";
                         transformedDir = 90;
                         break;
                 }
                 if (power>=75) {
+                    BluetoothCommunication.writeMsg(str.getBytes(Charset.defaultCharset()));
                     map.moveRobot(transformedDir, automaticeUpdate);
                 }
             }
@@ -280,14 +284,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void activateSwitches () {
-//        touchSwitch = findViewById(R.id.touchSwitch);
-//        touchSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            @Override
-//            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-//                map.toggleTouchScreen();
-//            }
-//        });
-
         updateValueSwitch = findViewById(R.id.updateValue);
         updateValueSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -361,8 +357,6 @@ public class MainActivity extends AppCompatActivity {
             String commandContent = arr[1];
             if (commandWhat.equals("status")) {
                 receiveMessageStatus(commandContent);
-            } else if (commandWhat.equals("f")) {
-                receiveMessageFastestPath(commandContent);
             } else if (commandWhat.equals("s")) {
                 receiveMessageObstacle(commandContent, true);
             } else if(commandWhat.equals("M")) { //it is map descriptor
@@ -372,23 +366,6 @@ public class MainActivity extends AppCompatActivity {
             }
         } catch (Exception e) {
             return;
-        }
-    }
-
-    public void receiveMessageFastestPath (String str) {
-        String movement;
-        int n;
-        for (int i = 0; i<str.length(); i+=2) {
-            movement = str.substring(i, i+1);
-            n = Integer.parseInt(str.substring(i+1, i+2));
-            for (int j = 0; j<n; j++) {
-//                try {
-//                    Thread.sleep(500);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-                receiveMessageMovement(movement);
-            }
         }
     }
 
@@ -531,7 +508,6 @@ public class MainActivity extends AppCompatActivity {
             String[] arr = str.split(",");
             int x = Integer.parseInt(arr[0]);
             int y = Integer.parseInt(arr[1]);
-//            map.addObstacle(x, 19-y, map.WAYPOINT);
             map.setWaypoint(x, 19-y, automaticeUpdate);
 
             //Send to RPi
@@ -576,22 +552,4 @@ public class MainActivity extends AppCompatActivity {
     public void sendImagesCoordinate (View view) {
         sendChat(generateImageCoordinateString(), SENT_BY_ROBOT);
     }
-
-//    public void emergencyImg (View view) {
-//        String img = files.loadDataString("imageCoordinate");
-//        img = "img:"+img;
-//        sendChat(img, SENT_BY_ROBOT);
-//        BluetoothCommunication.writeMsg("IMAGE".getBytes(Charset.defaultCharset()));
-//    }
-
-//    public void emergencyMap (View view) {
-//        String map1 = files.loadDataString("map1");
-//        String map2 = files.loadDataString("map2");
-//        map1 = "map1:"+map1;
-//        map2 = "map2:"+map2;
-//        sendChat(map1, SENT_BY_ROBOT);
-//        sendChat(map2, SENT_BY_ROBOT);
-//        BluetoothCommunication.writeMsg("MDF".getBytes(Charset.defaultCharset()));
-//    }
-
 }
