@@ -14,8 +14,6 @@ from PIL import Image
 from math import ceil, floor
 
 from image_receiver import imagezmq_custom as imagezmq
-from utils import label_map_util
-from utils import visualization_utils as vis_util
 
 #packages for detect object
 import config
@@ -54,6 +52,7 @@ class ImageProcessingServer:
             cdt,frame = self.image_hub.recv_image()
 
             if(cdt == "END"):
+                # stitch images to show all identified obstacles
                 self.stitch_images()
                 print("Stitching Images...")
                 print("Image Processing Server Ended")
@@ -81,9 +80,6 @@ class ImageProcessingServer:
             else:
                 self.image_hub.send_reply(str(reply))
 
-            # to add in when image sending ends
-            # self.stitch_images()
-
     def detect_image(self, model, image, raw_image_name, cut_width, cut_height,cdt_list):
         # adjust brightness
         brightness = np.average(np.linalg.norm(image, axis=2)) / np.sqrt(3)
@@ -94,10 +90,8 @@ class ImageProcessingServer:
             brightness = np.average(np.linalg.norm(image, axis=2)) / np.sqrt(3)
 
         # run selective search on the image to generate bounding box proposal regions
-        # print("Running selective search...")
         ss = cv2.ximgproc.segmentation.createSelectiveSearchSegmentation()
         ss.setBaseImage(image)
-        # ss.switchToSelectiveSearchFast()
         ss.switchToSingleStrategy()
         rects = ss.process()
 
@@ -129,19 +123,16 @@ class ImageProcessingServer:
         # convert the proposals and bounding boxes into numpy arrays
         proposals = np.array(proposals, dtype="float32")
         boxes = np.array(boxes, dtype="float32")
-        # print("Proposal shape: {}".format(proposals.shape))
 
         # classify each of the proposal ROIs using fine-tuned model
-        # print("Classifying proposals using model...")
         proba = model.predict(proposals)
 
         # find the index of predictions that are positive for the classes
-        # print("Applying WBF...")
-        idxs = np.where(proba[:,:15]>config.MIN_PROBA)[0]
+        indexes = np.where(proba[:,:15]>config.MIN_PROBA)[0]
 
         # use the indexes to extract all bounding boxes with associated class and probabilities
-        boxes = boxes[idxs]
-        proba = proba[idxs][:, :15]
+        boxes = boxes[indexes]
+        proba = proba[indexes][:, :15]
 
         # get labels and scores of each bounding box
         labels = [0]*len(boxes)
@@ -177,6 +168,7 @@ class ImageProcessingServer:
             text = str(labels[i])
             box_width = abs(startX-endX)
             box_height = abs(startY-endY)
+            # split image into 3 and add coordinates to text
             for w in range(cut_width):
                 w = w+1
                 section_width = float(image.shape[1])/cut_width*w
@@ -188,23 +180,16 @@ class ImageProcessingServer:
                         else:
                             text = text + ", (" + cdt_list[2*w-2] + ", " + cdt_list[2*w-1] + ")"
                             break
-            # for h in range(cut_height):
-            #     h = h+1
-            #     section_height = float(image.shape[0])/cut_height*h
-            #     if startY<section_height:
-            #         if (box_height/2)<(section_height - startY):
-            #             text = text + cdt_list[1] + ")"
-            #             break
             if len(text)!=0:
                 cv2.putText(image, text, (startX, y),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 2)
+                # only add return image id to rpi if image id has not been detected before    
                 if labels[i] not in PROCESSED_IMAGE_IDS:
                     reply_list.append(text)
                     PROCESSED_IMAGE_IDS.append(labels[i])
         if len(reply_list)!=0:
             processed_image_path = 'processed_images/' + raw_image_name[:raw_image_name.rfind(".")] + "_processed" + IMAGE_ENCODING
             save_success = cv2.imwrite(processed_image_path, image)
-            # print('save image successful?', save_success)
         return reply_list
 
     def stitch_images(self):
@@ -212,28 +197,31 @@ class ImageProcessingServer:
         images_per_row = 5
         padding = 0
 
+        # read processed_images from disk
         os.chdir('processed_images')
         images = glob.glob("*.png")
 
         img_width, img_height = Image.open(images[0]).size
-        sf = (frame_width-(images_per_row-1)*padding)/(images_per_row*img_width)       #scaling factor
-        scaled_img_width = ceil(img_width*sf)                   #s
-        scaled_img_height = ceil(img_height*sf)
+        # set scaling factor
+        scale_factor = (frame_width-(images_per_row-1)*padding)/(images_per_row*img_width)
+        scaled_img_width = ceil(img_width*scale_factor)
+        scaled_img_height = ceil(img_height*scale_factor)
 
         number_of_rows = ceil(len(images)/images_per_row)
-        frame_height = ceil(sf*img_height*number_of_rows)
+        frame_height = ceil(scale_factor*img_height*number_of_rows)
 
-        new_im = Image.new('RGB', (frame_width, frame_height))
+        new_img = Image.new('RGB', (frame_width, frame_height))
 
         i,j=0,0
-        for num, im in enumerate(images):
+        for num, img in enumerate(images):
             if num%images_per_row==0:
                 i=0
-            im = Image.open(im)
-            im.thumbnail((scaled_img_width,scaled_img_height)) #resize image
+            img = Image.open(img)
+            # resize image
+            img.thumbnail((scaled_img_width,scaled_img_height)) 
             y_cord = (j//images_per_row)*scaled_img_height
-            new_im.paste(im, (i,y_cord))
+            new_img.paste(img, (i,y_cord))
             i=(i+scaled_img_width)+padding
             j+=1
-        new_im.save("stitched_output.png", "PNG", quality=80, optimize=True, progressive=True)
+        new_img.save("stitched_output.png", "PNG", quality=80, optimize=True, progressive=True)
         os.chdir("..")

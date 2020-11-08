@@ -1,11 +1,8 @@
-# coding: utf-8
 __author__ = 'ZFTurbo: https://kaggle.com/zfturbo'
-
 
 import warnings
 import numpy as np
 from numba import jit
-
 
 @jit(nopython=True)
 def bb_intersection_over_union(A, B) -> float:
@@ -55,34 +52,34 @@ def prefilter_boxes(boxes, scores, labels, weights, thr):
 
             # Box data checks
             if x2 < x1:
-                warnings.warn('X2 < X1 value in box. Swap them.')
+                warnings.warn('X2 < X1. Swap them.')
                 x1, x2 = x2, x1
             if y2 < y1:
-                warnings.warn('Y2 < Y1 value in box. Swap them.')
+                warnings.warn('Y2 < Y1. Swap them.')
                 y1, y2 = y2, y1
             if x1 < 0:
-                warnings.warn('X1 < 0 in box. Set it to 0.')
+                warnings.warn('X1 < 0. Set to 0.')
                 x1 = 0
             if x1 > 1:
-                warnings.warn('X1 > 1 in box. Set it to 1. Check that you normalize boxes in [0, 1] range.')
+                warnings.warn('X1 > 1. Set to 1. Normalize boxes in [0, 1] range.')
                 x1 = 1
             if x2 < 0:
-                warnings.warn('X2 < 0 in box. Set it to 0.')
+                warnings.warn('X2 < 0. Set to 0.')
                 x2 = 0
             if x2 > 1:
-                warnings.warn('X2 > 1 in box. Set it to 1. Check that you normalize boxes in [0, 1] range.')
+                warnings.warn('X2 > 1. Set to 1. Normalize boxes in [0, 1] range.')
                 x2 = 1
             if y1 < 0:
-                warnings.warn('Y1 < 0 in box. Set it to 0.')
+                warnings.warn('Y1 < 0. Set to 0.')
                 y1 = 0
             if y1 > 1:
-                warnings.warn('Y1 > 1 in box. Set it to 1. Check that you normalize boxes in [0, 1] range.')
+                warnings.warn('Y1 > 1. Set to 1. Normalize boxes in [0, 1] range.')
                 y1 = 1
             if y2 < 0:
-                warnings.warn('Y2 < 0 in box. Set it to 0.')
+                warnings.warn('Y2 < 0. Set to 0.')
                 y2 = 0
             if y2 > 1:
-                warnings.warn('Y2 > 1 in box. Set it to 1. Check that you normalize boxes in [0, 1] range.')
+                warnings.warn('Y2 > 1. Set to 1. Normalize boxes in [0, 1] range.')
                 y2 = 1
             if (x2 - x1) * (y2 - y1) == 0.0:
                 warnings.warn("Zero area box skipped: {}.".format(box_part))
@@ -102,13 +99,6 @@ def prefilter_boxes(boxes, scores, labels, weights, thr):
 
 
 def get_weighted_box(boxes, conf_type='avg'):
-    """
-    Create weighted box for set of boxes
-    :param boxes: set of boxes to fuse
-    :param conf_type: type of confidence one of 'avg' or 'max'
-    :return: weighted box
-    """
-
     box = np.zeros(6, dtype=np.float32)
     conf = 0
     conf_list = []
@@ -141,22 +131,6 @@ def find_matching_box(boxes_list, new_box, match_iou):
 
 
 def weighted_boxes_fusion(boxes_list, scores_list, labels_list, weights=None, iou_thr=0.1, skip_box_thr=0.9, conf_type='avg', allows_overflow=False):
-    '''
-    :param boxes_list: list of boxes predictions from each model, each box is 4 numbers.
-    It has 3 dimensions (models_number, model_preds, 4)
-    Order of boxes: x1, y1, x2, y2. We expect float normalized coordinates [0; 1]
-    :param scores_list: list of scores for each model
-    :param labels_list: list of labels for each model
-    :param weights: list of weights for each model. Default: None, which means weight == 1 for each model
-    :param iou_thr: IoU value for boxes to be a match
-    :param skip_box_thr: exclude boxes with score lower than this variable
-    :param conf_type: how to calculate confidence in weighted boxes. 'avg': average value, 'max': maximum value
-    :param allows_overflow: false if we want confidence score not exceed 1.0
-    :return: boxes: boxes coordinates (Order of boxes: x1, y1, x2, y2).
-    :return: scores: confidence score
-    :return: labels: boxes labels
-    '''
-
     if weights is None:
         weights = np.ones(len(boxes_list))
     if len(weights) != len(boxes_list):
