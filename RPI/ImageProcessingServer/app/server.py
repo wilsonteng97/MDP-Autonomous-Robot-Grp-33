@@ -2,7 +2,7 @@ import os
 import shutil
 import sys
 from datetime import datetime
-
+from image_receiver import imagezmq_custom as imagezmq
 import cv2
 import imutils
 import numpy as np
@@ -12,10 +12,6 @@ import PIL
 import glob
 from PIL import Image
 from math import ceil, floor
-
-from image_receiver import imagezmq_custom as imagezmq
-
-#packages for detect object
 import config
 import wbf
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
@@ -23,17 +19,13 @@ from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.models import load_model
 import timeit
 
-IMAGE_ENCODING = '.png'
-STOPPING_IMAGE = 'stop_image_processing.png'
+IMG_ENCODING = '.png'
 
-IMAGE_WIDTH = 500  # 400
-IMAGE_HEIGHT = 1080  # 225
+IMG_WIDTH = 500
 
-RAW_IMAGE_PREFIX = 'frame'
 PROCESSED_IMAGE_IDS = []
-PROCESSED_IMAGE_PREFIX = 'processed'
+
 sys.path.append("..")
-cwd_path = os.getcwd()
 
 class ImageProcessingServer:
     def __init__(self):
@@ -42,7 +34,7 @@ class ImageProcessingServer:
         # load the our fine-tuned model and label binarizer from disk
         print("Loading model...")
         self.model = load_model(config.MODEL_PATH)
-        lb = pickle.loads(open(config.ENCODER_PATH, "rb").read())
+        labelBin = pickle.loads(open(config.ENCODER_PATH, "rb").read())
 
     def start(self):
         print('\nStarted image processing server.\n')
@@ -60,10 +52,10 @@ class ImageProcessingServer:
                 
             print('Connected and received frame at time: ' + str(datetime.now()))
 
-            frame = imutils.resize(frame, width=IMAGE_WIDTH)
+            frame = imutils.resize(frame, width=IMG_WIDTH)
 
             # form image file path for saving
-            raw_image_name = cdt.replace(":","") + IMAGE_ENCODING
+            raw_image_name = cdt.replace(":","") + IMG_ENCODING
             raw_image_path = os.path.join('captured_images', raw_image_name)
             # save raw image
             save_success = cv2.imwrite(raw_image_path, frame)
@@ -90,68 +82,68 @@ class ImageProcessingServer:
             brightness = np.average(np.linalg.norm(image, axis=2)) / np.sqrt(3)
 
         # run selective search on the image to generate bounding box proposal regions
-        ss = cv2.ximgproc.segmentation.createSelectiveSearchSegmentation()
-        ss.setBaseImage(image)
-        ss.switchToSingleStrategy()
-        rects = ss.process()
+        selectiveSearch = cv2.ximgproc.segmentation.createSelectiveSearchSegmentation()
+        selectiveSearch.setBaseImage(image)
+        selectiveSearch.switchToSingleStrategy()
+        rects = selectiveSearch.process()
 
         # initialize the list of region proposals to classify and their respective bounding boxes
         proposals = []
         boxes = []
 
         # loop over the region proposal bounding box coordinates
-        for (x, y, w, h) in rects[:config.MAX_PROPOSALS_INFER]:
+        for (x, y, w, h) in rects[:config.MAX_PROPOSALS_INFER_NO]:
             # extract the region from the input image, convert it from BGR to RGB channel ordering
             roi = image[y:y + h, x:x + w]
             roi = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
             # resize input image to the input dimensions of our trained CNN
-            roi = cv2.resize(roi, config.INPUT_DIMS,
+            roi = cv2.resize(roi, config.INPUT_DIMENSIONS,
                 interpolation=cv2.INTER_CUBIC)
             # further preprocess by the ROI
             roi = img_to_array(roi)
             roi = preprocess_input(roi)
             #normalize box coordinates
-            x_2 = (x+w)/image.shape[1]
-            y_2 = (y+h)/image.shape[0]
+            x2 = (x+w)/image.shape[1]
+            y2 = (y+h)/image.shape[0]
             x = x/image.shape[1]
             y = y/image.shape[0]
 
             # update our proposals and bounding boxes lists
             proposals.append(roi)
-            boxes.append((x, y, x_2, y_2))
+            boxes.append((x, y, x2, y2))
 
         # convert the proposals and bounding boxes into numpy arrays
         proposals = np.array(proposals, dtype="float32")
         boxes = np.array(boxes, dtype="float32")
 
         # classify each of the proposal ROIs using fine-tuned model
-        proba = model.predict(proposals)
+        prob = model.predict(proposals)
 
         # find the index of predictions that are positive for the classes
-        indexes = np.where(proba[:,:15]>config.MIN_PROBA)[0]
+        indexes = np.where(prob[:,:15]>config.MIN_PROB)[0]
 
         # use the indexes to extract all bounding boxes with associated class and probabilities
         boxes = boxes[indexes]
-        proba = proba[indexes][:, :15]
+        prob = prob[indexes][:, :15]
 
         # get labels and scores of each bounding box
         labels = [0]*len(boxes)
         for i in range(len(boxes)):
             for j in range(15):
-                if proba[i][j]>config.MIN_PROBA:
+                if prob[i][j]>config.MIN_PROB:
                     labels[i]=j+1
         scores = [0]*len(boxes)
         for i in range(len(boxes)):
             for j in range(15):
-                if proba[i][j]>config.MIN_PROBA:
-                    if proba[i][j] > scores[i]:
-                        scores[i] = proba[i][j]
+                if prob[i][j]>config.MIN_PROB:
+                    if prob[i][j] > scores[i]:
+                        scores[i] = prob[i][j]
 
         boxes_list = [boxes]
         scores_list = [scores]
         labels_list = [labels]
         reply_list = []
-        boxes, scores, labels = wbf.weighted_boxes_fusion(boxes_list, scores_list, labels_list)
+        boxes, scores, labels = wbf.wbf(boxes_list, scores_list, labels_list)
 
         for i in range(len(boxes)):
             boxes[i][0]=boxes[i][0]*image.shape[1]
@@ -188,40 +180,40 @@ class ImageProcessingServer:
                     reply_list.append(text)
                     PROCESSED_IMAGE_IDS.append(labels[i])
         if len(reply_list)!=0:
-            processed_image_path = 'processed_images/' + raw_image_name[:raw_image_name.rfind(".")] + "_processed" + IMAGE_ENCODING
+            processed_image_path = 'processed_images/' + raw_image_name[:raw_image_name.rfind(".")] + "_processed" + IMG_ENCODING
             save_success = cv2.imwrite(processed_image_path, image)
         return reply_list
 
     def stitch_images(self):
-        frame_width = 1920
-        images_per_row = 5
+        frameWidth = 1920
+        imagesPerRow = 5
         padding = 0
 
         # read processed_images from disk
         os.chdir('processed_images')
         images = glob.glob("*.png")
 
-        img_width, img_height = Image.open(images[0]).size
+        imgWidth, imgHeight = Image.open(images[0]).size
         # set scaling factor
-        scale_factor = (frame_width-(images_per_row-1)*padding)/(images_per_row*img_width)
-        scaled_img_width = ceil(img_width*scale_factor)
-        scaled_img_height = ceil(img_height*scale_factor)
+        scaleFactor = (frameWidth-(imagesPerRow-1)*padding)/(imagesPerRow*imgWidth)
+        scaledImgWidth = ceil(imgWidth*scaleFactor)
+        scaledImgHeight = ceil(imgHeight*scaleFactor)
 
-        number_of_rows = ceil(len(images)/images_per_row)
-        frame_height = ceil(scale_factor*img_height*number_of_rows)
+        rowNo = ceil(len(images)/imagesPerRow)
+        frameHeight = ceil(scaleFactor*imgHeight*rowNo)
 
-        new_img = Image.new('RGB', (frame_width, frame_height))
+        newImg = Image.new('RGB', (frameWidth, frameHeight))
 
         i,j=0,0
-        for num, img in enumerate(images):
-            if num%images_per_row==0:
+        for idx, img in enumerate(images):
+            if idx%imagesPerRow==0:
                 i=0
             img = Image.open(img)
             # resize image
-            img.thumbnail((scaled_img_width,scaled_img_height)) 
-            y_cord = (j//images_per_row)*scaled_img_height
-            new_img.paste(img, (i,y_cord))
-            i=(i+scaled_img_width)+padding
+            img.thumbnail((scaledImgWidth,scaledImgHeight)) 
+            y_cord = (j//imagesPerRow)*scaledImgHeight
+            newImg.paste(img, (i,y_cord))
+            i=(i+scaledImgWidth)+padding
             j+=1
-        new_img.save("stitched_output.png", "PNG", quality=80, optimize=True, progressive=True)
+        newImg.save("stitched_output.png", "PNG", quality=80, optimize=True, progressive=True)
         os.chdir("..")
