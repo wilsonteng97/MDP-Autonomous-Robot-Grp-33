@@ -1,5 +1,7 @@
 .idea/
 /out
+Algorithms/.classpath
+Algorithms/.project
 *.pyc
 *.pyc
 *.pyc

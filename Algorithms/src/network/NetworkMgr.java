@@ -17,12 +17,12 @@ public class NetworkMgr {
     // Android Integration (Android --> PC)
     public static final String EXP_START = "ES|";                   // Start exploration (RPi send E| to Arduino)
     public static final String FP_START = "FS|";                    // Fastest path (RPi send F| to Arduino)
-    public static final String SEND_MDF_STR = "SendArena";          // Give MDF string
+//    public static final String SEND_MDF_STR = "SendArena";          // Give MDF string
     public static final String START_POS = "starting (x,y,s)";      // Determine starting point (x and y coordinates, s is a integer of direction: 0-up, 1-right, 2-down, 3-left)
     public static final String SET_WAYPOINT = "waypoint (x,y)";     // Set waypoint (x,y)
 
     // PC --> other components
-    public static final String MAP_STRINGS = "MAP";         // PC --> Android
+    public static final String MAP_STRINGS = "M";         // PC --> Android
     public static final String BOT_POS = "BOT_POS";         // PC --> Android
     public static final String BOT_START = "BOT_START";     // PC --> Arduino
     public static final String INSTRUCTIONS = "INSTR";      // PC --> Arduino
@@ -107,15 +107,20 @@ public class NetworkMgr {
     public boolean sendMsg(String msg, String msgType) {
         try {
             System.out.println("[sendMsg()] Sending Message...");
-            String outputMsg;
+            String outputMsg = msg;
             // FIXME finalize message format here
-            if (msg == null) {
-                outputMsg = msgType + "\n";
-            } else if (msgType.equals(MAP_STRINGS) || msgType.equals(BOT_POS)) {
-                outputMsg = msgType + " " + msg + "\n";
-            } else {
-                outputMsg = msgType + " " + msg + "\n";
+
+            if (msgType.equals(MAP_STRINGS)) {
+                outputMsg = MAP_STRINGS + msg;
             }
+
+//            if (msg == null) {
+//                outputMsg = msgType + "\n";
+//            } else if (msgType.equals(MAP_STRINGS) || msgType.equals(BOT_POS)) {
+//                outputMsg = msgType + " " + msg + "\n";
+//            } else {
+//                outputMsg = msgType + " " + msg + "\n";
+//            }
             out.write(outputMsg);
             out.flush(); msgCounter++;
             System.out.println("[sendMsg() | " + msgCounter + "] Message: " + outputMsg);
@@ -142,55 +147,16 @@ public class NetworkMgr {
 
     }
 
-    // A naive receiveMsg()
-//     public String receiveMsg() {
-//         try {
-//             System.out.println("[receiveMsg()] Receiving Message...");
-//             String receivedMsg, parsedMsg;
-//             StringBuilder msgParser = new StringBuilder();
-//             InputStream din=socket.getInputStream();
-//             while (true) {
-//                 if(din.available()!=0){
-//                     byte[] data321 = new byte[512];
-//                     din.read(data321);
-//                     receivedMsg=new String(data321, StandardCharsets.UTF_8);
-//                     for (int i = 0, n = receivedMsg.length(); i < n; i++) {
-//                         char c = receivedMsg.charAt(i);
-//                         msgParser.append(c);
-//                         if (c == '|') {
-//                             break;
-//                         }
-//                     }
-//                     parsedMsg = msgParser.toString();
-// //                    System.out.println("Message Length: " + parsedMsg.length());
-
-//                     if (parsedMsg != null && parsedMsg.length() > 0) {
-//                         System.out.println("[receiveMsg()] Received Message: "+parsedMsg);
-//                         return parsedMsg;
-//                     }
-//                 }
-//             }
-
-
-//         } catch (IOException e) {
-//             System.out.println("[receiveMsg()] Receiving Message Failed (IOException)!");
-//             return receiveMsg();
-//         } catch (Exception e) {
-//             System.out.println("[receiveMsg()] Receiving Message Failed!"); e.printStackTrace();
-//         }
-//         return null;
-//     }
-
     // Wait and receive Message
     public String receiveMsg() {
         try {
             System.out.println("[receiveMsg()] Receiving Message...");
             String receivedMsg;
             while (true) {
-                    receivedMsg = in.readLine();
-                    if (receivedMsg != null && receivedMsg.length() > 0) {
-                        System.out.println("[receiveMsg()] Received Message: "+receivedMsg);
-                        return receivedMsg;
+                receivedMsg = in.readLine();
+                if (receivedMsg != null && receivedMsg.length() > 0) {
+                    System.out.println("[receiveMsg()] Received Message: "+receivedMsg);
+                    return receivedMsg;
                 }
             }
         } catch (IOException e) {

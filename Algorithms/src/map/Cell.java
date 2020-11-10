@@ -24,6 +24,12 @@ public class Cell {
         this.virtualWall = false; this.obstacle = false;
     }
 
+    public Cell(int row, int col) {
+        this.coord = new Point(col, row);
+        this.explored = false; this.moveThru = false;
+        this.virtualWall = false; this.obstacle = false;
+    }
+
     // Methods
     public boolean isExplorableCell() {
         return !obstacle && !virtualWall;

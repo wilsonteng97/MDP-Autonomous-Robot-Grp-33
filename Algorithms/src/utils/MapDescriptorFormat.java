@@ -1,6 +1,6 @@
 package utils;
 
-import map.Map;
+import map.ArenaMap;
 import map.MapSettings;
 
 public class MapDescriptorFormat {
@@ -26,11 +26,11 @@ public class MapDescriptorFormat {
         return bin;
     }
 
-    public static String[] generateMapDescriptorFormat(Map map) {
+    public static String[] generateMapDescriptorFormat(ArenaMap arenaMap) {
         String[] ret = new String[2];
 
-        String Part1 = generateMDFStringPart1(map);
-        String Part2 = generateMDFStringPart2(map);
+        String Part1 = generateMDFStringPart1(arenaMap);
+        String Part2 = generateMDFStringPart2(arenaMap);
 
         ret[0] = Part1; ret[1] = Part2;
         System.out.println("P1: " + Part1 + "\nP2: " + Part2);
@@ -38,14 +38,14 @@ public class MapDescriptorFormat {
         return ret;
     }
 
-    public static String generateMDFStringPart1(Map map) {
+    public static String generateMDFStringPart1(ArenaMap arenaMap) {
         StringBuilder part1 = new StringBuilder();
         StringBuilder part1_bin = new StringBuilder();
         part1_bin.append("11");
         for (int r = 0; r < MapSettings.MAP_ROWS; r++) {
             for (int c = 0; c < MapSettings.MAP_COLS; c++) {
 
-                if (map.getCell(r, c).isExplored())
+                if (arenaMap.getCell(r, c).isExplored())
                     part1_bin.append("1");
                 else
                     part1_bin.append("0");
@@ -61,13 +61,13 @@ public class MapDescriptorFormat {
         return part1.toString();
     }
 
-    public static String generateMDFStringPart2(Map map) {
+    public static String generateMDFStringPart2(ArenaMap arenaMap) {
         StringBuilder part2 = new StringBuilder();
         StringBuilder part2_bin = new StringBuilder();
         for (int r = 0; r < MapSettings.MAP_ROWS; r++) {
             for (int c = 0; c < MapSettings.MAP_COLS; c++) {
-                if (map.getCell(r, c).isExplored()) {
-                    if (map.getCell(r, c).isObstacle())
+                if (arenaMap.getCell(r, c).isExplored()) {
+                    if (arenaMap.getCell(r, c).isObstacle())
                         part2_bin.append("1");
                     else
                         part2_bin.append("0");

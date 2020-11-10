@@ -1,0 +1,6 @@
+<resources>
+    <declare-styleable name="GameView">
+        <attr name="column_count" format="integer" />
+        <attr name="row_count" format="integer" />
+    </declare-styleable>
+</resources>

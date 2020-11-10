@@ -1,5 +1,7 @@
 package hardware;
 
+import java.awt.*;
+
 public class AgentSettings {
     // Agent Start Direction
     public static final Direction START_DIR = Direction.NORTH;
@@ -25,10 +27,17 @@ public class AgentSettings {
 
     // Sensors default range (In grids)
     public static final int SHORT_MIN = 1;
-    public static final int SHORT_MAX = 5;
+    public static final int SHORT_MAX = 2;
 
-    public static final int LONG_MIN = 2;
-    public static final int LONG_MAX = 7;
+    public static final int LONG_MIN = 1;
+    public static final int LONG_MAX = 5;
+
+    // Camera default range (In grids)
+    public static final int CAMERA_MIN = 1;
+    public static final int CAMERA_MAX = SHORT_MAX;     // Should be the same as SHORT_MAX
+
+    // Camera Direction
+    public static final Direction CAMERA_DIRECTION = Direction.EAST;
 
     public static final double RIGHT_THRES = 0.5;       // Threshold value or right sensor will calibrate once exceeded
     public static final double RIGHT_DIS_THRES_CLOSE = 1.0;
@@ -99,30 +108,34 @@ public class AgentSettings {
         RESET_ROBOT,                                // Reset Agent, sensors to initial position/direction.
                                                     // If applicable, reset Waypoint too.
 
+        TAKE_PICTURE,
+
         ERROR;                                      // Error
-          
+
           public static String print(Actions m) {
             switch (m) {
                 case FORWARD:
-                    return "F";
+                    return "W1|";
                 case BACKWARD:
-                    return "B";
+                    return "S|";
                 case FACE_RIGHT:
-                    return "FACE_RIGHT";
-                case MOVE_RIGHT:
-                    return "MR";
+                    return "D1|";
+//                case MOVE_RIGHT:
+//                    return "D1|";
                 case FACE_LEFT:
-                    return "FACE_LEFT";
-                case MOVE_LEFT:
-                    return "ML";
+                    return "A1|";
+//                case MOVE_LEFT:
+//                    return "A1|";
                 case START_EXP:
-                    return "START_EXP";
+                    return "ES";
                 case ALIGN_FRONT:
-                    return "ALIGN_FRONT";
+                    return "V|";
                 case ALIGN_RIGHT:
-                    return "ALIGN_RIGHT";
+                    return "B|";
                 case START_FAST:
-                    return "START_FAST";
+                    return "FS";
+                case TAKE_PICTURE:
+                    return "P|";
                 case ERROR:
                 default:
                     return "E";
