@@ -1,0 +1,26 @@
+<annotation>
+	<folder>train</folder>
+	<filename>80 (8).jpeg</filename>
+	<path>C:\tensorflow1\models\research\object_detection\images1\train\80 (8).jpeg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>1080</width>
+		<height>720</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>alphabet_x</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>451</xmin>
+			<ymin>341</ymin>
+			<xmax>770</xmax>
+			<ymax>649</ymax>
+		</bndbox>
+	</object>
+</annotation>

@@ -1,0 +1,26 @@
+<annotation>
+	<folder>images</folder>
+	<filename>imgx_1_2_2.jpg</filename>
+	<path>C:\Users\xiaoqing\Documents\school stuff\Year 3 Sem 1\CZ3004 MDP\image-rec-3\13_x\images\imgx_1_2_2.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>640</width>
+		<height>480</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>x</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>368</xmin>
+			<ymin>263</ymin>
+			<xmax>524</xmax>
+			<ymax>427</ymax>
+		</bndbox>
+	</object>
+</annotation>
