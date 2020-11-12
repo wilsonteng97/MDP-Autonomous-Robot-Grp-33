@@ -26,14 +26,9 @@ public class BluetoothCommunication {
     private static BluetoothDevice BTConnectionDevice;
 
     public static void startCommunication(BluetoothSocket socket) {
-
-        Log.d(TAG, "ConnectedThread: Starting");
-
         mmSocket = socket;
         InputStream tmpIn = null;
         OutputStream tmpOut = null;
-
-
         try {
             tmpIn = mmSocket.getInputStream();
             tmpOut = mmSocket.getOutputStream();
@@ -54,7 +49,6 @@ public class BluetoothCommunication {
                 numbytes = inputStream.read(buffer);
 
                 String incomingMessage = new String(buffer, 0, numbytes);
-                Log.d(TAG, "InputStream: " + incomingMessage);
 
                 //BROADCAST INCOMING MSG
                 Intent incomingMsgIntent = new Intent("IncomingMsg");
@@ -68,13 +62,10 @@ public class BluetoothCommunication {
                 connectionStatusIntent.putExtra("ConnectionStatus", "disconnect");
                 connectionStatusIntent.putExtra("Device",BTConnectionDevice);
                 LocalBroadcastManager.getInstance(mmContext).sendBroadcast(connectionStatusIntent);
-
-                Log.d(TAG, "chat service closed");
                 e.printStackTrace();
                 break;
 
             } catch (Exception e){
-                Log.d(TAG, "chat service closed"+ e);
                 e.printStackTrace();
 
             }
@@ -86,7 +77,6 @@ public class BluetoothCommunication {
     public static void write(byte[] bytes) {
 
         String text = new String(bytes, Charset.defaultCharset());
-        Log.d(TAG, "Write: Writing to outputstream: " + text);
 
         try {
             outPutStream.write(bytes);
@@ -100,7 +90,6 @@ public class BluetoothCommunication {
 
     // start communicating with remote device
     static void connected(BluetoothSocket mmSocket, BluetoothDevice BTDevice, Context context) {
-        Log.d(TAG, "Connected: Starting");
 
         BTConnectionDevice = BTDevice;
         mmContext = context;

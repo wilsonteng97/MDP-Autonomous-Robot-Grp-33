@@ -56,7 +56,6 @@ public class ConnectBT extends AppCompatActivity {
     StringBuilder incomingMessageSB;
     Button discoverBTN;
     Button connectBTN;
-    Button sendBTN;
     TextView searchStatusTV;
     TextView pairedDeviceTV;
     ProgressDialog progressDialog;
@@ -78,9 +77,6 @@ public class ConnectBT extends AppCompatActivity {
         discoverBTN = findViewById(R.id.btnStartDiscover);
         newDevicesLV = findViewById(R.id.newdeviceLV);
         pairedDevicesLV = findViewById(R.id.pairedDeviceLV);
-        sendBTN = findViewById(R.id.sendBtn);
-        sendMessageET = findViewById(R.id.messageET);
-        incomingMessageTV = findViewById(R.id.incomingMsgTV);
         searchStatusTV = findViewById(R.id.searchStatID);
         pairedDeviceTV = findViewById(R.id.pairedDeviceTV);
         incomingMessageSB = new StringBuilder();
@@ -205,14 +201,6 @@ public class ConnectBT extends AppCompatActivity {
 
                 }
                 pairedDevicesLV.setAdapter(pairedDeviceListAdapter);
-            }
-        });
-
-        sendBTN.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                byte[] bytes = sendMessageET.getText().toString().getBytes(Charset.defaultCharset());
-                BluetoothCommunication.writeMsg(bytes);
-                sendMessageET.setText("");
             }
         });
     }

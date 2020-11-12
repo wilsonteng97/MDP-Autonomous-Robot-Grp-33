@@ -1,0 +1,26 @@
+<annotation>
+	<folder>images</folder>
+	<filename>img7_2_2_3.jpg</filename>
+	<path>C:\Users\xiaoqing\Documents\school stuff\Year 3 Sem 1\CZ3004 MDP\image-rec-3\07_7\images\img7_2_2_3.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>640</width>
+		<height>480</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>7</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>376</xmin>
+			<ymin>323</ymin>
+			<xmax>465</xmax>
+			<ymax>441</ymax>
+		</bndbox>
+	</object>
+</annotation>

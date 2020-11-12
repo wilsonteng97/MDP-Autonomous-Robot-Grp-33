@@ -1,14 +1,9 @@
 package com.example.mdp;
-
-import android.content.pm.ActivityInfo;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Bundle;
-import android.content.Context;
 import android.util.Log;
-import android.widget.TextView;
 
 public class TiltSensor {
     SensorManager sensorManager;
