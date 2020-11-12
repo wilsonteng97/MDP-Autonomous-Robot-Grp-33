@@ -260,11 +260,6 @@ public class Simulator {
                     exploration = new RightWallHugging(explorationArenaMap, dummyArenaMap, agt, coverageLimit, timeLimit);
                 }
 
-//                if (!sim) {
-                    // Transmit signal to start Agent
-//                    NetworkMgr.getInstance().sendMsg(null, NetworkMgr.BOT_START);
-//                }
-
                 exploration.runExploration();
 
                 if (!sim) {

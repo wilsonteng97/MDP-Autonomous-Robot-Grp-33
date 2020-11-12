@@ -191,28 +191,6 @@ public class Agent {
 
 
     /**
-     * Initial Agent direction initialisation
-     */
-//    private AgentSettings.Direction referenceAgtDir(AgentSettings.Actions action) {
-//        switch (action) {
-//            case FACE_LEFT:
-//                this.agtDir = AgentSettings.Direction.antiClockwise90(agtDir);
-//            case FACE_RIGHT:
-//                this.agtDir = AgentSettings.Direction.clockwise90(agtDir);
-//            case FACE_REVERSE:
-//                this.agtDir = AgentSettings.Direction.reverse(agtDir);
-//        }
-//        return agtDir;
-//        if (action == AgentSettings.Actions.FACE_RIGHT) {
-//            return AgentSettings.Direction.clockwise90(agtDir);
-//        } else if (action == AgentSettings.Actions.FACE_LEFT) {
-//            return AgentSettings.Direction.antiClockwise90(agtDir);
-//        } else {
-//            return agtDir;
-//        }
-//    }
-
-    /**
      * Flexible agent action Methods
      * @return
      */

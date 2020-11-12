@@ -14,8 +14,6 @@ abstract public class FastestPathAlgo {
     protected AgentSettings.Direction curDir; // current direction of robot
     protected Cell current;                   // current Cell
     protected boolean explorationMode;
-//    private int waypointX;
-//    private int waypointY;
 
     /**
      * Constructor called during Fastest Path leaderboard.
@@ -24,8 +22,6 @@ abstract public class FastestPathAlgo {
     public FastestPathAlgo(ArenaMap exploredArenaMap, Agent bot) {
         this.realArenaMap = null;
         initObject(exploredArenaMap, bot);
-//        this.waypointX = waypointX;
-//        this.waypointY = waypointY;
     }
 
     /**
@@ -36,8 +32,6 @@ abstract public class FastestPathAlgo {
         this.realArenaMap = realArenaMap;
         this.explorationMode = true;
         initObject(exploredArenaMap, bot);
-//        this.waypointX = waypointX;
-//        this.waypointY = waypointY;
     }
 
     protected void initObject(ArenaMap arenaMap, Agent bot) {
@@ -53,9 +47,7 @@ abstract public class FastestPathAlgo {
     protected boolean canBeVisited(Cell c) {
         return c.isExplored() && !c.isObstacle() && !c.isVirtualWall();
     }
-//    protected boolean canBeVisited(Cell c) {
-//        return !c.isObstacle() && !c.isVirtualWall();
-//    }
+
 
     /**
      * Returns the target direction of the bot from [botR, botC] to target Cell.

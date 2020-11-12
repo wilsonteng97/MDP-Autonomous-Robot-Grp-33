@@ -18,9 +18,7 @@ import java.util.logging.Logger;
 
 import static hardware.AgentSettings.Actions.ALIGN_RIGHT;
 import static hardware.AgentSettings.Direction.*;
-import static hardware.AgentSettings.Direction.SOUTH;
 import static network.NetworkMgr.INSTRUCTIONS;
-import static utils.MsgParsingUtils.parseFastestPathString;
 import static utils.MsgParsingUtils.parsePictureMsg;
 import static utils.SimulatorSettings.GOHOMESLOW_SLEEP;
 import static utils.SimulatorSettings.SIM;

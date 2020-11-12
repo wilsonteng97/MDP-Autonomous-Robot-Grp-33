@@ -300,34 +300,6 @@ public class AStarHeuristicSearch extends FastestPathAlgo {
                 bot.takeActionNotSent(x, 1, exploredArenaMap, realArenaMap);
                 this.exploredArenaMap.repaint();
             }
-
-
-//            int fCount = 0;
-//            for (Actions x : movements) {
-//                if (x == Actions.FORWARD) {
-//                    fCount++;
-//                    if (fCount == 10) {
-//                        bot.takeAction(Actions.FORWARD, fCount, exploredArenaMap, realArenaMap);
-//                        fCount = 0;
-//                        exploredArenaMap.repaint();
-//                    }
-//                } else if (x == Actions.FACE_RIGHT || x == Actions.FACE_LEFT) {
-//                    if (fCount > 0) {
-//                        bot.takeAction(Actions.FORWARD, fCount, exploredArenaMap, realArenaMap);
-//                        fCount = 0;
-//                        exploredArenaMap.repaint();
-//                    }
-//
-//                    bot.takeAction(x, 1, exploredArenaMap, realArenaMap);
-//                    exploredArenaMap.repaint();
-//                }
-//            }
-//
-//            if (fCount > 0) {
-//                bot.takeAction(Actions.FORWARD, fCount, exploredArenaMap, realArenaMap);
-//                exploredArenaMap.repaint();
-//            }
-//            NetworkMgr.getInstance().sendMsg(outputString + "", NetworkMgr.INSTRUCTIONS);
         }
 
         System.out.println("\nMovements: " + outputString.toString());

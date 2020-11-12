@@ -6,7 +6,6 @@ import hardware.AgentSettings;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
@@ -63,15 +62,11 @@ public class ArenaMap extends JPanel {
         setVirtualWallIfBorder(row, col);
         // Set obstacle virtual walls
         if (this.grid[row][col].isObstacle()) {
-//            System.out.printf(" ->grid[%d][%d] is obstacle\n", row, col);
-//            if (inStartZone(row, col) || inGoalZone(row, col)) return;
             for (int r = row - 1; r <= row + 1; r++)
                 for (int c = col - 1; c <= col + 1; c++)
                     if (checkValidCell(r, c)) {
-//                        System.out.println("Setting Virtual wall at " + "[" + r + ", " + c + "]");
                         this.grid[r][c].setVirtualWall(true);
                     }
-
         }
     }
     public void resetVirtualWalls(int row, int col) {
@@ -316,16 +311,6 @@ public class ArenaMap extends JPanel {
         }
         return true;
     }
-    
-//    public boolean checkCanMoveThruCell(int row, int col) {
-//        for(int r = row-1; r <= row+1; r++) {
-//            for(int c = col-1; c <= col+1; c++) {
-//                if(!grid[r][c].isMoveThru())
-//                    return true;
-//            }
-//        }
-//        return false;
-//    }
 
     /**
      * Reset ArenaMap Method
